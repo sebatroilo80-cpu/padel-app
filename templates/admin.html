@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - 37 Pádel Club</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="contenedor">
+
+        <div class="topbar">
+            <div class="topbar-left">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-admin">
+                <div>
+                    <h1 class="titulo-admin">Panel Admin</h1>
+                    <p class="sub-admin">37 Pádel Club</p>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <a href="/configuracion" class="btn-top btn-azul">Configurar precios</a>
+                <a href="/logout" class="btn-top btn-rojo">Salir</a>
+            </div>
+        </div>
+
+        <div class="cards-resumen">
+            <div class="card-resumen verde">
+                <div class="card-label">Saldo de hoy</div>
+                <div class="card-value">${{ total_hoy }}</div>
+            </div>
+
+            <div class="card-resumen azul">
+                <div class="card-label">Saldo del mes</div>
+                <div class="card-value">${{ total_mes }}</div>
+            </div>
+
+            <div class="card-resumen violeta">
+                <div class="card-label">Saldo del año</div>
+                <div class="card-value">${{ total_anio }}</div>
+            </div>
+        </div>
+
+        <div class="cards-info">
+            <div class="card-info">
+                <h3>Caja de hoy</h3>
+                <p>Ingresos: <strong>${{ ingresos_hoy }}</strong></p>
+                <p>Egresos: <strong>${{ egresos_hoy }}</strong></p>
+            </div>
+
+            <div class="card-info">
+                <h3>Métodos de pago</h3>
+                <p>Efectivo: <strong>${{ efectivo_hoy }}</strong></p>
+                <p>Transferencia: <strong>${{ transferencia_hoy }}</strong></p>
+                <p>Mercado Pago: <strong>${{ mercado_pago_hoy }}</strong></p>
+                <p>QR: <strong>${{ qr_hoy }}</strong></p>
+            </div>
+        </div>
+
+        <div class="bloque-seccion">
+            <div class="seccion-header">
+                <h2>Agenda del día</h2>
+            </div>
+
+            <form method="GET" action="/admin" class="form-agenda">
+                <input type="date" name="fecha" value="{{ fecha_admin }}" class="campo fecha-agenda">
+                <button type="submit" class="boton boton-agenda">Ver agenda</button>
+            </form>
+
+            <div class="leyenda">
+                <div class="item"><span class="color-box leyenda-libre"></span> Libre</div>
+                <div class="item"><span class="color-box pago-efectivo"></span> Efectivo</div>
+                <div class="item"><span class="color-box pago-transferencia"></span> Transferencia</div>
+                <div class="item"><span class="color-box pago-mp"></span> Mercado Pago</div>
+                <div class="item"><span class="color-box pago-qr"></span> QR</div>
+            </div>
+
+            <p class="texto-ayuda">
+                Doble clic en una celda libre para cargar una reserva. Doble clic en una ocupada para editar.
+            </p>
+
+            <div class="agenda-scroll">
+                <table class="agenda-grid">
+                    <thead>
+                        <tr>
+                            <th class="th-hora">Horario</th>
+                            {% for cancha in canchas %}
+                            <th>{{ cancha }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for horario in horarios %}
+                        <tr>
+                            <td class="hora-col">{{ horario }}</td>
+
+                            {% for cancha in canchas %}
+                                {% set celda = grilla[horario][cancha] %}
+                                <td class="celda-grid">
+
+                                    {% if celda.estado == "libre" %}
+                                        <div
+                                            ondblclick="abrirModal('{{ fecha_admin }}', '{{ cancha }}', '{{ horario }}')"
+                                            class="modulo modulo-libre">
+                                            <div class="modulo-titulo">Libre</div>
+                                            <div class="modulo-sub">Doble clic</div>
+                                        </div>
+
+                                    {% elif celda.estado == "inicio" %}
+                                        {% set reserva = celda.reserva %}
+                                        {% set mp = reserva[8] %}
+                                        {% set estado = reserva[9] %}
+                                        <div
+                                            ondblclick="window.location.href='/editar/{{ reserva[0] }}'"
+                                            class="modulo modulo-turno modulo-inicio
+                                            {% if mp == 'Efectivo' %} pago-efectivo
+                                            {% elif mp == 'Transferencia' %} pago-transferencia
+                                            {% elif mp == 'Mercado Pago' %} pago-mp
+                                            {% elif mp == 'QR' %} pago-qr
+                                            {% else %} pago-sin-metodo
+                                            {% endif %}">
+                                            <div class="modulo-titulo">Reservada</div>
+                                            <div class="modulo-sub">{{ mp }}</div>
+                                            <div class="badge-estado {% if estado == 'Pagado' %}estado-pagado{% else %}estado-reserva{% endif %}">
+                                                {{ estado }}
+                                            </div>
+                                        </div>
+
+                                    {% elif celda.estado == "continuacion" %}
+                                        {% set reserva = celda.reserva %}
+                                        {% set mp = reserva[8] %}
+                                        <div
+                                            ondblclick="window.location.href='/editar/{{ reserva[0] }}'"
+                                            class="modulo modulo-turno modulo-continuacion
+                                            {% if mp == 'Efectivo' %} pago-efectivo
+                                            {% elif mp == 'Transferencia' %} pago-transferencia
+                                            {% elif mp == 'Mercado Pago' %} pago-mp
+                                            {% elif mp == 'QR' %} pago-qr
+                                            {% else %} pago-sin-metodo
+                                            {% endif %}">
+                                        </div>
+                                    {% endif %}
+
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bloque-seccion">
+            <div class="seccion-header">
+                <h2>Reporte mensual</h2>
+            </div>
+
+            <div class="tabla-scroll">
+                <table class="tabla-simple">
+                    <thead>
+                        <tr>
+                            <th>Mes</th>
+                            <th>Ingresos</th>
+                            <th>Egresos</th>
+                            <th>Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in reporte_mensual %}
+                        <tr>
+                            <td>{{ item.mes }}</td>
+                            <td>${{ item.ingresos }}</td>
+                            <td>${{ item.egresos }}</td>
+                            <td>${{ item.saldo }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bloque-seccion">
+            <div class="seccion-header">
+                <h2>Cargar egreso</h2>
+            </div>
+
+            <form action="/agregar-egreso" method="POST" class="form-card">
+                <input type="date" name="fecha" class="campo" required>
+                <input type="text" name="descripcion" placeholder="Descripción del egreso" class="campo" required>
+                <input type="number" name="monto" placeholder="Monto" class="campo" required>
+                <button type="submit" class="boton">Guardar egreso</button>
+            </form>
+        </div>
+
+        <div class="bloque-seccion">
+            <div class="seccion-header">
+                <h2>Reservas cargadas</h2>
+            </div>
+
+            {% if reservas %}
+                <div class="lista-cards">
+                    {% for r in reservas %}
+                        {% set precio = r[7] %}
+                        {% set pagado = r[10] %}
+                        {% set falta = precio - pagado %}
+                        <div class="card-lista">
+                            <strong>{{ r[1] }}</strong><br>
+                            Teléfono: {{ r[2] or '-' }}<br>
+                            Fecha: {{ r[3] }}<br>
+                            Cancha: {{ r[4] }}<br>
+                            Duración: {{ r[5] }}<br>
+                            Horario: {{ r[6] }}<br>
+                            Precio total: ${{ precio }}<br>
+                            Pagó: ${{ pagado }}<br>
+                            Falta: ${{ falta }}<br>
+                            Método de pago: {{ r[8] }}<br>
+                            Estado: {{ r[9] }}<br><br>
+
+                            <a href="/editar/{{ r[0] }}" class="btn-top btn-azul btn-mini">Editar</a>
+                            <a href="/eliminar/{{ r[0] }}"
+                               onclick="return confirm('¿Seguro que querés eliminar esta reserva?')"
+                               class="btn-top btn-rojo btn-mini">
+                               Eliminar
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No hay reservas todavía.</p>
+            {% endif %}
+        </div>
+
+        <div class="bloque-seccion">
+            <div class="seccion-header">
+                <h2>Egresos cargados</h2>
+            </div>
+
+            {% if egresos %}
+                <div class="lista-cards">
+                    {% for e in egresos %}
+                        <div class="card-egreso">
+                            <strong>{{ e[2] }}</strong><br>
+                            Fecha: {{ e[1] }}<br>
+                            Monto: ${{ e[3] }}<br><br>
+
+                            <a href="/eliminar-egreso/{{ e[0] }}"
+                               onclick="return confirm('¿Seguro que querés eliminar este egreso?')"
+                               class="btn-top btn-rojo btn-mini">
+                               Eliminar egreso
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No hay egresos cargados.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="modalReserva" class="modal-fondo">
+        <div class="modal-caja">
+            <h2>Nueva reserva</h2>
+
+            <form action="/admin-reservar" method="POST">
+                <input type="text" name="nombre" placeholder="Nombre y apellido" class="campo" required>
+                <input type="date" name="fecha" id="modal_fecha" class="campo" required>
+                <input type="text" name="cancha" id="modal_cancha" class="campo" readonly required>
+
+                <select name="duracion" id="modal_duracion" class="campo" required>
+                    <option value="">Duración</option>
+                    <option>60 minutos</option>
+                    <option>90 minutos</option>
+                </select>
+
+                <input type="text" name="horario" id="modal_horario" class="campo" readonly required>
+
+                <select name="metodo_pago" class="campo" required>
+                    <option value="">Método de pago</option>
+                    <option>Transferencia</option>
+                    <option>Mercado Pago</option>
+                    <option>Efectivo</option>
+                    <option>QR</option>
+                </select>
+
+                <select name="opcion_pago" class="campo" required>
+                    <option value="">Cómo querés cobrar</option>
+                    <option value="Reserva">Reserva (30%)</option>
+                    <option value="Pagado">Pago total</option>
+                </select>
+
+                <p id="modal_precio" class="precio-modal"></p>
+
+                <div class="modal-botones">
+                    <button type="submit" class="boton">Guardar reserva</button>
+                    <button type="button" onclick="cerrarModal()" class="btn-cancelar">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const config = {{ config|tojson }};
+
+        function abrirModal(fecha, cancha, horario) {
+            document.getElementById("modal_fecha").value = fecha;
+            document.getElementById("modal_cancha").value = cancha;
+            document.getElementById("modal_horario").value = horario;
+            document.getElementById("modal_duracion").value = "";
+            document.getElementById("modal_precio").innerText = "";
+            document.getElementById("modalReserva").style.display = "flex";
+        }
+
+        function cerrarModal() {
+            document.getElementById("modalReserva").style.display = "none";
+        }
+
+        function calcularPrecioModal() {
+            const duracion = document.getElementById("modal_duracion").value;
+            const horario = document.getElementById("modal_horario").value;
+            const texto = document.getElementById("modal_precio");
+
+            if (!duracion || !horario) {
+                texto.innerText = "";
+                return;
+            }
+
+            const hora = parseInt(horario.split(":")[0], 10);
+            let precio = 0;
+
+            if (hora < 18) {
+                precio = duracion === "60 minutos" ? config[0] : config[2];
+            } else {
+                precio = duracion === "60 minutos" ? config[1] : config[3];
+            }
+
+            texto.innerText = "Precio: $" + precio;
+        }
+
+        document.getElementById("modal_duracion").addEventListener("change", calcularPrecioModal);
+    </script>
+</body>
+</html>

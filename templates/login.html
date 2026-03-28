@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="contenedor">
+        <div class="header">
+            <img src="{{ url_for('static', filename='logo.png') }}" width="50">
+            <h1>Login Admin</h1>
+        </div>
+
+        <form method="POST" action="/login" style="margin-top: 20px;">
+            <input type="text" name="usuario" placeholder="Usuario" class="campo" required>
+            <input type="password" name="clave" placeholder="Contraseña" class="campo" required>
+            <button type="submit" class="boton" style="margin-top: 12px;">Ingresar</button>
+        </form>
+
+        {% if error %}
+            <p style="color: red; margin-top: 12px;">{{ error }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
