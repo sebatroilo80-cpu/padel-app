@@ -57,14 +57,21 @@ def crear_preferencia_mp(data):
     url = "https://api.mercadopago.com/checkout/preferences"
 
     payload = {
-        "items": [{
-            "title": f"Reserva {data['cancha']} {data['fecha']} {data['horario']}",
-            "quantity": 1,
-            "currency_id": "ARS",
-            "unit_price": float(data["monto"])
-        }],
-        "external_reference": data["id"]
-    }
+    "items": [{
+        "title": f"Reserva {data['cancha']} {data['fecha']} {data['horario']}",
+        "quantity": 1,
+        "currency_id": "ARS",
+        "unit_price": float(data["monto"])
+    }],
+    "external_reference": data["id"],
+    "back_urls": {
+        "success": f"{base_url}/mp/success",
+        "failure": f"{base_url}/mp/failure",
+        "pending": f"{base_url}/mp/pending"
+    },
+    "notification_url": f"{base_url}/webhook/mercadopago",
+    "auto_return": "approved"
+}
 
     headers = {
         "Authorization": f"Bearer {MP_ACCESS_TOKEN}",
@@ -358,6 +365,48 @@ def webhook_mercadopago():
 
         resp = requests.get(url, headers=headers)
         pago = resp.json()
+
+        if pago.get("status") == "approved":
+
+           ref = pago.get("external_reference")
+
+           if not ref:
+                print("❌ No hay external_reference")
+                return jsonify({"ok": True}), 200
+
+    print("📦 REF:", ref)
+
+conn = sqlite3.connect("padel.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+    SELECT cliente, fecha, hora, cancha, precio
+    FROM turnos
+    WHERE id = ?
+""", (ref,))
+
+turno = cursor.fetchone()
+
+if turno:
+    cliente, fecha, hora, cancha, precio = turno
+
+    cursor.execute("""
+        UPDATE turnos
+        SET pagado = 1
+        WHERE id = ?
+    """, (ref,))
+
+    cursor.execute("""
+        INSERT INTO movimientos (fecha, tipo, concepto, monto, metodo_pago)
+        VALUES (?, 'ingreso', ?, ?, 'mercadopago')
+    """, (
+        fecha,
+        f"Turno {cliente} - Cancha {cancha} {hora}",
+        precio
+    ))
+
+    conn.commit()
+    conn.close()
 
         print("DETALLE PAGO:", pago)
 
