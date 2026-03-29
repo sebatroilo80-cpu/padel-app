@@ -54,24 +54,27 @@ def calcular_precio(cursor, duracion, horario):
         return precio_60_noche if duracion == "60 minutos" else precio_90_noche
 
 def crear_preferencia_mp(data):
+    import os
+
+    base_url = os.getenv("BASE_URL")
     url = "https://api.mercadopago.com/checkout/preferences"
 
     payload = {
-    "items": [{
-        "title": f"Reserva {data['cancha']} {data['fecha']} {data['horario']}",
-        "quantity": 1,
-        "currency_id": "ARS",
-        "unit_price": float(data["monto"])
-    }],
-    "external_reference": data["id"],
-    "back_urls": {
-        "success": f"{base_url}/mp/success",
-        "failure": f"{base_url}/mp/failure",
-        "pending": f"{base_url}/mp/pending"
-    },
-    "notification_url": f"{base_url}/webhook/mercadopago",
-    "auto_return": "approved"
-}
+        "items": [{
+            "title": f"Reserva {data['cancha']} {data['fecha']} {data['horario']}",
+            "quantity": 1,
+            "currency_id": "ARS",
+            "unit_price": float(data["monto"])
+        }],
+        "external_reference": data["id"],
+        "back_urls": {
+            "success": f"{base_url}/mp/success",
+            "failure": f"{base_url}/mp/failure",
+            "pending": f"{base_url}/mp/pending"
+        },
+        "notification_url": f"{base_url}/webhook/mercadopago",
+        "auto_return": "approved"
+    }
 
     headers = {
         "Authorization": f"Bearer {MP_ACCESS_TOKEN}",
@@ -84,8 +87,9 @@ def crear_preferencia_mp(data):
         print("ERROR MP:", r.text)
         return None
 
-    data = r.json()
-    return data.get("init_point") or data.get("sandbox_init_point")
+    data_resp = r.json()
+    print("INIT POINT:", data_resp.get("init_point") or data_resp.get("sandbox_init_point"))
+    return data_resp.get("init_point") or data_resp.get("sandbox_init_point")
 
 def slots_reserva(horario, duracion):
     horarios = generar_horarios()
