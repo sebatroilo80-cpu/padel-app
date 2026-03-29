@@ -343,11 +343,11 @@ def reservar():
 
 @app.route("/webhook/mercadopago", methods=["POST"])
 def webhook_mercadopago():
-    data = request.get_json(silent=True) or {}
-
-    print("WEBHOOK MP:", data)
-
     try:
+        data = request.get_json(silent=True) or {}
+        print("WEBHOOK MP:", data)
+
+        # Solo procesar pagos
         if data.get("type") != "payment":
             return jsonify({"ok": True}), 200
 
@@ -360,111 +360,73 @@ def webhook_mercadopago():
 
         access_token = os.getenv("MP_ACCESS_TOKEN")
 
-
+        # Consultar el pago en MercadoPago
         url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
-        headers = {"Authorization": f"Bearer {access_token}"}
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
 
         resp = requests.get(url, headers=headers)
         pago = resp.json()
 
-        if pago.get("status") == "approved":
-
-           ref = pago.get("external_reference")
-
-           if not ref:
-                print("❌ No hay external_reference")
-                return jsonify({"ok": True}), 200
-
-    print("📦 REF:", ref)
-
-conn = sqlite3.connect("padel.db")
-cursor = conn.cursor()
-
-cursor.execute("""
-    SELECT cliente, fecha, hora, cancha, precio
-    FROM turnos
-    WHERE id = ?
-""", (ref,))
-
-turno = cursor.fetchone()
-
-if turno:
-    cliente, fecha, hora, cancha, precio = turno
-
-    cursor.execute("""
-        UPDATE turnos
-        SET pagado = 1
-        WHERE id = ?
-    """, (ref,))
-
-    cursor.execute("""
-        INSERT INTO movimientos (fecha, tipo, concepto, monto, metodo_pago)
-        VALUES (?, 'ingreso', ?, ?, 'mercadopago')
-    """, (
-        fecha,
-        f"Turno {cliente} - Cancha {cancha} {hora}",
-        precio
-    ))
-
-    conn.commit()
-    conn.close()
-
         print("DETALLE PAGO:", pago)
 
+        # Solo si está aprobado
         if pago.get("status") != "approved":
             return jsonify({"ok": True}), 200
 
-        external_id = pago.get("external_reference")
+        ref = pago.get("external_reference")
 
-        # 🔥 recuperar datos guardados antes del pago
-        reserva = session.get("reserva_mp")
-
-        if not reserva:
-            print("No hay datos de reserva en session")
+        if not ref:
+            print("❌ No hay external_reference")
             return jsonify({"ok": True}), 200
 
-        import sqlite3
+        print("📦 REF:", ref)
 
+        # Conexión a DB
+        import sqlite3
         conn = sqlite3.connect("padel.db")
         cursor = conn.cursor()
 
+        # Buscar el turno
         cursor.execute("""
-            INSERT INTO reservas (nombre, telefono, fecha, cancha, duracion, horario, precio, pagado, metodo_pago)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            reserva["nombre"],
-            reserva["telefono"],
-            reserva["fecha"],
-            reserva["cancha"],
-            reserva["duracion"],
-            reserva["horario"],
-            reserva["precio"],
-            reserva["precio"],
-            "Mercado Pago"
-        ))
+            SELECT cliente, fecha, hora, cancha, precio
+            FROM turnos
+            WHERE id = ?
+        """, (ref,))
 
-        cursor.execute("""
-            INSERT INTO movimientos (fecha, tipo, concepto, monto, metodo_pago)
-            VALUES (?, ?, ?, ?, ?)
-        """, (
-            reserva["fecha"],
-            "ingreso",
-            f"Reserva MP - {reserva['nombre']}",
-            reserva["precio"],
-            "Mercado Pago"
-        ))
+        turno = cursor.fetchone()
 
-        conn.commit()
-        conn.close()
+        if turno:
+            cliente, fecha, hora, cancha, precio = turno
 
-        print("✅ RESERVA GUARDADA AUTOMÁTICAMENTE")
+            # Marcar como pagado
+            cursor.execute("""
+                UPDATE turnos
+                SET pagado = 1
+                WHERE id = ?
+            """, (ref,))
+
+            # Registrar ingreso en caja
+            cursor.execute("""
+                INSERT INTO movimientos (fecha, tipo, concepto, monto, metodo_pago)
+                VALUES (?, 'ingreso', ?, ?, 'mercadopago')
+            """, (
+                fecha,
+                f"Turno {cliente} - Cancha {cancha} {hora}",
+                precio
+            ))
+
+            conn.commit()
+            conn.close()
+
+            print("✅ RESERVA GUARDADA AUTOMÁTICAMENTE")
+
+        return jsonify({"ok": True}), 200
 
     except Exception as e:
-    print("❌ ERROR WEBHOOK:", e)
-    return jsonify({"ok": False}), 200
-
-    return jsonify({"ok": True}), 200
-
+        print("❌ ERROR WEBHOOK:", e)
+        return jsonify({"ok": False}), 200
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
