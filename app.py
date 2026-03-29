@@ -360,6 +360,7 @@ def webhook_mercadopago():
 
         access_token = os.getenv("MP_ACCESS_TOKEN")
 
+
         url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
         headers = {"Authorization": f"Bearer {access_token}"}
 
@@ -459,9 +460,11 @@ if turno:
         print("✅ RESERVA GUARDADA AUTOMÁTICAMENTE")
 
     except Exception as e:
-        print("ERROR WEBHOOK:", e)
+    print("❌ ERROR WEBHOOK:", e)
+    return jsonify({"ok": False}), 200
 
     return jsonify({"ok": True}), 200
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
