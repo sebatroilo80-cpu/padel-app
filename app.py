@@ -966,6 +966,54 @@ def eliminar_reserva(id):
 
     return redirect("/admin")
 
+@app.route("/confirmar_transferencia/<int:id>")
+def confirmar_transferencia(id):
+    if not session.get("admin"):
+        return redirect("/login")
+
+    conn = sqlite3.connect("padel.db")
+    cursor = conn.cursor()
+
+    # Buscar la reserva
+    cursor.execute("""
+        SELECT fecha, nombre, cancha, horario, precio, pagado, metodo_pago
+        FROM reservas
+        WHERE id = ?
+    """, (id,))
+    reserva = cursor.fetchone()
+
+    if not reserva:
+        conn.close()
+        return "Reserva no encontrada"
+
+    fecha, nombre, cancha, horario, precio, pagado, metodo_pago = reserva
+
+    # Marcar como pagado
+    cursor.execute("""
+        UPDATE reservas
+        SET estado_pago = 'Pagado',
+            pagado = precio
+        WHERE id = ?
+    """, (id,))
+
+    # Registrar ingreso en caja
+    descripcion = f"Pago confirmado reserva #{id} - {nombre} - {cancha} - {horario}"
+
+    cursor.execute("""
+        INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        fecha,
+        "ingreso",
+        descripcion,
+        precio,
+        metodo_pago
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin")
 
 @app.route("/eliminar-egreso/<int:id>")
 def eliminar_egreso(id):
