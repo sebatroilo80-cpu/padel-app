@@ -513,7 +513,6 @@ def admin():
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
 
-    # Crear tabla movimientos si no existe
     try:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS movimientos (
@@ -533,18 +532,12 @@ def admin():
     if not fecha_admin:
         fecha_admin = date.today().strftime("%Y-%m-%d")
 
-    # =========================
-    # TODAS las reservas
-    # =========================
     cursor.execute("""
         SELECT * FROM reservas
         ORDER BY fecha DESC, horario ASC
     """)
     reservas = cursor.fetchall()
 
-    # =========================
-    # Reservas del día elegido
-    # =========================
     cursor.execute("""
         SELECT * FROM reservas
         WHERE fecha = ?
@@ -552,9 +545,6 @@ def admin():
     """, (fecha_admin,))
     reservas_del_dia = cursor.fetchall()
 
-    # =========================
-    # Egresos cargados
-    # =========================
     cursor.execute("""
         SELECT * FROM movimientos
         WHERE tipo = 'egreso'
@@ -562,9 +552,6 @@ def admin():
     """)
     egresos = cursor.fetchall()
 
-    # =========================
-    # Caja del día seleccionado
-    # =========================
     cursor.execute("""
         SELECT COALESCE(SUM(monto), 0)
         FROM movimientos
@@ -581,9 +568,6 @@ def admin():
 
     total_hoy = ingresos_hoy - egresos_hoy
 
-    # =========================
-    # Métodos de pago del día seleccionado
-    # =========================
     cursor.execute("""
         SELECT COALESCE(SUM(monto), 0)
         FROM movimientos
@@ -612,9 +596,6 @@ def admin():
     """, (fecha_admin,))
     qr_hoy = cursor.fetchone()[0] or 0
 
-    # =========================
-    # Total del mes
-    # =========================
     cursor.execute("""
         SELECT COALESCE(SUM(CASE WHEN tipo='ingreso' THEN monto ELSE 0 END), 0) -
                COALESCE(SUM(CASE WHEN tipo='egreso' THEN monto ELSE 0 END), 0)
@@ -623,9 +604,6 @@ def admin():
     """, (fecha_admin[:7],))
     total_mes = cursor.fetchone()[0] or 0
 
-    # =========================
-    # Total del año
-    # =========================
     cursor.execute("""
         SELECT COALESCE(SUM(CASE WHEN tipo='ingreso' THEN monto ELSE 0 END), 0) -
                COALESCE(SUM(CASE WHEN tipo='egreso' THEN monto ELSE 0 END), 0)
@@ -634,9 +612,6 @@ def admin():
     """, (fecha_admin[:4],))
     total_anio = cursor.fetchone()[0] or 0
 
-    # =========================
-    # Reporte mensual
-    # =========================
     meses_nombres = {
         "01": "Enero", "02": "Febrero", "03": "Marzo", "04": "Abril",
         "05": "Mayo", "06": "Junio", "07": "Julio", "08": "Agosto",
@@ -671,9 +646,6 @@ def admin():
             "saldo": ingresos_mes - egresos_mes
         })
 
-    # =========================
-    # Configuración de precios
-    # =========================
     cursor.execute("""
         SELECT precio_60_dia, precio_60_noche, precio_90_dia, precio_90_noche
         FROM configuracion
@@ -681,9 +653,6 @@ def admin():
     """)
     config = cursor.fetchone()
 
-    # =========================
-    # Agenda / grilla
-    # =========================
     canchas = ["Cancha 1", "Cancha 2", "Cancha 3"]
 
     horarios = [
