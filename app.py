@@ -534,6 +534,15 @@ def admin():
         fecha_admin = date.today().strftime("%Y-%m-%d")
 
     # =========================
+    # TODAS las reservas
+    # =========================
+    cursor.execute("""
+        SELECT * FROM reservas
+        ORDER BY fecha DESC, horario ASC
+    """)
+    reservas = cursor.fetchall()
+
+    # =========================
     # Reservas del día elegido
     # =========================
     cursor.execute("""
@@ -543,17 +552,14 @@ def admin():
     """, (fecha_admin,))
     reservas_del_dia = cursor.fetchall()
 
-    # Esta lista es la que ve el bloque "Reservas cargadas"
-    reservas = reservas_del_dia
-
     # =========================
-    # Egresos del día elegido
+    # Egresos cargados
     # =========================
     cursor.execute("""
         SELECT * FROM movimientos
-        WHERE tipo = 'egreso' AND fecha = ?
-        ORDER BY id DESC
-    """, (fecha_admin,))
+        WHERE tipo = 'egreso'
+        ORDER BY fecha DESC, id DESC
+    """)
     egresos = cursor.fetchall()
 
     # =========================
@@ -610,9 +616,8 @@ def admin():
     # Total del mes
     # =========================
     cursor.execute("""
-        SELECT
-            COALESCE(SUM(CASE WHEN tipo='ingreso' THEN monto ELSE 0 END), 0) -
-            COALESCE(SUM(CASE WHEN tipo='egreso' THEN monto ELSE 0 END), 0)
+        SELECT COALESCE(SUM(CASE WHEN tipo='ingreso' THEN monto ELSE 0 END), 0) -
+               COALESCE(SUM(CASE WHEN tipo='egreso' THEN monto ELSE 0 END), 0)
         FROM movimientos
         WHERE substr(fecha, 1, 7) = ?
     """, (fecha_admin[:7],))
@@ -622,9 +627,8 @@ def admin():
     # Total del año
     # =========================
     cursor.execute("""
-        SELECT
-            COALESCE(SUM(CASE WHEN tipo='ingreso' THEN monto ELSE 0 END), 0) -
-            COALESCE(SUM(CASE WHEN tipo='egreso' THEN monto ELSE 0 END), 0)
+        SELECT COALESCE(SUM(CASE WHEN tipo='ingreso' THEN monto ELSE 0 END), 0) -
+               COALESCE(SUM(CASE WHEN tipo='egreso' THEN monto ELSE 0 END), 0)
         FROM movimientos
         WHERE substr(fecha, 1, 4) = ?
     """, (fecha_admin[:4],))
@@ -718,7 +722,7 @@ def admin():
     conn.close()
 
     return render_template(
-        "admin.html",
+        "admin_v2.html",
         total_hoy=total_hoy,
         total_mes=total_mes,
         total_anio=total_anio,
@@ -736,7 +740,7 @@ def admin():
         reservas=reservas,
         egresos=egresos,
         config=config
-    )
+    )    
 
 
 @app.route("/configuracion", methods=["GET", "POST"])
