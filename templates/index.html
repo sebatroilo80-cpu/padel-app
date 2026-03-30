@@ -10,20 +10,55 @@
 
 <div class="cliente-app">
 
-    <div class="cliente-box cliente-form-box" id="formBox">
+    <div class="cliente-tabs">
+        <div class="cliente-tab activa">RESERVAR</div>
+        <div class="cliente-tab">INFO GENERAL</div>
+    </div>
 
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
-            <div style="background:#eaf6ee; padding:12px; border-radius:12px;">✅</div>
+    <div class="cliente-box">
+        <div class="cliente-dias" id="diasContainer">
+            {% for d in dias_cliente %}
+            <button
+                type="button"
+                class="dia-card {% if loop.first %}activa{% endif %}"
+                data-fecha="{{ d.iso }}">
+                <span class="dia-titulo">{{ d.titulo }}</span>
+                <span class="dia-numero">{{ d.numero }}</span>
+                <span class="dia-mes">{{ d.mes }}</span>
+            </button>
+            {% endfor %}
+        </div>
+
+        <div class="cliente-alerta">
+            Las reservas se pueden realizar hasta con seis días de antelación
+        </div>
+
+        <p class="cliente-ayuda">
+            Solo estás viendo horarios con al menos una opción disponible.
+        </p>
+
+        <div class="cliente-horarios" id="horariosContainer"></div>
+    </div>
+
+    <div class="cliente-box">
+        <h2 class="cliente-seccion-titulo">Reservar una cancha</h2>
+        <p class="cliente-seccion-sub">Elegí horario y después una opción disponible</p>
+
+        <div id="canchasContainer" class="cliente-canchas"></div>
+    </div>
+
+    <div class="cliente-box cliente-form-box form-app-box" id="formBox" style="display:none;">
+        <div class="form-app-header">
+            <div class="form-app-icono">✅</div>
             <div>
-                <h2 style="margin:0;">Completar reserva</h2>
-                <p style="margin:0; color:#777;">Confirmá tu turno en segundos</p>
+                <h2 class="cliente-seccion-titulo">Completar reserva</h2>
+                <p class="form-app-sub">Confirmá tu turno en segundos</p>
             </div>
         </div>
 
-        <div class="cliente-resumen" id="resumenReserva"></div>
+        <div class="cliente-resumen resumen-app" id="resumenReserva"></div>
 
         <form action="/reservar" method="POST" id="formReserva">
-
             <input type="hidden" name="fecha" id="inputFecha">
             <input type="hidden" name="horario" id="inputHorario">
             <input type="hidden" name="cancha" id="inputCancha">
@@ -32,58 +67,63 @@
             <input type="hidden" name="opcion_pago" id="inputOpcionPago">
             <input type="hidden" name="precio" id="inputPrecio">
 
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <input type="text" name="nombre" placeholder="👤 Nombre" class="campo" style="flex:1;" required>
-                <input type="text" name="telefono" placeholder="📱 Teléfono" class="campo" style="flex:1;" required>
+            <div class="cliente-datos-grid datos-app-grid">
+                <input type="text" name="nombre" placeholder="👤 Nombre y apellido" class="campo cliente-campo-grande campo-app" required>
+                <input type="text" name="telefono" placeholder="📱 Teléfono" class="campo cliente-campo-grande campo-app" required>
             </div>
 
-            <h3>💸 Cómo querés pagar</h3>
+            <div class="cliente-bloque-opciones bloque-app-opciones">
+                <h3 class="cliente-subtitulo-opcion">💸 Cómo querés pagar</h3>
+                <div class="opciones-grid opciones-grid-app">
+                    <button type="button" class="opcion-card opcion-card-app" data-tipo="opcion" data-valor="Reserva">
+                        <span class="opcion-icono-app">📝</span>
+                        <span class="opcion-titulo-app">Reservar</span>
+                        <span class="opcion-texto-app">Pagás 30% ahora</span>
+                    </button>
 
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button type="button" class="opcion-card-app" data-tipo="opcion" data-valor="Reserva">
-                    📝 Reservar  
-                    <small>Pagás 30%</small>
-                </button>
-
-                <button type="button" class="opcion-card-app" data-tipo="opcion" data-valor="Pagado">
-                    ✅ Pago total  
-                    <small>Pagás 100%</small>
-                </button>
+                    <button type="button" class="opcion-card opcion-card-app" data-tipo="opcion" data-valor="Pagado">
+                        <span class="opcion-icono-app">✅</span>
+                        <span class="opcion-titulo-app">Pagar total</span>
+                        <span class="opcion-texto-app">Pagás 100% ahora</span>
+                    </button>
+                </div>
             </div>
 
-            <h3>💳 Método de pago</h3>
+            <div class="cliente-bloque-opciones bloque-app-opciones">
+                <h3 class="cliente-subtitulo-opcion">💳 Método de pago</h3>
+                <div class="opciones-grid opciones-grid-app">
+                    <button type="button" class="opcion-card opcion-card-app" data-tipo="metodo" data-valor="Transferencia">
+                        <span class="opcion-icono-app">🏦</span>
+                        <span class="opcion-titulo-app">Transferencia</span>
+                        <span class="opcion-texto-app">Pago bancario</span>
+                    </button>
 
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button type="button" class="opcion-card-app" data-tipo="metodo" data-valor="Transferencia">
-                    🏦 Transferencia  
-                    <small>Bancario</small>
-                </button>
-
-                <button type="button" class="opcion-card-app" data-tipo="metodo" data-valor="Mercado Pago">
-                    💳 Mercado Pago  
-                    <small>Digital</small>
-                </button>
+                    <button type="button" class="opcion-card opcion-card-app" data-tipo="metodo" data-valor="Mercado Pago">
+                        <span class="opcion-icono-app">💳</span>
+                        <span class="opcion-titulo-app">Mercado Pago</span>
+                        <span class="opcion-texto-app">Pago digital</span>
+                    </button>
+                </div>
             </div>
 
             <div id="datos_transferencia" style="display:none; margin-top:12px;">
-                <div style="background:#111; color:#fff; padding:15px; border-radius:10px;">
+                <div class="bloque-transferencia-app">
                     <strong>📌 Datos para transferir</strong><br><br>
                     Alias: 37padelclub<br>
                     CVU: 0000003100030540946290<br>
                     Titular: Eduardo Sebastián Troilo<br><br>
-                    <small>⚠️ Queda pendiente hasta confirmar</small>
+                    <small>⚠️ La reserva quedará pendiente hasta confirmar el pago.</small>
                 </div>
             </div>
 
-            <div style="margin:20px 0;">
+            <div class="cliente-precio-info precio-app-box">
                 <p id="precioTotalTexto"></p>
                 <p id="precioPagoTexto"></p>
             </div>
 
-            <button class="boton" style="width:100%; font-size:18px;">
+            <button class="boton cliente-boton-final boton-app-final" type="submit">
                 🚀 Confirmar reserva
             </button>
-
         </form>
     </div>
 
@@ -91,90 +131,362 @@
 
 <script>
 const config = {{ config|tojson }};
+const reservasOcupadas = {{ reservas_ocupadas|tojson }};
 
+const canchas = [
+    {
+        nombre: "Cancha 1",
+        subtitulo: "Césped sintético | Descubierta | Con iluminación"
+    },
+    {
+        nombre: "Cancha 2",
+        subtitulo: "Césped sintético | Descubierta | Con iluminación"
+    },
+    {
+        nombre: "Cancha 3",
+        subtitulo: "Césped sintético | Descubierta | Con iluminación"
+    }
+];
+
+const horariosBase = [
+    "08:00","08:30","09:00","09:30",
+    "10:00","10:30","11:00","11:30",
+    "12:00","12:30","13:00","13:30",
+    "14:00","14:30","15:00","15:30",
+    "16:00","16:30","17:00","17:30",
+    "18:00","18:30","19:00","19:30",
+    "20:00","20:30","21:00","21:30",
+    "22:00","22:30","23:00","23:30"
+];
+
+let fechaSeleccionada = document.querySelector(".dia-card.activa").dataset.fecha;
+let horarioSeleccionado = null;
+let canchaSeleccionada = null;
+let duracionSeleccionada = null;
 let precioSeleccionado = 0;
 let metodoPagoSeleccionado = "";
 let opcionPagoSeleccionada = "";
 
+const horariosContainer = document.getElementById("horariosContainer");
+const canchasContainer = document.getElementById("canchasContainer");
+const formBox = document.getElementById("formBox");
+const resumenReserva = document.getElementById("resumenReserva");
+
+const inputFecha = document.getElementById("inputFecha");
+const inputHorario = document.getElementById("inputHorario");
+const inputCancha = document.getElementById("inputCancha");
+const inputDuracion = document.getElementById("inputDuracion");
 const inputMetodoPago = document.getElementById("inputMetodoPago");
 const inputOpcionPago = document.getElementById("inputOpcionPago");
 const inputPrecio = document.getElementById("inputPrecio");
 
 const precioTotalTexto = document.getElementById("precioTotalTexto");
 const precioPagoTexto = document.getElementById("precioPagoTexto");
-
+const formReserva = document.getElementById("formReserva");
 const datosTransferencia = document.getElementById("datos_transferencia");
 
-function actualizarPago() {
-    if (!precioSeleccionado) return;
+function precioSegunHora(duracion, horario) {
+    const hora = parseInt(horario.split(":")[0], 10);
 
-    precioTotalTexto.textContent = "💰 Total: $" + precioSeleccionado;
+    if (hora < 18) {
+        return duracion === "60 minutos" ? config[0] : config[2];
+    } else {
+        return duracion === "60 minutos" ? config[1] : config[3];
+    }
+}
+
+function slotsNecesarios(horario, duracion) {
+    const idx = horariosBase.indexOf(horario);
+    if (idx === -1) return [];
+
+    if (duracion === "60 minutos") {
+        return horariosBase.slice(idx, idx + 2);
+    }
+    return horariosBase.slice(idx, idx + 3);
+}
+
+function estaOcupado(fecha, cancha, horario) {
+    return reservasOcupadas.some(r =>
+        r.fecha === fecha &&
+        r.cancha === cancha &&
+        r.horario === horario
+    );
+}
+
+function canchaDisponible(fecha, cancha, horario, duracion) {
+    const slots = slotsNecesarios(horario, duracion);
+    if (slots.length === 0) return false;
+
+    for (const slot of slots) {
+        if (estaOcupado(fecha, cancha, slot)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function opcionesDisponiblesParaHorario(fecha, horario) {
+    let opciones = 0;
+
+    canchas.forEach(c => {
+        if (canchaDisponible(fecha, c.nombre, horario, "60 minutos")) opciones += 1;
+        if (canchaDisponible(fecha, c.nombre, horario, "90 minutos")) opciones += 1;
+    });
+
+    return opciones;
+}
+
+function renderDias() {
+    document.querySelectorAll(".dia-card").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".dia-card").forEach(x => x.classList.remove("activa"));
+            btn.classList.add("activa");
+            fechaSeleccionada = btn.dataset.fecha;
+
+            horarioSeleccionado = null;
+            canchaSeleccionada = null;
+            duracionSeleccionada = null;
+            precioSeleccionado = 0;
+            metodoPagoSeleccionado = "";
+            opcionPagoSeleccionada = "";
+
+            inputFecha.value = "";
+            inputHorario.value = "";
+            inputCancha.value = "";
+            inputDuracion.value = "";
+            inputMetodoPago.value = "";
+            inputOpcionPago.value = "";
+            inputPrecio.value = "";
+
+            datosTransferencia.style.display = "none";
+            formBox.style.display = "none";
+
+            renderHorarios();
+            renderCanchas();
+        });
+    });
+}
+
+function renderHorarios() {
+    horariosContainer.innerHTML = "";
+
+    const disponibles = horariosBase.filter(h => opcionesDisponiblesParaHorario(fechaSeleccionada, h) > 0);
+
+    if (disponibles.length === 0) {
+        horariosContainer.innerHTML = `<div class="cliente-vacio">No hay horarios disponibles para ese día.</div>`;
+        return;
+    }
+
+    disponibles.forEach(h => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "hora-chip" + (h === horarioSeleccionado ? " activa" : "");
+        btn.textContent = h;
+
+        btn.addEventListener("click", () => {
+            horarioSeleccionado = h;
+            canchaSeleccionada = null;
+            duracionSeleccionada = null;
+            precioSeleccionado = 0;
+            metodoPagoSeleccionado = "";
+            opcionPagoSeleccionada = "";
+
+            inputFecha.value = fechaSeleccionada;
+            inputHorario.value = horarioSeleccionado;
+            inputCancha.value = "";
+            inputDuracion.value = "";
+            inputMetodoPago.value = "";
+            inputOpcionPago.value = "";
+            inputPrecio.value = "";
+
+            datosTransferencia.style.display = "none";
+            formBox.style.display = "none";
+            renderHorarios();
+            renderCanchas();
+        });
+
+        horariosContainer.appendChild(btn);
+    });
+}
+
+function renderCanchas() {
+    canchasContainer.innerHTML = "";
+
+    if (!horarioSeleccionado) {
+        canchasContainer.innerHTML = `<div class="cliente-vacio">Elegí un horario para ver las canchas y duraciones disponibles.</div>`;
+        return;
+    }
+
+    let hayOpciones = false;
+
+    canchas.forEach(c => {
+        const disponible60 = canchaDisponible(fechaSeleccionada, c.nombre, horarioSeleccionado, "60 minutos");
+        const disponible90 = canchaDisponible(fechaSeleccionada, c.nombre, horarioSeleccionado, "90 minutos");
+
+        if (!disponible60 && !disponible90) {
+            return;
+        }
+
+        hayOpciones = true;
+
+        const card = document.createElement("div");
+        card.className = "cancha-card";
+
+        const precio60 = precioSegunHora("60 minutos", horarioSeleccionado);
+        const precio90 = precioSegunHora("90 minutos", horarioSeleccionado);
+
+        card.innerHTML = `
+            <div class="cancha-header">
+                <div>
+                    <h3>${c.nombre}</h3>
+                    <p>${c.subtitulo}</p>
+                </div>
+            </div>
+
+            <div class="precio-opciones">
+                ${disponible60 ? `
+                <button type="button" class="precio-card"
+                    data-cancha="${c.nombre}" data-duracion="60 minutos" data-precio="${precio60}">
+                    <span class="precio-monto">$${precio60}</span>
+                    <span class="precio-tiempo">60 min</span>
+                </button>
+                ` : ""}
+
+                ${disponible90 ? `
+                <button type="button" class="precio-card"
+                    data-cancha="${c.nombre}" data-duracion="90 minutos" data-precio="${precio90}">
+                    <span class="precio-monto">$${precio90}</span>
+                    <span class="precio-tiempo">90 min</span>
+                </button>
+                ` : ""}
+            </div>
+        `;
+
+        canchasContainer.appendChild(card);
+    });
+
+    if (!hayOpciones) {
+        canchasContainer.innerHTML = `<div class="cliente-vacio">No quedan canchas libres para ese horario.</div>`;
+        return;
+    }
+
+    document.querySelectorAll(".precio-card").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".precio-card").forEach(x => x.classList.remove("activa"));
+
+            btn.classList.add("activa");
+
+            canchaSeleccionada = btn.dataset.cancha;
+            duracionSeleccionada = btn.dataset.duracion;
+            precioSeleccionado = Number(btn.dataset.precio);
+
+            inputFecha.value = fechaSeleccionada;
+            inputHorario.value = horarioSeleccionado;
+            inputCancha.value = canchaSeleccionada;
+            inputDuracion.value = duracionSeleccionada;
+            inputPrecio.value = precioSeleccionado;
+
+            resumenReserva.innerHTML = `
+                <div class="resumen-app-item"><span>📅 Fecha</span><strong>${fechaSeleccionada}</strong></div>
+                <div class="resumen-app-item"><span>⏰ Horario</span><strong>${horarioSeleccionado}</strong></div>
+                <div class="resumen-app-item"><span>🎾 Cancha</span><strong>${canchaSeleccionada}</strong></div>
+                <div class="resumen-app-item"><span>⏳ Duración</span><strong>${duracionSeleccionada}</strong></div>
+            `;
+
+            metodoPagoSeleccionado = "";
+            opcionPagoSeleccionada = "";
+            inputMetodoPago.value = "";
+            inputOpcionPago.value = "";
+
+            datosTransferencia.style.display = "none";
+            document.querySelectorAll(".opcion-card").forEach(card => card.classList.remove("activa"));
+
+            formBox.style.display = "block";
+            actualizarPago();
+            activarOpciones();
+            formBox.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+    });
+}
+
+function actualizarPago() {
+    if (!precioSeleccionado) {
+        precioTotalTexto.textContent = "";
+        precioPagoTexto.textContent = "";
+        return;
+    }
+
+    precioTotalTexto.textContent = "💰 Precio total: $" + precioSeleccionado.toLocaleString("es-AR");
 
     if (opcionPagoSeleccionada === "Reserva") {
-        precioPagoTexto.textContent = "Pagás ahora: $" + (precioSeleccionado * 0.30);
+        precioPagoTexto.textContent = "💳 Pagás ahora (30%): $" + (precioSeleccionado * 0.30).toLocaleString("es-AR");
     } else if (opcionPagoSeleccionada === "Pagado") {
-        precioPagoTexto.textContent = "Pagás ahora: $" + precioSeleccionado;
+        precioPagoTexto.textContent = "✅ Pagás ahora: $" + precioSeleccionado.toLocaleString("es-AR");
+    } else {
+        precioPagoTexto.textContent = "Elegí cómo querés pagar";
     }
 }
 
-document.querySelectorAll(".opcion-card-app").forEach(btn => {
-    btn.onclick = () => {
-        const tipo = btn.dataset.tipo;
-        const valor = btn.dataset.valor;
+function activarOpciones() {
+    document.querySelectorAll(".opcion-card").forEach(btn => {
+        btn.onclick = () => {
+            const tipo = btn.dataset.tipo;
+            const valor = btn.dataset.valor;
 
-        document.querySelectorAll(`[data-tipo="${tipo}"]`).forEach(x => x.classList.remove("activa"));
-        btn.classList.add("activa");
+            document.querySelectorAll(`.opcion-card[data-tipo="${tipo}"]`).forEach(x => x.classList.remove("activa"));
+            btn.classList.add("activa");
 
-        if (tipo === "metodo") {
-            metodoPagoSeleccionado = valor;
-            inputMetodoPago.value = valor;
+            if (tipo === "metodo") {
+                metodoPagoSeleccionado = valor;
+                inputMetodoPago.value = valor;
 
-            if (valor === "Transferencia") {
-                datosTransferencia.style.display = "block";
-            } else {
-                datosTransferencia.style.display = "none";
+                if (valor === "Transferencia") {
+                    datosTransferencia.style.display = "block";
+                } else {
+                    datosTransferencia.style.display = "none";
+                }
             }
-        }
 
-        if (tipo === "opcion") {
-            opcionPagoSeleccionada = valor;
-            inputOpcionPago.value = valor;
-            actualizarPago();
-        }
-    };
-});
+            if (tipo === "opcion") {
+                opcionPagoSeleccionada = valor;
+                inputOpcionPago.value = valor;
+                actualizarPago();
+            }
+        };
+    });
+}
 
-document.getElementById("formReserva").addEventListener("submit", (e) => {
-    if (!inputOpcionPago.value || !inputMetodoPago.value) {
+formReserva.addEventListener("submit", (e) => {
+    if (!inputFecha.value || !inputHorario.value || !inputCancha.value || !inputDuracion.value) {
         e.preventDefault();
-        alert("Elegí cómo pagar y método");
+        alert("Elegí fecha, horario, cancha y duración.");
+        return;
+    }
+
+    if (!inputPrecio.value) {
+        e.preventDefault();
+        alert("Elegí una opción de cancha con precio.");
+        return;
+    }
+
+    if (!inputOpcionPago.value) {
+        e.preventDefault();
+        alert("Elegí cómo querés pagar.");
+        return;
+    }
+
+    if (!inputMetodoPago.value) {
+        e.preventDefault();
+        alert("Elegí el método de pago.");
+        return;
     }
 });
+
+renderDias();
+renderHorarios();
+renderCanchas();
+activarOpciones();
 </script>
-
-<style>
-.opcion-card-app {
-    flex:1;
-    border:2px solid #ddd;
-    border-radius:12px;
-    padding:15px;
-    text-align:center;
-    cursor:pointer;
-    font-weight:bold;
-    background:#fff;
-}
-
-.opcion-card-app small {
-    display:block;
-    font-weight:normal;
-    color:#777;
-}
-
-.opcion-card-app.activa {
-    border-color:#4CAF50;
-    background:#eaf6ee;
-}
-</style>
 
 </body>
 </html>
