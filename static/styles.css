@@ -826,3 +826,18 @@ body.cliente-body {
         font-size: 26px;
     }
 }
+.btn-whatsapp {
+    background: #25D366;
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    display: inline-block;
+    text-decoration: none;
+    margin-top: 5px;
+}
+
+.btn-whatsapp:hover {
+    background: #1ebe5d;
+}
