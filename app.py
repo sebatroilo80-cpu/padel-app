@@ -266,7 +266,6 @@ def reservar():
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
 
-    # Crear tabla movimientos si no existe
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS movimientos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -285,15 +284,16 @@ def reservar():
 
     precio = calcular_precio(cursor, duracion, horario)
 
-    # Lógica especial para transferencia
     if metodo_pago == "Transferencia":
         pagado = 0
-        estado_pago = "Pendiente"
+        if opcion_pago == "Reserva":
+            estado_pago = "Pendiente reserva"
+        else:
+            estado_pago = "Pendiente pago total"
     else:
         pagado = calcular_pagado_inicial(precio, opcion_pago)
         estado_pago = calcular_estado_desde_pagado(precio, pagado)
 
-    # Guardar reserva del cliente
     cursor.execute("""
         INSERT INTO reservas (
             nombre, telefono, fecha, cancha, duracion, horario,
@@ -315,9 +315,6 @@ def reservar():
 
     reserva_id = cursor.lastrowid
 
-    # Si NO es Mercado Pago NI Transferencia y pagó algo, impacta en caja acá
-    # Mercado Pago impacta por webhook
-    # Transferencia impacta cuando vos confirmes el pago
     if metodo_pago not in ["Mercado Pago", "Transferencia"] and float(pagado) > 0:
         if opcion_pago == "Reserva":
             descripcion = f"Seña reserva #{reserva_id} - {nombre} - {cancha} - {horario}"
@@ -337,9 +334,8 @@ def reservar():
 
         conn.commit()
         conn.close()
-        return redirect(f"/?ok=1")
+        return redirect("/?ok=1")
 
-    # Si es Mercado Pago, crear preferencia y redirigir
     if metodo_pago == "Mercado Pago":
         external_id = str(reserva_id)
 
@@ -364,7 +360,7 @@ def reservar():
 
     conn.commit()
     conn.close()
-    return redirect(f"/?ok=1")
+    return redirect("/?ok=1")
 
 @app.route("/webhook/mercadopago", methods=["POST"])
 def webhook_mercadopago():
@@ -987,14 +983,19 @@ def confirmar_transferencia(id):
 
     fecha, nombre, cancha, horario, precio, metodo_pago, estado_pago = reserva
 
-    if estado_pago == "Pendiente reserva":
+    estado_texto = (estado_pago or "").strip().lower()
+
+    if estado_texto == "pendiente reserva":
         monto_confirmado = round(float(precio) * 0.30, 2)
         nuevo_estado = "Reserva"
         descripcion = f"Seña confirmada reserva #{id} - {nombre} - {cancha} - {horario}"
-    else:
+    elif estado_texto == "pendiente pago total":
         monto_confirmado = float(precio)
         nuevo_estado = "Pagado"
         descripcion = f"Pago total confirmado reserva #{id} - {nombre} - {cancha} - {horario}"
+    else:
+        conn.close()
+        return f"No se puede confirmar esta reserva porque su estado actual es: {estado_pago}"
 
     cursor.execute("""
         UPDATE reservas
