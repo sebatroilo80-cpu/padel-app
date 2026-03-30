@@ -1,843 +1,238 @@
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    background: #f4f7fb;
-    color: #1f2937;
-}
-
-a {
-    text-decoration: none;
-}
-
-/* =========================
-   ADMIN
-========================= */
-
-.contenedor {
-    max-width: 1250px;
+.nuevo-portal {
+    max-width: 860px;
     margin: 0 auto;
-    padding: 24px;
+    padding: 24px 18px 50px;
 }
 
-.topbar {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 18px 22px;
+.hero-reserva {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 16px;
-    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+    gap: 18px;
     margin-bottom: 22px;
 }
 
-.topbar-left {
+.hero-icono {
+    width: 78px;
+    height: 78px;
+    border-radius: 22px;
+    background: #eaf6ee;
     display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.logo-admin {
-    width: 82px;
-    height: 82px;
-    object-fit: contain;
-    border-radius: 14px;
-    background: #fff;
-}
-
-.titulo-admin {
-    margin: 0;
-    font-size: 42px;
-    font-weight: 800;
-    line-height: 1;
-    color: #111827;
-}
-
-.sub-admin {
-    margin: 6px 0 0 0;
-    color: #6b7280;
-    font-size: 18px;
-}
-
-.topbar-right {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.btn-top {
-    display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 16px;
-    border-radius: 12px;
-    color: white;
-    font-weight: 700;
-    border: none;
-}
-
-.btn-mini {
-    padding: 8px 12px;
-    font-size: 14px;
-}
-
-.btn-azul {
-    background: #2563eb;
-}
-
-.btn-rojo {
-    background: #dc2626;
-}
-
-.cards-resumen {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-bottom: 18px;
-}
-
-.card-resumen {
-    border-radius: 18px;
-    padding: 22px;
-    color: #111827;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
-}
-
-.card-resumen.verde {
-    background: #dcfce7;
-}
-
-.card-resumen.azul {
-    background: #dbeafe;
-}
-
-.card-resumen.violeta {
-    background: #ede9fe;
-}
-
-.card-label {
-    font-size: 16px;
-    color: #374151;
-    margin-bottom: 8px;
-    font-weight: 700;
-}
-
-.card-value {
     font-size: 34px;
-    font-weight: 800;
 }
 
-.cards-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 18px;
-}
-
-.card-info {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
-}
-
-.card-info h3 {
-    margin: 0 0 12px 0;
-    font-size: 22px;
-}
-
-.card-info p {
-    margin: 8px 0;
-    font-size: 17px;
-}
-
-.bloque-seccion {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 22px;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
-    margin-bottom: 18px;
-}
-
-.seccion-header {
-    margin-bottom: 14px;
-}
-
-.seccion-header h2 {
+.hero-texto h1 {
+    font-size: 2.2rem;
     margin: 0;
-    font-size: 34px;
-    font-weight: 800;
+    color: #111;
 }
 
-.form-agenda {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
+.hero-texto p {
+    margin: 6px 0 0;
+    font-size: 1.15rem;
+    color: #6f7673;
 }
 
-.fecha-agenda {
-    max-width: 320px;
+.cliente-box-principal {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    margin-bottom: 18px;
 }
 
-.boton,
-.boton-agenda,
-.btn-cancelar {
-    border: none;
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.boton,
-.boton-agenda {
-    background: #22c55e;
-    color: white;
-}
-
-.btn-cancelar {
-    background: #e5e7eb;
-    color: #111827;
-}
-
-.campo {
-    width: 100%;
-    padding: 14px 16px;
-    border: 1px solid #d1d5db;
-    border-radius: 12px;
-    font-size: 16px;
-    background: #fff;
-}
-
-.texto-ayuda {
-    color: #4b5563;
-    font-size: 16px;
-    margin: 8px 0 16px 0;
-}
-
-.leyenda {
+.dias-app {
     display: flex;
     gap: 14px;
-    flex-wrap: wrap;
-    margin-bottom: 8px;
-}
-
-.leyenda .item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: #374151;
-}
-
-.color-box {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-    display: inline-block;
-}
-
-.leyenda-libre {
-    background: #dcfce7;
-}
-
-.pago-efectivo {
-    background: #dbeafe !important;
-}
-
-.pago-transferencia {
-    background: #dcfce7 !important;
-}
-
-.pago-mp {
-    background: #fef3c7 !important;
-}
-
-.pago-qr {
-    background: #ede9fe !important;
-}
-
-.pago-sin-metodo {
-    background: #e5e7eb !important;
-}
-
-.agenda-scroll,
-.tabla-scroll {
     overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 22px;
 }
 
-.agenda-grid {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 8px;
-    min-width: 900px;
-}
-
-.agenda-grid th {
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 14px 10px;
-    text-align: center;
-    font-size: 20px;
-    font-weight: 800;
-}
-
-.th-hora {
+.dia-card-app {
     min-width: 120px;
+    min-height: 168px;
+    border-radius: 24px;
+    border: 2px solid #d9dfdb;
+    background: #fff;
+    color: #111;
+    padding: 16px 10px;
 }
 
-.hora-col {
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 14px 10px;
-    text-align: center;
-    font-size: 18px;
+.dia-card-app.activa {
+    background: #56b574;
+    border-color: #56b574;
+    color: #fff;
+    box-shadow: 0 12px 24px rgba(86,181,116,.22);
+}
+
+.dia-card-app .dia-titulo {
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.dia-card-app .dia-numero {
+    font-size: 2.2rem;
     font-weight: 800;
-    white-space: nowrap;
+    margin: 10px 0 4px;
 }
 
-.celda-grid {
-    min-width: 210px;
-    vertical-align: top;
+.dia-card-app .dia-mes {
+    font-size: 1rem;
+    text-transform: lowercase;
 }
 
-.modulo {
-    width: 100%;
-    min-height: 78px;
-    border-radius: 16px;
-    padding: 12px;
+.alerta-horario {
+    display: inline-block;
+    background: #e8f5ec;
+    color: #4d8f60;
+    border-radius: 999px;
+    padding: 12px 18px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+}
+
+.texto-suave {
+    color: #747b78;
+    margin-bottom: 24px;
+}
+
+.bloque-duracion-app {
+    margin-bottom: 18px;
+}
+
+.duraciones-app {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.duracion-app-card {
+    border: 2px solid #d7ddda;
+    background: #fff;
+    color: #1a1a1a;
+    border-radius: 22px;
+    padding: 18px 26px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.duracion-app-card.activa {
+    border-color: #56b574;
+    color: #56b574;
+    background: #f4fbf6;
+}
+
+.cliente-canchas-app {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    cursor: pointer;
-    transition: 0.2s ease;
+    gap: 26px;
+    margin-top: 14px;
 }
 
-.modulo:hover {
-    transform: scale(1.01);
+.cancha-card-app {
+    background: #fff;
+    border: 2px solid #dde2df;
+    border-radius: 28px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.05);
 }
 
-.modulo-libre {
-    background: #dcfce7;
-    border: 2px solid #bbf7d0;
+.cancha-header-app {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 22px;
 }
 
-.modulo-turno {
-    border: 2px solid rgba(255,255,255,0.6);
-}
-
-.modulo-inicio {
-    border-radius: 16px 16px 10px 10px;
-}
-
-.modulo-continuacion {
-    min-height: 58px;
-    border-radius: 10px;
-}
-
-.modulo-titulo {
-    font-size: 20px;
-    font-weight: 800;
-}
-
-.modulo-sub {
-    font-size: 14px;
-    margin-top: 4px;
-    color: #374151;
-}
-
-.badge-estado {
-    margin: 8px auto 0 auto;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 800;
-    width: fit-content;
-}
-
-.estado-pagado {
-    background: #16a34a;
-    color: white;
-}
-
-.estado-reserva {
-    background: #f59e0b;
-    color: white;
-}
-
-.tabla-simple {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px;
-}
-
-.tabla-simple th,
-.tabla-simple td {
-    border-bottom: 1px solid #e5e7eb;
-    padding: 14px 10px;
-    text-align: left;
-    font-size: 15px;
-}
-
-.tabla-simple th {
-    font-size: 16px;
-    font-weight: 800;
-}
-
-.form-card {
-    display: grid;
-    gap: 12px;
-    max-width: 520px;
-}
-
-.lista-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-    gap: 14px;
-}
-
-.card-lista,
-.card-egreso {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 16px;
-    border-left: 6px solid #cbd5e1;
-    font-size: 15px;
-    line-height: 1.55;
-}
-
-.borde-efectivo {
-    border-left-color: #60a5fa;
-}
-
-.borde-transferencia {
-    border-left-color: #4ade80;
-}
-
-.borde-mp {
-    border-left-color: #fbbf24;
-}
-
-.borde-qr {
-    border-left-color: #a78bfa;
-}
-
-.modal-fondo {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.45);
+.cancha-icono-app {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    background: #eef7f0;
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
-    z-index: 999;
+    font-size: 32px;
 }
 
-.modal-caja {
-    background: white;
-    border-radius: 18px;
-    width: 100%;
-    max-width: 520px;
-    padding: 24px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-}
-
-.modal-caja h2 {
-    margin-top: 0;
-    margin-bottom: 18px;
-    font-size: 30px;
-}
-
-.modal-caja form {
-    display: grid;
-    gap: 12px;
-}
-
-.modal-botones {
-    display: flex;
-    gap: 10px;
-    margin-top: 8px;
-}
-
-.precio-modal {
+.cancha-info-app h3 {
     margin: 0;
-    font-size: 18px;
-    font-weight: 800;
-    color: #111827;
+    font-size: 2rem;
+    color: #151515;
 }
 
-/* =========================
-   CLIENTE
-========================= */
-
-body.cliente-body {
-    background: #f5f7f9;
+.cancha-info-app p {
+    margin: 6px 0 0;
+    color: #6e7572;
+    font-size: 1rem;
 }
 
-.cliente-app {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
-}
-
-.cliente-tabs {
-    display: flex;
-    gap: 20px;
-    border-bottom: 2px solid #e5e7eb;
-    margin-bottom: 20px;
-    overflow-x: auto;
-}
-
-.cliente-tab {
-    padding: 10px;
-    font-weight: 700;
-    color: #9ca3af;
-    white-space: nowrap;
-}
-
-.cliente-tab.activa {
-    color: #16a34a;
-    border-bottom: 3px solid #16a34a;
-}
-
-.cliente-dias {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    margin-bottom: 15px;
-}
-
-.dia-card {
-    border: none;
-    background: #f3f4f6;
-    border-radius: 10px;
-    padding: 10px;
-    min-width: 70px;
-    text-align: center;
-    cursor: pointer;
-    flex: 0 0 auto;
-}
-
-.dia-card.activa {
-    background: #16a34a;
-    color: white;
-}
-
-.dia-titulo {
-    font-size: 12px;
-}
-
-.dia-numero {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.dia-mes {
-    font-size: 11px;
-}
-
-.cliente-alerta {
-    background: #eef6ff;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-.cliente-ayuda {
-    font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 15px;
-}
-
-.cliente-horarios {
+.slots-grid-app {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
 }
 
-.hora-chip {
-    border: 1px solid #d1d5db;
-    background: white;
-    padding: 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 700;
-    transition: all 0.2s ease;
-}
-
-.hora-chip.activa {
-    background: #16a34a;
-    color: white;
-    border-color: #15803d;
-    box-shadow: 0 6px 15px rgba(22,163,74,0.3);
-    transform: scale(1.05);
-}
-
-.cliente-canchas {
+.slot-card {
+    min-height: 98px;
+    border-radius: 22px;
+    border: 2px solid #d8deda;
+    background: #fff;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-}
-
-.cancha-card h3 {
-    margin: 0;
-}
-
-.cancha-card p {
-    margin: 5px 0 15px;
-    color: #6b7280;
-}
-
-.precio-opciones {
-    display: flex;
-    gap: 10px;
-}
-
-.precio-card {
-    flex: 1;
-    background: #dcfce7;
-    border-radius: 14px;
-    padding: 15px;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-    font-weight: bold;
-    transition: 0.2s;
-}
-
-.precio-card:hover {
-    transform: scale(1.02);
-}
-
-.precio-card.activa {
-    background: #16a34a;
-    color: white;
-}
-
-.precio-card.deshabilitada {
-    background: #e5e7eb;
-    color: #9ca3af;
-    cursor: not-allowed;
-}
-
-.precio-monto {
-    font-size: 18px;
-    font-weight: bold;
-    display: block;
-}
-
-.precio-tiempo {
-    font-size: 14px;
-    display: block;
-    margin-top: 4px;
-}
-
-.cliente-form-box {
-    margin-top: 20px;
-}
-
-.cliente-seccion-titulo {
-    font-size: 30px;
-    margin: 0 0 10px 0;
-}
-
-.cliente-seccion-sub {
-    margin: 0 0 18px 0;
-    color: #6b7280;
-}
-
-.cliente-resumen {
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 16px;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-.cliente-campo-grande {
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: 1px solid #d1d5db;
-    margin-bottom: 15px;
-    font-size: 16px;
-}
-
-.cliente-datos-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 6px;
-}
-
-.cliente-bloque-opciones {
-    margin-top: 18px;
-}
-
-.cliente-subtitulo-opcion {
-    margin: 0 0 12px 0;
-    font-size: 22px;
-    color: #1f2937;
-    font-weight: 800;
-}
-
-.opciones-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-}
-
-.opcion-card {
-    background: #f9fafb;
-    border-radius: 14px;
-    padding: 18px;
-    border: 1px solid #e5e7eb;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.25s ease;
-}
-
-.opcion-card:hover {
-    transform: scale(1.03);
-}
-
-.opcion-card.activa {
-    border: 2px solid #16a34a;
-    background: #dcfce7;
-    box-shadow: 0 6px 15px rgba(34,197,94,0.25);
-}
-
-.opcion-icono {
-    font-size: 28px;
-    display: block;
-    margin-bottom: 8px;
-}
-
-.opcion-titulo {
-    font-weight: 800;
-    display: block;
-    margin-top: 5px;
-    font-size: 18px;
-}
-
-.opcion-texto {
-    font-size: 15px;
-    color: #6b7280;
-    display: block;
-    margin-top: 4px;
-}
-
-.cliente-precio-info {
-    margin-top: 15px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     font-weight: 700;
-    font-size: 18px;
-    line-height: 1.6;
 }
 
-.cliente-boton-final {
-    margin-top: 15px;
-    width: 100%;
-    padding: 16px;
-    border-radius: 12px;
-    border: none;
-    background: #16a34a;
-    color: white;
-    font-size: 18px;
+.slot-libre {
     cursor: pointer;
-    font-weight: 800;
 }
 
-.cliente-boton-final:hover {
-    background: #15803d;
+.slot-libre.activa {
+    border-color: #56b574;
+    background: #f4fbf6;
+    box-shadow: 0 8px 20px rgba(86,181,116,.18);
 }
 
-.cliente-vacio {
-    color: #9ca3af;
-    text-align: center;
-    padding: 10px;
+.slot-ocupado {
+    background: #f2f3f2;
+    color: #b5b8b6;
+    border-color: #eceeed;
 }
 
-@media (max-width: 900px) {
-    .cards-resumen,
-    .cards-info {
-        grid-template-columns: 1fr;
-    }
+.slot-hora {
+    font-size: 1.05rem;
+}
+
+.slot-precio {
+    font-size: 0.95rem;
+    color: #56b574;
+}
+
+.bloque-transferencia-app {
+    background: #111;
+    color: #fff;
+    padding: 15px;
+    border-radius: 14px;
 }
 
 @media (max-width: 700px) {
-    .topbar {
-        flex-direction: column;
-        align-items: flex-start;
+    .hero-texto h1 {
+        font-size: 1.8rem;
     }
 
-    .titulo-admin {
-        font-size: 32px;
+    .dia-card-app {
+        min-width: 105px;
+        min-height: 150px;
     }
 
-    .cliente-horarios {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .opciones-grid,
-    .cliente-datos-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .precio-opciones {
-        flex-direction: column;
-    }
-
-    .modal-botones {
-        flex-direction: column;
-    }
-}
-
-@media (max-width: 480px) {
-    .contenedor,
-    .cliente-app {
-        padding: 12px;
-    }
-
-    .cliente-horarios {
+    .slots-grid-app {
         grid-template-columns: repeat(2, 1fr);
     }
-
-    .titulo-admin {
-        font-size: 28px;
-    }
-
-    .card-value {
-        font-size: 28px;
-    }
-
-    .seccion-header h2,
-    .cliente-seccion-titulo {
-        font-size: 26px;
-    }
-}
-.btn-whatsapp {
-    background: #25D366;
-    color: white;
-    font-weight: bold;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 8px;
-    display: inline-block;
-    text-decoration: none;
-    margin-top: 5px;
-}
-
-.btn-whatsapp:hover {
-    background: #1ebe5d;
 }

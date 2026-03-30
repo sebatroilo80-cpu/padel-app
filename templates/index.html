@@ -3,24 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservar turno</title>
+    <title>Reservá tu cancha</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body class="cliente-body">
 
-<div class="cliente-app">
+<div class="cliente-app nuevo-portal">
 
-    <div class="cliente-tabs">
-        <div class="cliente-tab activa">RESERVAR</div>
-        <div class="cliente-tab">INFO GENERAL</div>
-    </div>
+    <section class="hero-reserva">
+        <div class="hero-icono">📅</div>
+        <div class="hero-texto">
+            <h1>Reservá tu cancha</h1>
+            <p>Elegí día, horario y confirmá en segundos</p>
+        </div>
+    </section>
 
-    <div class="cliente-box">
-        <div class="cliente-dias" id="diasContainer">
+    <section class="cliente-box cliente-box-principal">
+        <div class="cliente-dias dias-app" id="diasContainer">
             {% for d in dias_cliente %}
             <button
                 type="button"
-                class="dia-card {% if loop.first %}activa{% endif %}"
+                class="dia-card dia-card-app {% if loop.first %}activa{% endif %}"
                 data-fecha="{{ d.iso }}">
                 <span class="dia-titulo">{{ d.titulo }}</span>
                 <span class="dia-numero">{{ d.numero }}</span>
@@ -29,23 +32,28 @@
             {% endfor %}
         </div>
 
-        <div class="cliente-alerta">
-            Las reservas se pueden realizar hasta con seis días de antelación
+        <div class="cliente-alerta alerta-horario">
+            ⏰ 08:00 – 23:00
         </div>
 
-        <p class="cliente-ayuda">
-            Solo estás viendo horarios con al menos una opción disponible.
+        <p class="cliente-ayuda texto-suave">
+            Las reservas se pueden realizar hasta con seis días de antelación.
         </p>
 
-        <div class="cliente-horarios" id="horariosContainer"></div>
-    </div>
+        <div class="bloque-duracion-app">
+            <h3 class="cliente-subtitulo-opcion">Duración del turno</h3>
+            <div class="duraciones-app" id="duracionesApp">
+                <button type="button" class="duracion-app-card" data-duracion="60 minutos">
+                    🕐 1 hora
+                </button>
+                <button type="button" class="duracion-app-card" data-duracion="90 minutos">
+                    🕜 1:30 hs
+                </button>
+            </div>
+        </div>
+    </section>
 
-    <div class="cliente-box">
-        <h2 class="cliente-seccion-titulo">Reservar una cancha</h2>
-        <p class="cliente-seccion-sub">Elegí horario y después una opción disponible</p>
-
-        <div id="canchasContainer" class="cliente-canchas"></div>
-    </div>
+    <section class="cliente-canchas-app" id="canchasContainer"></section>
 
     <div class="cliente-box cliente-form-box" id="formBox" style="display:none;">
         <h2 class="cliente-seccion-titulo">Completar reserva</h2>
@@ -101,7 +109,7 @@
             </div>
 
             <div id="datos_transferencia" style="display:none; margin-top:12px;">
-                <div style="background:#111; color:#fff; padding:15px; border-radius:10px;">
+                <div class="bloque-transferencia-app">
                     <strong>Datos para transferir:</strong><br><br>
                     Alias: 37padelclub<br>
                     CVU: 0000003100030540946290<br>
@@ -128,15 +136,15 @@ const reservasOcupadas = {{ reservas_ocupadas|tojson }};
 const canchas = [
     {
         nombre: "Cancha 1",
-        subtitulo: "Césped sintético | Descubierta | Con iluminación"
+        subtitulo: "Pádel • Disponible"
     },
     {
         nombre: "Cancha 2",
-        subtitulo: "Césped sintético | Descubierta | Con iluminación"
+        subtitulo: "Pádel • Disponible"
     },
     {
         nombre: "Cancha 3",
-        subtitulo: "Césped sintético | Descubierta | Con iluminación"
+        subtitulo: "Pádel • Disponible"
     }
 ];
 
@@ -154,12 +162,11 @@ const horariosBase = [
 let fechaSeleccionada = document.querySelector(".dia-card.activa").dataset.fecha;
 let horarioSeleccionado = null;
 let canchaSeleccionada = null;
-let duracionSeleccionada = null;
+let duracionSeleccionada = "90 minutos";
 let precioSeleccionado = 0;
 let metodoPagoSeleccionado = "";
 let opcionPagoSeleccionada = "";
 
-const horariosContainer = document.getElementById("horariosContainer");
 const canchasContainer = document.getElementById("canchasContainer");
 const formBox = document.getElementById("formBox");
 const resumenReserva = document.getElementById("resumenReserva");
@@ -217,17 +224,6 @@ function canchaDisponible(fecha, cancha, horario, duracion) {
     return true;
 }
 
-function opcionesDisponiblesParaHorario(fecha, horario) {
-    let opciones = 0;
-
-    canchas.forEach(c => {
-        if (canchaDisponible(fecha, c.nombre, horario, "60 minutos")) opciones += 1;
-        if (canchaDisponible(fecha, c.nombre, horario, "90 minutos")) opciones += 1;
-    });
-
-    return opciones;
-}
-
 function renderDias() {
     document.querySelectorAll(".dia-card").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -235,9 +231,8 @@ function renderDias() {
             btn.classList.add("activa");
             fechaSeleccionada = btn.dataset.fecha;
 
-            horarioSeleccionado = null;
             canchaSeleccionada = null;
-            duracionSeleccionada = null;
+            horarioSeleccionado = null;
             precioSeleccionado = 0;
             metodoPagoSeleccionado = "";
             opcionPagoSeleccionada = "";
@@ -253,122 +248,92 @@ function renderDias() {
             datosTransferencia.style.display = "none";
             formBox.style.display = "none";
 
-            renderHorarios();
             renderCanchas();
         });
     });
 }
 
-function renderHorarios() {
-    horariosContainer.innerHTML = "";
-
-    const disponibles = horariosBase.filter(h => opcionesDisponiblesParaHorario(fechaSeleccionada, h) > 0);
-
-    if (disponibles.length === 0) {
-        horariosContainer.innerHTML = `<div class="cliente-vacio">No hay horarios disponibles para ese día.</div>`;
-        return;
-    }
-
-    disponibles.forEach(h => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "hora-chip" + (h === horarioSeleccionado ? " activa" : "");
-        btn.textContent = h;
+function activarDuraciones() {
+    document.querySelectorAll(".duracion-app-card").forEach(btn => {
+        if (btn.dataset.duracion === duracionSeleccionada) {
+            btn.classList.add("activa");
+        }
 
         btn.addEventListener("click", () => {
-            horarioSeleccionado = h;
+            document.querySelectorAll(".duracion-app-card").forEach(x => x.classList.remove("activa"));
+            btn.classList.add("activa");
+            duracionSeleccionada = btn.dataset.duracion;
+
             canchaSeleccionada = null;
-            duracionSeleccionada = null;
+            horarioSeleccionado = null;
             precioSeleccionado = 0;
-            metodoPagoSeleccionado = "";
-            opcionPagoSeleccionada = "";
-
-            inputFecha.value = fechaSeleccionada;
-            inputHorario.value = horarioSeleccionado;
-            inputCancha.value = "";
-            inputDuracion.value = "";
-            inputMetodoPago.value = "";
-            inputOpcionPago.value = "";
-            inputPrecio.value = "";
-
-            datosTransferencia.style.display = "none";
             formBox.style.display = "none";
-            renderHorarios();
+
             renderCanchas();
         });
-
-        horariosContainer.appendChild(btn);
     });
 }
 
 function renderCanchas() {
     canchasContainer.innerHTML = "";
 
-    if (!horarioSeleccionado) {
-        canchasContainer.innerHTML = `<div class="cliente-vacio">Elegí un horario para ver las canchas y duraciones disponibles.</div>`;
-        return;
-    }
-
-    let hayOpciones = false;
-
     canchas.forEach(c => {
-        const disponible60 = canchaDisponible(fechaSeleccionada, c.nombre, horarioSeleccionado, "60 minutos");
-        const disponible90 = canchaDisponible(fechaSeleccionada, c.nombre, horarioSeleccionado, "90 minutos");
-
-        if (!disponible60 && !disponible90) {
-            return;
-        }
-
-        hayOpciones = true;
+        const horariosDisponibles = horariosBase.filter(h =>
+            canchaDisponible(fechaSeleccionada, c.nombre, h, duracionSeleccionada)
+        );
 
         const card = document.createElement("div");
-        card.className = "cancha-card";
+        card.className = "cancha-card-app";
 
-        const precio60 = precioSegunHora("60 minutos", horarioSeleccionado);
-        const precio90 = precioSegunHora("90 minutos", horarioSeleccionado);
+        const horariosHtml = horariosBase.map(h => {
+            const disponible = canchaDisponible(fechaSeleccionada, c.nombre, h, duracionSeleccionada);
+            const precio = precioSegunHora(duracionSeleccionada, h);
+
+            if (!disponible) {
+                return `
+                    <div class="slot-card slot-ocupado">
+                        <span class="slot-hora">${h}</span>
+                    </div>
+                `;
+            }
+
+            return `
+                <button type="button" class="slot-card slot-libre"
+                    data-cancha="${c.nombre}"
+                    data-horario="${h}"
+                    data-duracion="${duracionSeleccionada}"
+                    data-precio="${precio}">
+                    <span class="slot-hora">${h}</span>
+                    <span class="slot-precio">$${precio.toLocaleString("es-AR")}</span>
+                </button>
+            `;
+        }).join("");
 
         card.innerHTML = `
-            <div class="cancha-header">
-                <div>
+            <div class="cancha-header-app">
+                <div class="cancha-icono-app">🎾</div>
+                <div class="cancha-info-app">
                     <h3>${c.nombre}</h3>
                     <p>${c.subtitulo}</p>
                 </div>
             </div>
 
-            <div class="precio-opciones">
-                ${disponible60 ? `
-                <button type="button" class="precio-card"
-                    data-cancha="${c.nombre}" data-duracion="60 minutos" data-precio="${precio60}">
-                    <span class="precio-monto">$${precio60}</span>
-                    <span class="precio-tiempo">60 min</span>
-                </button>
-                ` : ""}
-
-                ${disponible90 ? `
-                <button type="button" class="precio-card"
-                    data-cancha="${c.nombre}" data-duracion="90 minutos" data-precio="${precio90}">
-                    <span class="precio-monto">$${precio90}</span>
-                    <span class="precio-tiempo">90 min</span>
-                </button>
-                ` : ""}
+            <div class="slots-grid-app">
+                ${horariosHtml}
             </div>
         `;
 
         canchasContainer.appendChild(card);
     });
 
-    if (!hayOpciones) {
-        canchasContainer.innerHTML = `<div class="cliente-vacio">No quedan canchas libres para ese horario.</div>`;
-        return;
-    }
-
-    document.querySelectorAll(".precio-card").forEach(btn => {
+    document.querySelectorAll(".slot-libre").forEach(btn => {
         btn.addEventListener("click", () => {
-            document.querySelectorAll(".precio-card").forEach(x => x.classList.remove("activa"));
+            document.querySelectorAll(".slot-libre").forEach(x => x.classList.remove("activa"));
 
             btn.classList.add("activa");
 
             canchaSeleccionada = btn.dataset.cancha;
+            horarioSeleccionado = btn.dataset.horario;
             duracionSeleccionada = btn.dataset.duracion;
             precioSeleccionado = Number(btn.dataset.precio);
 
@@ -408,12 +373,12 @@ function actualizarPago() {
         return;
     }
 
-    precioTotalTexto.textContent = "Precio total: $" + precioSeleccionado;
+    precioTotalTexto.textContent = "Precio total: $" + precioSeleccionado.toLocaleString("es-AR");
 
     if (opcionPagoSeleccionada === "Reserva") {
-        precioPagoTexto.textContent = "Pagás ahora (30%): $" + (precioSeleccionado * 0.30).toFixed(2);
+        precioPagoTexto.textContent = "Pagás ahora (30%): $" + (precioSeleccionado * 0.30).toLocaleString("es-AR");
     } else if (opcionPagoSeleccionada === "Pagado") {
-        precioPagoTexto.textContent = "Pagás ahora: $" + precioSeleccionado.toFixed(2);
+        precioPagoTexto.textContent = "Pagás ahora: $" + precioSeleccionado.toLocaleString("es-AR");
     } else {
         precioPagoTexto.textContent = "Elegí cómo querés pagar";
     }
@@ -475,7 +440,7 @@ formReserva.addEventListener("submit", (e) => {
 });
 
 renderDias();
-renderHorarios();
+activarDuraciones();
 renderCanchas();
 activarOpciones();
 </script>
