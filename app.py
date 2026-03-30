@@ -930,7 +930,31 @@ def eliminar_reserva(id):
 
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
+
+    # Buscar datos de la reserva antes de borrarla
+    cursor.execute("""
+        SELECT id, nombre, fecha, cancha, horario, metodo_pago
+        FROM reservas
+        WHERE id = ?
+    """, (id,))
+    reserva = cursor.fetchone()
+
+    if reserva:
+        reserva_id = reserva[0]
+        nombre = reserva[1] or ""
+        fecha = reserva[2] or ""
+        cancha = reserva[3] or ""
+        horario = reserva[4] or ""
+
+        # Borrar movimientos relacionados de caja
+        cursor.execute("""
+            DELETE FROM movimientos
+            WHERE descripcion LIKE ?
+        """, (f"%reserva #{reserva_id}%",))
+
+    # Borrar la reserva
     cursor.execute("DELETE FROM reservas WHERE id = ?", (id,))
+
     conn.commit()
     conn.close()
 
