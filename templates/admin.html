@@ -215,9 +215,14 @@
                             Falta: ${{ falta }}<br>
                             Método de pago: {{ r[8] }}<br>
                             Estado: {{ r[9] }}<br><br>
+                            {% if r[9] != "Pagado" and r[8] == "Transferencia" %}
+                            <a href="/confirmar_transferencia/{{ r[0] }}" class="btn-confirmar">
+                                Confirmar pago
+                            </a><br><br>
+                            {% endif %}
 
-                            <a href="/editar/{{ r[0] }}" class="btn-top btn-azul btn-mini">Editar</a>
-                            <a href="/eliminar/{{ r[0] }}"
+                            <a href="/editar/{{ r[0] }}" ...
+                            <a href="/eliminar/{{ r[0] }}" ...
                                onclick="return confirm('¿Seguro que querés eliminar esta reserva?')"
                                class="btn-top btn-rojo btn-mini">
                                Eliminar
