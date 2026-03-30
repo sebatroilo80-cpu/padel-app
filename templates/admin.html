@@ -193,11 +193,11 @@
         </div>
 
         <div class="bloque-seccion">
-            <div class="seccion-header">
-                <h2>Reservas cargadas</h2>
-            </div>
+    <div class="seccion-header">
+        <h2>Reservas cargadas</h2>
+    </div>
 
-            {% if reservas %}
+    {% if reservas %}
     <div class="lista-cards">
         {% for r in reservas %}
             {% set precio = r[7] %}
@@ -217,18 +217,21 @@
                 Método de pago: {{ r[8] }}<br>
                 Estado: {{ r[9] }}<br><br>
 
+                <!-- 🔔 AVISO ADMIN -->
                 <a href="https://wa.me/5493513272846?text=Nuevo%20turno%20reservado%0ACliente:%20{{ r[1] }}%0ATel:%20{{ r[2] or '' }}%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AMetodo:%20{{ r[8] }}%0AEstado:%20{{ r[9] }}"
                    target="_blank"
                    class="btn-top btn-verde btn-mini">
                    Avisar admin
                 </a><br><br>
 
+                <!-- 💸 CONFIRMAR TRANSFERENCIA -->
                 {% if r[9] != "Pagado" and r[8] == "Transferencia" %}
                 <a href="/confirmar_transferencia/{{ r[0] }}" class="btn-confirmar">
                     Confirmar pago
                 </a><br><br>
                 {% endif %}
 
+                <!-- 📲 AVISAR CLIENTE -->
                 {% if r[2] and (r[9] == "Pagado" or r[9] == "Reserva") %}
                 <a href="https://wa.me/{{ r[2] }}?text=Reserva%20confirmada%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AEstado:%20{{ r[9] }}"
                    target="_blank"
@@ -247,9 +250,10 @@
             </div>
         {% endfor %}
     </div>
-{% else %}
-    <p>No hay reservas todavía.</p>
-{% endif %}
+    {% else %}
+        <p>No hay reservas todavía.</p>
+    {% endif %}
+</div>
 
                 <!-- 🔥 AVISAR CLIENTE -->
                 {% if r[9] == "Pagado" or r[9] == "Reserva" %}
