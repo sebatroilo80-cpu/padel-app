@@ -55,10 +55,16 @@
 
     <section class="cliente-canchas-app" id="canchasContainer"></section>
 
-    <div class="cliente-box cliente-form-box" id="formBox" style="display:none;">
-        <h2 class="cliente-seccion-titulo">Completar reserva</h2>
+    <div class="cliente-box cliente-form-box form-app-box" id="formBox" style="display:none;">
+        <div class="form-app-header">
+            <div class="form-app-icono">✅</div>
+            <div>
+                <h2 class="cliente-seccion-titulo">Completar reserva</h2>
+                <p class="form-app-sub">Confirmá tu turno y elegí cómo querés pagar</p>
+            </div>
+        </div>
 
-        <div class="cliente-resumen" id="resumenReserva"></div>
+        <div class="cliente-resumen resumen-app" id="resumenReserva"></div>
 
         <form action="/reservar" method="POST" id="formReserva">
             <input type="hidden" name="fecha" id="inputFecha">
@@ -69,48 +75,48 @@
             <input type="hidden" name="opcion_pago" id="inputOpcionPago">
             <input type="hidden" name="precio" id="inputPrecio">
 
-            <div class="cliente-datos-grid">
-                <input type="text" name="nombre" placeholder="👤 Nombre y apellido" class="campo cliente-campo-grande" required>
-                <input type="text" name="telefono" placeholder="📱 Teléfono" class="campo cliente-campo-grande" required>
+            <div class="cliente-datos-grid datos-app-grid">
+                <input type="text" name="nombre" placeholder="👤 Nombre y apellido" class="campo cliente-campo-grande campo-app" required>
+                <input type="text" name="telefono" placeholder="📱 Teléfono" class="campo cliente-campo-grande campo-app" required>
             </div>
 
-            <div class="cliente-bloque-opciones">
-                <h3 class="cliente-subtitulo-opcion">Cómo querés pagar</h3>
-                <div class="opciones-grid">
-                    <button type="button" class="opcion-card" data-tipo="opcion" data-valor="Reserva">
-                        <span class="opcion-icono">📝</span>
-                        <span class="opcion-titulo">Reservar</span>
-                        <span class="opcion-texto">Pagás 30% ahora</span>
+            <div class="cliente-bloque-opciones bloque-app-opciones">
+                <h3 class="cliente-subtitulo-opcion">💸 Cómo querés pagar</h3>
+                <div class="opciones-grid opciones-grid-app">
+                    <button type="button" class="opcion-card opcion-card-app" data-tipo="opcion" data-valor="Reserva">
+                        <span class="opcion-icono-app">📝</span>
+                        <span class="opcion-titulo-app">Reservar</span>
+                        <span class="opcion-texto-app">Pagás 30% ahora</span>
                     </button>
 
-                    <button type="button" class="opcion-card" data-tipo="opcion" data-valor="Pagado">
-                        <span class="opcion-icono">✅</span>
-                        <span class="opcion-titulo">Pagar total</span>
-                        <span class="opcion-texto">Pagás 100% ahora</span>
+                    <button type="button" class="opcion-card opcion-card-app" data-tipo="opcion" data-valor="Pagado">
+                        <span class="opcion-icono-app">✅</span>
+                        <span class="opcion-titulo-app">Pagar total</span>
+                        <span class="opcion-texto-app">Pagás 100% ahora</span>
                     </button>
                 </div>
             </div>
 
-            <div class="cliente-bloque-opciones">
-                <h3 class="cliente-subtitulo-opcion">Método de pago</h3>
-                <div class="opciones-grid">
-                    <button type="button" class="opcion-card" data-tipo="metodo" data-valor="Transferencia">
-                        <span class="opcion-icono">🏦</span>
-                        <span class="opcion-titulo">Transferencia</span>
-                        <span class="opcion-texto">Pago bancario</span>
+            <div class="cliente-bloque-opciones bloque-app-opciones">
+                <h3 class="cliente-subtitulo-opcion">💳 Método de pago</h3>
+                <div class="opciones-grid opciones-grid-app">
+                    <button type="button" class="opcion-card opcion-card-app" data-tipo="metodo" data-valor="Transferencia">
+                        <span class="opcion-icono-app">🏦</span>
+                        <span class="opcion-titulo-app">Transferencia</span>
+                        <span class="opcion-texto-app">Pago bancario</span>
                     </button>
 
-                    <button type="button" class="opcion-card" data-tipo="metodo" data-valor="Mercado Pago">
-                        <span class="opcion-icono">💳</span>
-                        <span class="opcion-titulo">Mercado Pago</span>
-                        <span class="opcion-texto">Pago digital</span>
+                    <button type="button" class="opcion-card opcion-card-app" data-tipo="metodo" data-valor="Mercado Pago">
+                        <span class="opcion-icono-app">💳</span>
+                        <span class="opcion-titulo-app">Mercado Pago</span>
+                        <span class="opcion-texto-app">Pago digital</span>
                     </button>
                 </div>
             </div>
 
             <div id="datos_transferencia" style="display:none; margin-top:12px;">
                 <div class="bloque-transferencia-app">
-                    <strong>Datos para transferir:</strong><br><br>
+                    <strong>📌 Datos para transferir:</strong><br><br>
                     Alias: 37padelclub<br>
                     CVU: 0000003100030540946290<br>
                     Titular: Eduardo Sebastián Troilo<br><br>
@@ -118,12 +124,14 @@
                 </div>
             </div>
 
-            <div class="cliente-precio-info">
+            <div class="cliente-precio-info precio-app-box">
                 <p id="precioTotalTexto"></p>
                 <p id="precioPagoTexto"></p>
             </div>
 
-            <button class="boton cliente-boton-final" type="submit">Confirmar reserva</button>
+            <button class="boton cliente-boton-final boton-app-final" type="submit">
+                🚀 Confirmar reserva
+            </button>
         </form>
     </div>
 
@@ -278,10 +286,6 @@ function renderCanchas() {
     canchasContainer.innerHTML = "";
 
     canchas.forEach(c => {
-        const horariosDisponibles = horariosBase.filter(h =>
-            canchaDisponible(fechaSeleccionada, c.nombre, h, duracionSeleccionada)
-        );
-
         const card = document.createElement("div");
         card.className = "cancha-card-app";
 
@@ -344,10 +348,10 @@ function renderCanchas() {
             inputPrecio.value = precioSeleccionado;
 
             resumenReserva.innerHTML = `
-                <div><strong>Fecha:</strong> ${fechaSeleccionada}</div>
-                <div><strong>Horario:</strong> ${horarioSeleccionado}</div>
-                <div><strong>Cancha:</strong> ${canchaSeleccionada}</div>
-                <div><strong>Duración:</strong> ${duracionSeleccionada}</div>
+                <div class="resumen-app-item"><span>📅 Fecha</span><strong>${fechaSeleccionada}</strong></div>
+                <div class="resumen-app-item"><span>⏰ Horario</span><strong>${horarioSeleccionado}</strong></div>
+                <div class="resumen-app-item"><span>🎾 Cancha</span><strong>${canchaSeleccionada}</strong></div>
+                <div class="resumen-app-item"><span>⏳ Duración</span><strong>${duracionSeleccionada}</strong></div>
             `;
 
             metodoPagoSeleccionado = "";
@@ -373,12 +377,12 @@ function actualizarPago() {
         return;
     }
 
-    precioTotalTexto.textContent = "Precio total: $" + precioSeleccionado.toLocaleString("es-AR");
+    precioTotalTexto.textContent = "💰 Precio total: $" + precioSeleccionado.toLocaleString("es-AR");
 
     if (opcionPagoSeleccionada === "Reserva") {
-        precioPagoTexto.textContent = "Pagás ahora (30%): $" + (precioSeleccionado * 0.30).toLocaleString("es-AR");
+        precioPagoTexto.textContent = "💳 Pagás ahora (30%): $" + (precioSeleccionado * 0.30).toLocaleString("es-AR");
     } else if (opcionPagoSeleccionada === "Pagado") {
-        precioPagoTexto.textContent = "Pagás ahora: $" + precioSeleccionado.toLocaleString("es-AR");
+        precioPagoTexto.textContent = "✅ Pagás ahora: $" + precioSeleccionado.toLocaleString("es-AR");
     } else {
         precioPagoTexto.textContent = "Elegí cómo querés pagar";
     }

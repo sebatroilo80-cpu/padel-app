@@ -236,66 +236,170 @@
         grid-template-columns: repeat(2, 1fr);
     }
 }
-/* =========================
-   BOTONES TIPO APP PRO
-========================= */
+/* ===== FORMULARIO ABAJO TIPO APP ===== */
+
+.form-app-box {
+    background: #fff;
+    border: 2px solid #dde2df;
+    border-radius: 28px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.05);
+    margin-top: 18px;
+}
+
+.form-app-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.form-app-icono {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: #eef7f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+.form-app-sub {
+    margin: 4px 0 0;
+    color: #6d7370;
+    font-size: 1rem;
+}
+
+.resumen-app {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.resumen-app-item {
+    background: #f8faf9;
+    border: 1px solid #e3e8e5;
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.resumen-app-item span {
+    font-size: .92rem;
+    color: #6f7673;
+    font-weight: 700;
+}
+
+.resumen-app-item strong {
+    font-size: 1.04rem;
+    color: #161616;
+}
+
+.datos-app-grid {
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.campo-app {
+    min-height: 56px;
+    border-radius: 16px;
+    border: 2px solid #dde2df;
+    font-size: 1rem;
+    padding: 0 16px;
+}
+
+.bloque-app-opciones {
+    margin-top: 20px;
+}
+
+.opciones-grid-app {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
 
 .opcion-card-app {
-    min-height: 110px;
-    border-radius: 18px;
-    border: 2px solid #e0e0e0;
+    min-height: 120px;
+    border-radius: 20px;
+    border: 2px solid #dce1de;
     background: #fff;
     padding: 18px;
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: .2s ease;
 }
 
-/* TEXTO GRANDE */
-.opcion-titulo-app {
-    font-size: 18px;
+.opcion-card-app .opcion-icono-app {
+    font-size: 1.8rem;
+}
+
+.opcion-card-app .opcion-titulo-app {
+    font-size: 1.18rem;
     font-weight: 800;
+    color: #1a1a1a;
 }
 
-/* TEXTO CHICO */
-.opcion-texto-app {
-    font-size: 14px;
-    color: #666;
+.opcion-card-app .opcion-texto-app {
+    font-size: 1rem;
+    color: #6d7471;
 }
 
-/* EMOJI */
-.opcion-icono-app {
-    font-size: 26px;
-}
-
-/* CUANDO SE SELECCIONA */
 .opcion-card-app.activa {
-    background: #2ecc71;
-    border-color: #2ecc71;
-    color: white;
+    border-color: #57b574;
+    background: #f3fbf5;
+    box-shadow: 0 10px 24px rgba(87,181,116,.16);
 }
 
-/* QUE TODO SE VUELVA BLANCO */
-.opcion-card-app.activa .opcion-texto-app {
-    color: #eafff2;
+.bloque-transferencia-app {
+    background: #111;
+    color: #fff;
+    padding: 18px;
+    border-radius: 16px;
 }
 
-/* BOTÓN FINAL */
+.precio-app-box {
+    background: #f7faf8;
+    border: 1px solid #e2e8e4;
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-top: 20px;
+    margin-bottom: 18px;
+}
+
+.precio-app-box p {
+    margin: 0 0 8px;
+    font-size: 1.08rem;
+    font-weight: 800;
+    color: #1a1a1a;
+}
+
+.precio-app-box p:last-child {
+    margin-bottom: 0;
+}
+
 .boton-app-final {
-    background: #2ecc71;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    height: 60px;
-    border-radius: 14px;
-    border: none;
-    cursor: pointer;
-    transition: 0.2s;
+    min-height: 60px;
+    border-radius: 18px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    width: 100%;
 }
 
-.boton-app-final:hover {
-    background: #27ae60;
+@media (max-width: 700px) {
+    .resumen-app,
+    .opciones-grid-app {
+        grid-template-columns: 1fr;
+    }
+
+    .form-app-box {
+        padding: 18px;
+    }
 }
