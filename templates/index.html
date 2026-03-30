@@ -99,6 +99,16 @@
                     </button>
                 </div>
             </div>
+            
+            <div id="datos_transferencia" style="display:none; margin-top:12px;">
+                <div style="background:#111; color:#fff; padding:15px; border-radius:10px;">
+                    <strong>Datos para transferir:</strong><br><br>
+                    Alias: 37padelclub<br>
+                    CVU: 0000003100030540946290<br>
+                    Titular: Eduardo Sebastián Troilo<br><br>
+                    <small>⚠️ La reserva quedará pendiente hasta confirmar el pago.</small>
+                </div>
+            </div>
 
             <div class="cliente-precio-info">
                 <p id="precioTotalTexto"></p>
@@ -458,6 +468,23 @@ renderDias();
 renderHorarios();
 renderCanchas();
 activarOpciones();
+</script>
+
+script>
+document.querySelectorAll('[data-tipo="metodo"]').forEach(btn => {
+    btn.addEventListener("click", function() {
+
+        const metodo = this.innerText.trim();
+
+        const bloque = document.getElementById("datos_transferencia");
+
+        if (metodo.includes("Transferencia")) {
+            bloque.style.display = "block";
+        } else {
+            bloque.style.display = "none";
+        }
+    });
+});
 </script>
 
 </body>
