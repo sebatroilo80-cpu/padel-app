@@ -974,9 +974,8 @@ def confirmar_transferencia(id):
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
 
-    # Buscar la reserva
     cursor.execute("""
-        SELECT fecha, nombre, cancha, horario, precio, pagado, metodo_pago
+        SELECT fecha, nombre, cancha, horario, precio, metodo_pago, estado_pago
         FROM reservas
         WHERE id = ?
     """, (id,))
@@ -986,18 +985,26 @@ def confirmar_transferencia(id):
         conn.close()
         return "Reserva no encontrada"
 
-    fecha, nombre, cancha, horario, precio, pagado, metodo_pago = reserva
+    fecha, nombre, cancha, horario, precio, metodo_pago, estado_pago = reserva
 
-    # Marcar como pagado
+    if estado_pago == "Pendiente reserva":
+        monto_confirmado = round(float(precio) * 0.30, 2)
+        nuevo_estado = "Reserva"
+        descripcion = f"Seña confirmada reserva #{id} - {nombre} - {cancha} - {horario}"
+    else:
+        monto_confirmado = float(precio)
+        nuevo_estado = "Pagado"
+        descripcion = f"Pago total confirmado reserva #{id} - {nombre} - {cancha} - {horario}"
+
     cursor.execute("""
         UPDATE reservas
-        SET estado_pago = 'Pagado',
-            pagado = precio
+        SET estado_pago = ?, pagado = ?
         WHERE id = ?
-    """, (id,))
-
-    # Registrar ingreso en caja
-    descripcion = f"Pago confirmado reserva #{id} - {nombre} - {cancha} - {horario}"
+    """, (
+        nuevo_estado,
+        monto_confirmado,
+        id
+    ))
 
     cursor.execute("""
         INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
@@ -1006,7 +1013,7 @@ def confirmar_transferencia(id):
         fecha,
         "ingreso",
         descripcion,
-        precio,
+        monto_confirmado,
         metodo_pago
     ))
 
