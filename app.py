@@ -284,10 +284,16 @@ def reservar():
         return "Ese horario ya está ocupado o bloqueado. Volvé atrás y elegí otro."
 
     precio = calcular_precio(cursor, duracion, horario)
-    pagado = calcular_pagado_inicial(precio, opcion_pago)
-    estado_pago = calcular_estado_desde_pagado(precio, pagado)
 
-    # Reserva del cliente
+    # Lógica especial para transferencia
+    if metodo_pago == "Transferencia":
+        pagado = 0
+        estado_pago = "Pendiente"
+    else:
+        pagado = calcular_pagado_inicial(precio, opcion_pago)
+        estado_pago = calcular_estado_desde_pagado(precio, pagado)
+
+    # Guardar reserva del cliente
     cursor.execute("""
         INSERT INTO reservas (
             nombre, telefono, fecha, cancha, duracion, horario,
@@ -309,10 +315,10 @@ def reservar():
 
     reserva_id = cursor.lastrowid
 
-    # Si NO es Mercado Pago y ya pagó algo, impacta en caja acá
-    # Si es Mercado Pago, NO lo cargamos acá para no duplicar:
-    # eso lo hace el webhook cuando MP aprueba el pago.
-    if metodo_pago != "Mercado Pago" and float(pagado) > 0:
+    # Si NO es Mercado Pago NI Transferencia y pagó algo, impacta en caja acá
+    # Mercado Pago impacta por webhook
+    # Transferencia impacta cuando vos confirmes el pago
+    if metodo_pago not in ["Mercado Pago", "Transferencia"] and float(pagado) > 0:
         if opcion_pago == "Reserva":
             descripcion = f"Seña reserva #{reserva_id} - {nombre} - {cancha} - {horario}"
         else:
