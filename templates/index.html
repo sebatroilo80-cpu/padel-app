@@ -99,7 +99,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <div id="datos_transferencia" style="display:none; margin-top:12px;">
                 <div style="background:#111; color:#fff; padding:15px; border-radius:10px;">
                     <strong>Datos para transferir:</strong><br><br>
@@ -175,6 +175,7 @@ const inputPrecio = document.getElementById("inputPrecio");
 const precioTotalTexto = document.getElementById("precioTotalTexto");
 const precioPagoTexto = document.getElementById("precioPagoTexto");
 const formReserva = document.getElementById("formReserva");
+const datosTransferencia = document.getElementById("datos_transferencia");
 
 function precioSegunHora(duracion, horario) {
     const hora = parseInt(horario.split(":")[0], 10);
@@ -249,6 +250,7 @@ function renderDias() {
             inputOpcionPago.value = "";
             inputPrecio.value = "";
 
+            datosTransferencia.style.display = "none";
             formBox.style.display = "none";
 
             renderHorarios();
@@ -289,6 +291,7 @@ function renderHorarios() {
             inputOpcionPago.value = "";
             inputPrecio.value = "";
 
+            datosTransferencia.style.display = "none";
             formBox.style.display = "none";
             renderHorarios();
             renderCanchas();
@@ -387,6 +390,7 @@ function renderCanchas() {
             inputMetodoPago.value = "";
             inputOpcionPago.value = "";
 
+            datosTransferencia.style.display = "none";
             document.querySelectorAll(".opcion-card").forEach(card => card.classList.remove("activa"));
 
             formBox.style.display = "block";
@@ -427,6 +431,12 @@ function activarOpciones() {
             if (tipo === "metodo") {
                 metodoPagoSeleccionado = valor;
                 inputMetodoPago.value = valor;
+
+                if (valor === "Transferencia") {
+                    datosTransferencia.style.display = "block";
+                } else {
+                    datosTransferencia.style.display = "none";
+                }
             }
 
             if (tipo === "opcion") {
@@ -468,23 +478,6 @@ renderDias();
 renderHorarios();
 renderCanchas();
 activarOpciones();
-</script>
-
-script>
-document.querySelectorAll('[data-tipo="metodo"]').forEach(btn => {
-    btn.addEventListener("click", function() {
-
-        const metodo = this.innerText.trim();
-
-        const bloque = document.getElementById("datos_transferencia");
-
-        if (metodo.includes("Transferencia")) {
-            bloque.style.display = "block";
-        } else {
-            bloque.style.display = "none";
-        }
-    });
-});
 </script>
 
 </body>
