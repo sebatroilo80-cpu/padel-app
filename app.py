@@ -254,78 +254,45 @@ def home():
 
 @app.route("/reservar", methods=["POST"])
 def reservar():
-    nombre = request.form.get("nombre")
-    telefono = request.form.get("telefono")
-    fecha = request.form.get("fecha")
-    cancha = request.form.get("cancha")
-    duracion = request.form.get("duracion")
-    horario = request.form.get("horario")
-    metodo_pago = request.form.get("metodo_pago")
-    precio = request.form.get("precio") or request.form.get("monto")
+    nombre = request.form.get("nombre", "").strip()
+    telefono = request.form.get("telefono", "").strip()
+    fecha = request.form.get("fecha", "").strip()
+    cancha = request.form.get("cancha", "").strip()
+    duracion = request.form.get("duracion", "").strip()
+    horario = request.form.get("horario", "").strip()
+    metodo_pago = request.form.get("metodo_pago", "").strip()
+    opcion_pago = request.form.get("opcion_pago", "").strip()
 
-    if not nombre or not fecha or not cancha or not duracion or not horario:
-        return "Faltan datos obligatorios para la reserva"
+    conn = sqlite3.connect("padel.db")
+    cursor = conn.cursor()
 
-    if not precio:
-        return "No llegó el precio de la reserva. Revisá el formulario."
-
-    try:
-        precio = float(precio)
-    except ValueError:
-        return "El precio es inválido"
-
-    pagado = precio
-    estado_pago = "pendiente"
-
-    # Si existe la función hay_conflicto en tu sistema, la usamos
-    try:
-        conn = sqlite3.connect("padel.db")
-        cursor = conn.cursor()
-
-        if hay_conflicto(cursor, fecha, cancha, horario, duracion):
-            conn.close()
-            return "Ese horario ya está ocupado o bloqueado."
-    except NameError:
-        # Si no existe hay_conflicto, seguimos sin validar conflicto
-        conn = sqlite3.connect("padel.db")
-        cursor = conn.cursor()
-
-    # MERCADO PAGO
-    if metodo_pago == "Mercado Pago":
-        external_id = str(uuid.uuid4())
-
-        session["reserva_mp"] = {
-            "id": external_id,
-            "nombre": nombre,
-            "telefono": telefono,
-            "fecha": fecha,
-            "cancha": cancha,
-            "duracion": duracion,
-            "horario": horario,
-            "precio": precio,
-            "pagado": pagado,
-            "estado": estado_pago
-        }
-
-        url_pago = crear_preferencia_mp({
-            "id": external_id,
-            "cancha": cancha,
-            "fecha": fecha,
-            "horario": horario,
-            "monto": precio
-        })
-
-        conn.close()
-
-        if not url_pago:
-            return "No se pudo crear el pago de Mercado Pago"
-
-        return redirect(url_pago)
-
-    # RESERVA NORMAL
+    # Crear tabla movimientos si no existe
     cursor.execute("""
-        INSERT INTO reservas
-        (nombre, telefono, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado)
+        CREATE TABLE IF NOT EXISTS movimientos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fecha TEXT,
+            tipo TEXT,
+            descripcion TEXT,
+            monto REAL,
+            metodo_pago TEXT
+        )
+    """)
+    conn.commit()
+
+    if hay_conflicto(cursor, fecha, cancha, horario, duracion):
+        conn.close()
+        return "Ese horario ya está ocupado o bloqueado. Volvé atrás y elegí otro."
+
+    precio = calcular_precio(cursor, duracion, horario)
+    pagado = calcular_pagado_inicial(precio, opcion_pago)
+    estado_pago = calcular_estado_desde_pagado(precio, pagado)
+
+    # Reserva del cliente
+    cursor.execute("""
+        INSERT INTO reservas (
+            nombre, telefono, fecha, cancha, duracion, horario,
+            precio, metodo_pago, estado_pago, pagado
+        )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         nombre,
@@ -340,10 +307,58 @@ def reservar():
         pagado
     ))
 
+    reserva_id = cursor.lastrowid
+
+    # Si NO es Mercado Pago y ya pagó algo, impacta en caja acá
+    # Si es Mercado Pago, NO lo cargamos acá para no duplicar:
+    # eso lo hace el webhook cuando MP aprueba el pago.
+    if metodo_pago != "Mercado Pago" and float(pagado) > 0:
+        if opcion_pago == "Reserva":
+            descripcion = f"Seña reserva #{reserva_id} - {nombre} - {cancha} - {horario}"
+        else:
+            descripcion = f"Pago total reserva #{reserva_id} - {nombre} - {cancha} - {horario}"
+
+        cursor.execute("""
+            INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            fecha,
+            "ingreso",
+            descripcion,
+            pagado,
+            metodo_pago
+        ))
+
+        conn.commit()
+        conn.close()
+        return redirect(f"/?ok=1")
+
+    # Si es Mercado Pago, crear preferencia y redirigir
+    if metodo_pago == "Mercado Pago":
+        external_id = str(reserva_id)
+
+        url_pago = crear_preferencia_mp({
+            "id": external_id,
+            "nombre": nombre,
+            "telefono": telefono,
+            "fecha": fecha,
+            "cancha": cancha,
+            "duracion": duracion,
+            "horario": horario,
+            "monto": pagado
+        })
+
+        conn.commit()
+        conn.close()
+
+        if not url_pago:
+            return "No se pudo generar el link de Mercado Pago."
+
+        return redirect(url_pago)
+
     conn.commit()
     conn.close()
-
-    return redirect("/")
+    return redirect(f"/?ok=1")
 
 @app.route("/webhook/mercadopago", methods=["POST"])
 def webhook_mercadopago():
@@ -359,20 +374,21 @@ def webhook_mercadopago():
         if not payment_id:
             return jsonify({"ok": True}), 200
 
-        import requests
-        import os
-
         access_token = os.getenv("MP_ACCESS_TOKEN")
+        if not access_token:
+            print("❌ Falta MP_ACCESS_TOKEN")
+            return jsonify({"ok": False}), 200
 
-        # Consultar el pago en MercadoPago
-        url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
         headers = {
             "Authorization": f"Bearer {access_token}"
         }
 
-        resp = requests.get(url, headers=headers)
-        pago = resp.json()
+        resp = requests.get(
+            f"https://api.mercadopago.com/v1/payments/{payment_id}",
+            headers=headers
+        )
 
+        pago = resp.json()
         print("DETALLE PAGO:", pago)
 
         # Solo si está aprobado
@@ -380,52 +396,90 @@ def webhook_mercadopago():
             return jsonify({"ok": True}), 200
 
         ref = pago.get("external_reference")
-
         if not ref:
             print("❌ No hay external_reference")
             return jsonify({"ok": True}), 200
 
-        print("📦 REF:", ref)
+        monto_pagado = float(pago.get("transaction_amount") or 0)
 
-        # Conexión a DB
-        import sqlite3
         conn = sqlite3.connect("padel.db")
         cursor = conn.cursor()
 
-        # Buscar el turno
+        # Crear tabla movimientos si no existe
         cursor.execute("""
-            SELECT cliente, fecha, hora, cancha, precio
-            FROM turnos
+            CREATE TABLE IF NOT EXISTS movimientos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fecha TEXT,
+                tipo TEXT,
+                descripcion TEXT,
+                monto REAL,
+                metodo_pago TEXT
+            )
+        """)
+        conn.commit()
+
+        # Buscar la reserva ya creada en /reservar
+        cursor.execute("""
+            SELECT id, nombre, telefono, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado
+            FROM reservas
             WHERE id = ?
         """, (ref,))
+        reserva = cursor.fetchone()
 
-        turno = cursor.fetchone()
+        if not reserva:
+            print(f"❌ No se encontró la reserva #{ref}")
+            conn.close()
+            return jsonify({"ok": True}), 200
 
-        if turno:
-            cliente, fecha, hora, cancha, precio = turno
+        reserva_id = reserva[0]
+        nombre = reserva[1]
+        fecha = reserva[3]
+        cancha = reserva[4]
+        horario = reserva[6]
+        precio_total = float(reserva[7] or 0)
 
-            # Marcar como pagado
+        # Definir nuevo estado según cuánto pagó realmente
+        nuevo_pagado = monto_pagado
+        nuevo_estado = "Pagado" if nuevo_pagado >= precio_total else "Reserva"
+
+        # Actualizar reserva con estado real de MP
+        cursor.execute("""
+            UPDATE reservas
+            SET metodo_pago = ?, estado_pago = ?, pagado = ?
+            WHERE id = ?
+        """, (
+            "Mercado Pago",
+            nuevo_estado,
+            nuevo_pagado,
+            reserva_id
+        ))
+
+        # Evitar duplicar caja si Mercado Pago manda el webhook más de una vez
+        descripcion_mov = f"Pago Mercado Pago reserva #{reserva_id} - {nombre} - {cancha} - {horario}"
+
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM movimientos
+            WHERE tipo = 'ingreso' AND descripcion = ?
+        """, (descripcion_mov,))
+        ya_existe = cursor.fetchone()[0]
+
+        if ya_existe == 0 and nuevo_pagado > 0:
             cursor.execute("""
-                UPDATE turnos
-                SET pagado = 1
-                WHERE id = ?
-            """, (ref,))
-
-            # Registrar ingreso en caja
-            cursor.execute("""
-                INSERT INTO movimientos (fecha, tipo, concepto, monto, metodo_pago)
-                VALUES (?, 'ingreso', ?, ?, 'mercadopago')
+                INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
+                VALUES (?, ?, ?, ?, ?)
             """, (
                 fecha,
-                f"Turno {cliente} - Cancha {cancha} {hora}",
-                precio
+                "ingreso",
+                descripcion_mov,
+                nuevo_pagado,
+                "Mercado Pago"
             ))
 
-            conn.commit()
-            conn.close()
+        conn.commit()
+        conn.close()
 
-            print("✅ RESERVA GUARDADA AUTOMÁTICAMENTE")
-
+        print("✅ Reserva actualizada y caja impactada automáticamente")
         return jsonify({"ok": True}), 200
 
     except Exception as e:
