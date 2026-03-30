@@ -455,9 +455,21 @@ def admin():
         return redirect("/login")
 
     conn = sqlite3.connect("padel.db")
-    cursor = conn.cursor()
+cursor = conn.cursor()
 
-    fecha_admin = request.args.get("fecha")
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS movimientos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        fecha TEXT,
+        tipo TEXT,
+        descripcion TEXT,
+        monto REAL,
+        metodo_pago TEXT
+    )
+""")
+conn.commit()
+
+fecha_admin = request.args.get("fecha")
     if not fecha_admin:
         fecha_admin = date.today().strftime("%Y-%m-%d")
 
