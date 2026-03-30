@@ -734,6 +734,19 @@ def admin_reservar():
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
 
+    # Crear tabla movimientos si no existe
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS movimientos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fecha TEXT,
+            tipo TEXT,
+            descripcion TEXT,
+            monto REAL,
+            metodo_pago TEXT
+        )
+    """)
+    conn.commit()
+
     if hay_conflicto(cursor, fecha, cancha, horario, duracion):
         conn.close()
         return "Ese horario ya está ocupado o bloqueado. Volvé atrás y elegí otro."
@@ -743,9 +756,43 @@ def admin_reservar():
     estado_pago = calcular_estado_desde_pagado(precio, pagado)
 
     cursor.execute("""
-        INSERT INTO reservas (nombre, telefono, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado)
+        INSERT INTO reservas (
+            nombre, telefono, fecha, cancha, duracion, horario,
+            precio, metodo_pago, estado_pago, pagado
+        )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (nombre, "", fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado))
+    """, (
+        nombre,
+        "",
+        fecha,
+        cancha,
+        duracion,
+        horario,
+        precio,
+        metodo_pago,
+        estado_pago,
+        pagado
+    ))
+
+    reserva_id = cursor.lastrowid
+
+    # Si pagó algo, registrar ingreso en caja
+    if pagado and float(pagado) > 0:
+        if opcion_pago == "Reserva":
+            descripcion = f"Seña reserva #{reserva_id} - {nombre} - {cancha} - {horario}"
+        else:
+            descripcion = f"Pago total reserva #{reserva_id} - {nombre} - {cancha} - {horario}"
+
+        cursor.execute("""
+            INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            fecha,
+            "ingreso",
+            descripcion,
+            pagado,
+            metodo_pago
+        ))
 
     conn.commit()
     conn.close()
