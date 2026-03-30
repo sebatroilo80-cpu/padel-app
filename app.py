@@ -455,21 +455,25 @@ def admin():
         return redirect("/login")
 
     conn = sqlite3.connect("padel.db")
-cursor = conn.cursor()
+    cursor = conn.cursor()
 
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS movimientos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        fecha TEXT,
-        tipo TEXT,
-        descripcion TEXT,
-        monto REAL,
-        metodo_pago TEXT
-    )
-""")
-conn.commit()
+    # Crear tabla movimientos si no existe
+    try:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS movimientos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fecha TEXT,
+                tipo TEXT,
+                descripcion TEXT,
+                monto REAL,
+                metodo_pago TEXT
+            )
+        """)
+        conn.commit()
+    except:
+        pass
 
-fecha_admin = request.args.get("fecha")
+    fecha_admin = request.args.get("fecha")
     if not fecha_admin:
         fecha_admin = date.today().strftime("%Y-%m-%d")
 
@@ -649,7 +653,6 @@ fecha_admin = request.args.get("fecha")
         return horarios[idx:idx+2]
 
     for r in reservas_del_dia:
-        rid = r[0]
         cancha = r[4]
         duracion = r[5]
         hora_inicio = r[6]
