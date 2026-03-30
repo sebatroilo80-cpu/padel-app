@@ -958,37 +958,77 @@ def logout():
 
 @app.route("/mp/success")
 def mp_success():
-    return redirect("/confirmar_pago")
-
-@app.route("/confirmar_pago")
-def confirmar_pago():
-    data = session.get("reserva_mp")
-
-    if not data:
-        return """
-        <html>
-        <body style="font-family: Arial; padding: 40px; text-align: center;">
-            <h1>No hay reserva pendiente</h1>
-            <a href="/">Volver al inicio</a>
-        </body>
-        </html>
-        """
-
     return """
     <html>
     <head>
-        <meta charset="UTF-8">
-        <title>Pago recibido</title>
-        <meta http-equiv="refresh" content="5;url=/finalizar_pago">
+        <title>Pago confirmado</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                padding-top: 80px;
+                background: #ffffff;
+            }
+            h1 {
+                color: #111;
+                font-size: 48px;
+                margin-bottom: 20px;
+            }
+            p {
+                font-size: 28px;
+                color: #444;
+                margin-bottom: 30px;
+            }
+            a {
+                font-size: 28px;
+                color: #444;
+                text-decoration: underline;
+            }
+        </style>
     </head>
-    <body style="font-family: Arial; padding: 40px; text-align: center; background: #f6f7fb;">
-        <div style="max-width: 520px; margin: 60px auto; background: white; padding: 30px; border-radius: 16px;">
-            <h1 style="color:#16a34a;">✅ Pago recibido</h1>
-            <p>Tu reserva se va a confirmar automáticamente.</p>
-            <a href="/finalizar_pago" style="display:inline-block; margin-top:20px; padding:14px 24px; background:#16a34a; color:white; text-decoration:none; border-radius:10px;">
-                Confirmar reserva
-            </a>
-        </div>
+    <body>
+        <h1>✅ Reserva confirmada</h1>
+        <p>El pago fue registrado correctamente.</p>
+        <a href="/">Volver al inicio</a>
+    </body>
+    </html>
+    """
+
+
+@app.route("/confirmar_pago")
+def confirmar_pago():
+    return """
+    <html>
+    <head>
+        <title>Pago confirmado</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                padding-top: 80px;
+                background: #ffffff;
+            }
+            h1 {
+                color: #111;
+                font-size: 48px;
+                margin-bottom: 20px;
+            }
+            p {
+                font-size: 28px;
+                color: #444;
+                margin-bottom: 30px;
+            }
+            a {
+                font-size: 28px;
+                color: #444;
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>✅ Reserva confirmada</h1>
+        <p>El pago fue registrado correctamente.</p>
+        <a href="/">Volver al inicio</a>
     </body>
     </html>
     """
