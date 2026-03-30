@@ -1052,5 +1052,19 @@ def mp_failure():
 def mp_pending():
     return "Pago pendiente"
 
+@app.route("/reset-db")
+def reset_db():
+    conn = sqlite3.connect("padel.db")
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM reservas")
+    cursor.execute("DELETE FROM movimientos")
+    cursor.execute("DELETE FROM egresos")
+
+    conn.commit()
+    conn.close()
+
+    return "Base de datos reseteada"
+
 if __name__ == "__main__":
     app.run(debug=True)
