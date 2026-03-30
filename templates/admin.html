@@ -26,7 +26,7 @@
 
         <div class="cards-resumen">
             <div class="card-resumen verde">
-                <div class="card-label">Saldo de hoy</div>
+                <div class="card-label">Saldo del día</div>
                 <div class="card-value">${{ total_hoy }}</div>
             </div>
 
@@ -43,7 +43,7 @@
 
         <div class="cards-info">
             <div class="card-info">
-                <h3>Caja de hoy</h3>
+                <h3>Caja del día seleccionado</h3>
                 <p>Ingresos: <strong>${{ ingresos_hoy }}</strong></p>
                 <p>Egresos: <strong>${{ egresos_hoy }}</strong></p>
             </div>
@@ -59,7 +59,7 @@
 
         <div class="bloque-seccion">
             <div class="seccion-header">
-                <h2>Agenda del día</h2>
+                <h2>Agenda del día {{ fecha_admin }}</h2>
             </div>
 
             <form method="GET" action="/admin" class="form-agenda">
@@ -198,37 +198,59 @@
             </div>
 
             {% if reservas %}
-                <div class="lista-cards">
-                    {% for r in reservas %}
-                        {% set precio = r[7] %}
-                        {% set pagado = r[10] %}
-                        {% set falta = precio - pagado %}
-                        <div class="card-lista">
-                            <strong>{{ r[1] }}</strong><br>
-                            Teléfono: {{ r[2] or '-' }}<br>
-                            Fecha: {{ r[3] }}<br>
-                            Cancha: {{ r[4] }}<br>
-                            Duración: {{ r[5] }}<br>
-                            Horario: {{ r[6] }}<br>
-                            Precio total: ${{ precio }}<br>
-                            Pagó: ${{ pagado }}<br>
-                            Falta: ${{ falta }}<br>
-                            Método de pago: {{ r[8] }}<br>
-                            Estado: {{ r[9] }}<br><br>
-                            {% if r[9] != "Pagado" and r[8] == "Transferencia" %}
-                            <a href="/confirmar_transferencia/{{ r[0] }}" class="btn-confirmar">
-                                Confirmar pago
-                            </a><br><br>
-                            {% endif %}
+    <div class="lista-cards">
+        {% for r in reservas %}
+            {% set precio = r[7] %}
+            {% set pagado = r[10] %}
+            {% set falta = precio - pagado %}
 
-                            <a href="/editar/{{ r[0] }}" ...
-                            <a href="/eliminar/{{ r[0] }}" ...
-                               onclick="return confirm('¿Seguro que querés eliminar esta reserva?')"
-                               class="btn-top btn-rojo btn-mini">
-                               Eliminar
-                            </a>
-                        </div>
-                    {% endfor %}
+            <div class="card-lista">
+                <strong>{{ r[1] }}</strong><br>
+                Teléfono: {{ r[2] or '-' }}<br>
+                Fecha: {{ r[3] }}<br>
+                Cancha: {{ r[4] }}<br>
+                Duración: {{ r[5] }}<br>
+                Horario: {{ r[6] }}<br>
+                Precio total: ${{ precio }}<br>
+                Pagó: ${{ pagado }}<br>
+                Falta: ${{ falta }}<br>
+                Método de pago: {{ r[8] }}<br>
+                Estado: {{ r[9] }}<br><br>
+
+                <!-- 🔥 AVISO PARA VOS -->
+                <a href="https://wa.me/5493513272846?text=Nuevo%20turno%20reservado%0ACliente:%20{{ r[1] }}%0ATel:%20{{ r[2] }}%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AMetodo:%20{{ r[8] }}%0AEstado:%20{{ r[9] }}"
+                   target="_blank"
+                   class="btn-top btn-verde btn-mini">
+                   Avisar admin
+                </a><br><br>
+
+                <!-- 🔥 CONFIRMAR TRANSFERENCIA -->
+                {% if r[9] != "Pagado" and r[8] == "Transferencia" %}
+                <a href="/confirmar_transferencia/{{ r[0] }}" class="btn-confirmar">
+                    Confirmar pago
+                </a><br><br>
+                {% endif %}
+
+                <!-- 🔥 AVISAR CLIENTE -->
+                {% if r[9] == "Pagado" or r[9] == "Reserva" %}
+                <a href="https://wa.me/{{ r[2] }}?text=Reserva%20confirmada%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AEstado:%20{{ r[9] }}"
+                   target="_blank"
+                   class="btn-top btn-verde btn-mini">
+                   Avisar cliente
+                </a><br><br>
+                {% endif %}
+
+                <a href="/editar/{{ r[0] }}" class="btn-top btn-azul btn-mini">Editar</a>
+
+                <a href="/eliminar/{{ r[0] }}"
+                   onclick="return confirm('¿Seguro que querés eliminar esta reserva?')"
+                   class="btn-top btn-rojo btn-mini">
+                   Eliminar
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
                 </div>
             {% else %}
                 <p>No hay reservas todavía.</p>
