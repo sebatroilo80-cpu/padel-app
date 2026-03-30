@@ -198,59 +198,52 @@
             </div>
 
             {% if reservas %}
-                <div class="lista-cards">
-                    {% for r in reservas %}
-                        {% set precio = r[7] %}
-                        {% set pagado = r[10] %}
-                        {% set falta = precio - pagado %}
+    <div class="lista-cards">
+        {% for r in reservas %}
+            {% set precio = r[7] %}
+            {% set pagado = r[10] %}
+            {% set falta = precio - pagado %}
 
-                        <div class="card-lista">
-                            <strong>{{ r[1] }}</strong><br>
-                            Teléfono: {{ r[2] or '-' }}<br>
-                            Fecha: {{ r[3] }}<br>
-                            Cancha: {{ r[4] }}<br>
-                            Duración: {{ r[5] }}<br>
-                            Horario: {{ r[6] }}<br>
-                            Precio total: ${{ precio }}<br>
-                            Pagó: ${{ pagado }}<br>
-                            Falta: ${{ falta }}<br>
-                            Método de pago: {{ r[8] }}<br>
-                            Estado: {{ r[9] }}<br><br>
+            <div class="card-lista">
+                <strong>{{ r[1] }}</strong><br>
+                Teléfono: {{ r[2] or '-' }}<br>
+                Fecha: {{ r[3] }}<br>
+                Cancha: {{ r[4] }}<br>
+                Duración: {{ r[5] }}<br>
+                Horario: {{ r[6] }}<br>
+                Precio total: ${{ precio }}<br>
+                Pagó: ${{ pagado }}<br>
+                Falta: ${{ falta }}<br>
+                Método de pago: {{ r[8] }}<br>
+                Estado: {{ r[9] }}<br><br>
 
-                            <a href="https://wa.me/5493513272846?text=Nuevo%20turno%20reservado%0ACliente:%20{{ r[1] }}%0ATel:%20{{ r[2] or '' }}%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AMetodo:%20{{ r[8] }}%0AEstado:%20{{ r[9] }}"
-                               target="_blank"
-                               class="btn-top btn-verde btn-mini">
-                               Avisar admin
-                            </a><br><br>
+                {% if r[8] == "Transferencia" and r[9] in ["Pendiente reserva", "Pendiente pago total"] %}
+                <a href="/confirmar_transferencia/{{ r[0] }}" class="btn-confirmar">
+                    Confirmar pago
+                </a><br><br>
+                {% endif %}
 
-                            {% if r[9] != "Pagado" and r[8] == "Transferencia" %}
-                            <a href="/confirmar_transferencia/{{ r[0] }}" class="btn-confirmar">
-                                Confirmar pago
-                            </a><br><br>
-                            {% endif %}
+                {% if r[2] and r[9] in ["Reserva", "Pagado"] %}
+                <a href="https://wa.me/{{ r[2] }}?text=Reserva%20confirmada%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AEstado:%20{{ r[9] }}"
+                   target="_blank"
+                   class="btn-whatsapp">
+                   Avisar cliente
+                </a><br><br>
+                {% endif %}
 
-                            {% if r[2] and (r[9] == "Pagado" or r[9] == "Reserva") %}
-                            <a href="https://wa.me/{{ r[2] }}?text=Reserva%20confirmada%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AEstado:%20{{ r[9] }}"
-                               target="_blank"
-                               class="btn-top btn-verde btn-mini">
-                               Avisar cliente
-                            </a><br><br>
-                            {% endif %}
+                <a href="/editar/{{ r[0] }}" class="btn-top btn-azul btn-mini">Editar</a>
 
-                            <a href="/editar/{{ r[0] }}" class="btn-top btn-azul btn-mini">Editar</a>
-
-                            <a href="/eliminar/{{ r[0] }}"
-                               onclick="return confirm('¿Seguro que querés eliminar esta reserva?')"
-                               class="btn-top btn-rojo btn-mini">
-                               Eliminar
-                            </a>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>No hay reservas todavía.</p>
-            {% endif %}
-        </div>
+                <a href="/eliminar/{{ r[0] }}"
+                   onclick="return confirm('¿Seguro que querés eliminar esta reserva?')"
+                   class="btn-top btn-rojo btn-mini">
+                   Eliminar
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No hay reservas todavía.</p>
+{% endif %}
 
         <div class="bloque-seccion">
             <div class="seccion-header">
