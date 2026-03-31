@@ -1089,20 +1089,35 @@ def agregar_egreso():
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
-        VALUES (?, ?, ?, ?, ?)
-    """, (
-        fecha,
-        "egreso",
-        descripcion,
-        monto,
-        "Egreso"
-    ))
+        SELECT name
+        FROM sqlite_master
+        WHERE type='table'
+    """)
+    tablas = [t[0] for t in cursor.fetchall()]
+
+    if "egresos" in tablas:
+        cursor.execute("""
+            INSERT INTO egresos (fecha, descripcion, monto)
+            VALUES (?, ?, ?)
+        """, (fecha, descripcion, monto))
+
+    elif "movimientos" in tablas:
+        cursor.execute("PRAGMA table_info(movimientos)")
+        columnas = [col[1] for col in cursor.fetchall()]
+        campo_texto = "descripcion" if "descripcion" in columnas else "concepto"
+
+        cursor.execute(f"""
+            INSERT INTO movimientos (fecha, tipo, {campo_texto}, monto, metodo_pago)
+            VALUES (?, 'egreso', ?, ?, 'Egreso')
+        """, (fecha, descripcion, monto))
+    else:
+        conn.close()
+        return "No existe tabla para guardar egresos"
 
     conn.commit()
     conn.close()
 
-    return redirect("/admin#seccion-caja")
+    return redirect("/admin?tab=caja")
 
 
 @app.route("/eliminar/<int:id>")
@@ -1213,14 +1228,21 @@ def eliminar_egreso(id):
     cursor = conn.cursor()
 
     cursor.execute("""
-        DELETE FROM movimientos
-        WHERE id = ? AND tipo = 'egreso'
-    """, (id,))
+        SELECT name
+        FROM sqlite_master
+        WHERE type='table'
+    """)
+    tablas = [t[0] for t in cursor.fetchall()]
+
+    if "egresos" in tablas:
+        cursor.execute("DELETE FROM egresos WHERE id = ?", (id,))
+    elif "movimientos" in tablas:
+        cursor.execute("DELETE FROM movimientos WHERE id = ? AND tipo = 'egreso'", (id,))
 
     conn.commit()
     conn.close()
 
-    return redirect("/admin#seccion-caja")
+    return redirect("/admin?tab=caja")
 
 
 @app.route("/logout")
