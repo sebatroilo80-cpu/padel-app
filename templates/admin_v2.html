@@ -232,12 +232,29 @@
                         {% if egresos %}
                             <div class="lista-egresos-v2">
                                 {% for e in egresos %}
-                                <div class="egreso-card-v2">
-                                    <div>
-                                        <strong>{{ e[2] }}</strong>
-                                        <p>📅 {{ e[1] }}</p>
-                                        <p>💸 ${{ e }}</p>
-                                    </div>
+<div class="egreso-card-v2">
+
+    <div class="egreso-linea">
+        <span>📅 Fecha:</span>
+        <strong>{{ e[1] }}</strong>
+    </div>
+
+    <div class="egreso-linea">
+        <span>🧾 Descripción:</span>
+        <strong>{{ e[2] }}</strong>
+    </div>
+
+    <div class="egreso-linea">
+        <span>💸 Monto:</span>
+        <strong>${{ e[3] }}</strong>
+    </div>
+
+    <a href="/eliminar-egreso/{{ e[0] }}" class="btn-eliminar"
+       onclick="return confirm('¿Eliminar egreso?')">
+        🗑 Eliminar
+    </a>
+
+</div>
 
                                     <a href="/eliminar-egreso/{{ e[0] }}"
                                        onclick="return confirm('¿Seguro que querés eliminar este egreso?')"

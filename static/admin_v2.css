@@ -605,3 +605,33 @@ body.adminv2-body {
         grid-template-columns: 1fr;
     }
 }
+.egreso-card-v2 {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.egreso-linea {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+
+.egreso-linea span {
+    color: #6b7280;
+}
+
+.btn-eliminar {
+    margin-top: 8px;
+    text-decoration: none;
+    background: #fdecec;
+    color: #c0392b;
+    padding: 8px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 700;
+}
