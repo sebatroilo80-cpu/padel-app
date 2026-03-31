@@ -515,7 +515,7 @@ def admin():
     fecha_admin = request.args.get("fecha")
 
     if not fecha_admin:
-        fecha_admin = datetime.now().strftime("%Y-%m-%d")
+        fecha_admin = date.today().strftime("%Y-%m-%d")
 
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
