@@ -635,3 +635,33 @@ body.adminv2-body {
     text-align: center;
     font-weight: 700;
 }
+.tabla-egresos-wrap {
+    overflow-x: auto;
+    margin-top: 12px;
+}
+
+.tabla-egresos-v2 {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.tabla-egresos-v2 th,
+.tabla-egresos-v2 td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.tabla-egresos-v2 th {
+    background: #f8fafc;
+    color: #374151;
+    font-weight: 800;
+}
+
+.tabla-egresos-v2 tr:last-child td {
+    border-bottom: none;
+}

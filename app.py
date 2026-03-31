@@ -965,7 +965,10 @@ def agregar_egreso():
     conn.commit()
     conn.close()
 
-    return redirect(request.referrer or "/admin")
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin#seccion-caja")
 
 
 @app.route("/eliminar/<int:id>")
@@ -1083,7 +1086,10 @@ def eliminar_egreso(id):
     conn.commit()
     conn.close()
 
-    return redirect(request.referrer or "/admin")
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin#seccion-caja")
 
 
 @app.route("/logout")
