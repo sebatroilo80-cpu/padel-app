@@ -946,20 +946,26 @@ def agregar_egreso():
 
     fecha = request.form["fecha"]
     descripcion = request.form["descripcion"]
-    monto = request.form["monto"]
+    monto = limpiar_numero(request.form.get("monto"))
 
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO egresos (fecha, descripcion, monto)
-        VALUES (?, ?, ?)
-    """, (fecha, descripcion, monto))
+        INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        fecha,
+        "egreso",
+        descripcion,
+        monto,
+        "Egreso"
+    ))
 
     conn.commit()
     conn.close()
 
-    return redirect("/admin")
+    return redirect("/reservas")
 
 
 @app.route("/eliminar/<int:id>")
@@ -1068,11 +1074,16 @@ def eliminar_egreso(id):
 
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM egresos WHERE id = ?", (id,))
+
+    cursor.execute("""
+        DELETE FROM movimientos
+        WHERE id = ? AND tipo = 'egreso'
+    """, (id,))
+
     conn.commit()
     conn.close()
 
-    return redirect(request.referrer or "/reservas")
+    return redirect("/reservas")
 
 
 @app.route("/logout")
