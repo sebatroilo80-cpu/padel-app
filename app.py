@@ -1128,35 +1128,46 @@ def eliminar_reserva(id):
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
 
-    # Buscar datos de la reserva antes de borrarla
+    # Buscar la reserva antes de borrarla
     cursor.execute("""
-        SELECT id, nombre, fecha, cancha, horario, metodo_pago
+        SELECT id, nombre, fecha, cancha, horario
         FROM reservas
         WHERE id = ?
     """, (id,))
     reserva = cursor.fetchone()
 
-    if reserva:
-        reserva_id = reserva[0]
-        nombre = reserva[1] or ""
-        fecha = reserva[2] or ""
-        cancha = reserva[3] or ""
-        horario = reserva[4] or ""
+    # Ver qué tablas existen
+    cursor.execute("""
+        SELECT name
+        FROM sqlite_master
+        WHERE type='table'
+    """)
+    tablas = [t[0] for t in cursor.fetchall()]
 
-        # Borrar movimientos relacionados de caja
-        cursor.execute("""
+    # Si existe movimientos, borra movimientos relacionados
+    if reserva and "movimientos" in tablas:
+        reserva_id = reserva[0]
+
+        cursor.execute("PRAGMA table_info(movimientos)")
+        columnas = [col[1] for col in cursor.fetchall()]
+
+        campo_texto = "descripcion" if "descripcion" in columnas else "concepto"
+
+        cursor.execute(f"""
             DELETE FROM movimientos
-            WHERE descripcion LIKE ?
+            WHERE {campo_texto} LIKE ?
         """, (f"%reserva #{reserva_id}%",))
 
     # Borrar la reserva
-    cursor.execute("DELETE FROM reservas WHERE id = ?", (id,))
+    cursor.execute("""
+        DELETE FROM reservas
+        WHERE id = ?
+    """, (id,))
 
     conn.commit()
     conn.close()
 
-    # 🔥 IMPORTANTE: volver a donde estabas
-    return redirect(request.referrer or "/reservas")
+    return redirect("/admin?tab=reservas")
 
 @app.route("/confirmar_transferencia/<int:id>")
 def confirmar_transferencia(id):
