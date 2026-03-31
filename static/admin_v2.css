@@ -275,35 +275,48 @@ body.adminv2-body {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, .35);
+    background: rgba(15, 23, 42, 0.45);
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 24px;
+    z-index: 999;
 }
 
 .modal-caja {
-    background: #fff;
-    border-radius: 20px;
-    padding: 24px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 28px;
     width: 100%;
-    max-width: 430px;
+    max-width: 470px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+    border: 1px solid #e5e7eb;
 }
 
 .modal-caja h2 {
-    margin-top: 0;
+    margin: 0 0 18px;
+    font-size: 1.5rem;
+    color: #111827;
 }
 
 .modal-caja form {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 .campo {
-    padding: 12px 14px;
-    border-radius: 10px;
+    padding: 14px 16px;
+    border-radius: 14px;
     border: 1px solid #d1d5db;
-    font-size: .95rem;
+    font-size: 0.98rem;
+    background: #f9fafb;
+    outline: none;
+}
+
+.campo:focus {
+    border-color: #57b574;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(87,181,116,0.12);
 }
 
 .modal-botones {
@@ -315,10 +328,12 @@ body.adminv2-body {
 .btn-guardar,
 .btn-cancelar {
     border: none;
-    padding: 12px 14px;
-    border-radius: 10px;
+    padding: 13px 16px;
+    border-radius: 14px;
     font-weight: 700;
     cursor: pointer;
+    font-size: 0.95rem;
+    flex: 1;
 }
 
 .btn-guardar {
@@ -327,13 +342,18 @@ body.adminv2-body {
 }
 
 .btn-cancelar {
-    background: #e45f5f;
-    color: #fff;
+    background: #eef2f7;
+    color: #1f2937;
 }
 
 .precio-modal {
     font-weight: 800;
     color: #2f8f51;
+    background: #eef9f1;
+    border: 1px solid #d8f0df;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin: 2px 0 0;
 }
 
 @media (max-width: 1100px) {
