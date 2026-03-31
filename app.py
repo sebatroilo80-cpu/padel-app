@@ -862,7 +862,7 @@ def editar(id):
         conn.commit()
         conn.close()
 
-        return redirect(f"/admin?fecha={fecha}")
+        return redirect("/reservas")
 
     cursor.execute("SELECT * FROM reservas WHERE id = ?", (id,))
     reserva = cursor.fetchone()
@@ -990,7 +990,7 @@ def confirmar_transferencia(id):
     conn.commit()
     conn.close()
 
-    return redirect("/admin")
+    return redirect("/reservas")
 
 @app.route("/eliminar-egreso/<int:id>")
 def eliminar_egreso(id):
@@ -1003,7 +1003,7 @@ def eliminar_egreso(id):
     conn.commit()
     conn.close()
 
-    return redirect("/admin")
+    return redirect(request.referrer or "/reservas")
 
 
 @app.route("/logout")
