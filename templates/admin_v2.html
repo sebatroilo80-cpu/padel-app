@@ -132,7 +132,7 @@
         </section>
 
         <!-- RESERVAS -->
-        <section id="seccion-reservas" class="adminv2-seccion">
+        <section id="<section id="seccion-reservas" class="adminv2-seccion {% if active_tab == 'reservas' %}activa{% endif %}">
             <div class="adminv2-grilla-box">
                 <div class="adminv2-section-head">
                     <div>
@@ -465,6 +465,20 @@ function mostrarSeccion(id, boton) {
 
 document.getElementById("modal_duracion").addEventListener("change", calcularPrecioModal);
 </script>
+
+window.addEventListener("load", function () {
+    const hash = window.location.hash;
+
+    if (hash === "#seccion-caja") {
+        mostrarSeccion("seccion-caja", document.querySelectorAll(".btn-nav")[2]);
+    } else if (hash === "#seccion-reportes") {
+        mostrarSeccion("seccion-reportes", document.querySelectorAll(".btn-nav")[3]);
+    } else if (hash === "#seccion-reservas") {
+        mostrarSeccion("seccion-reservas", document.querySelectorAll(".btn-nav")[1]);
+    } else {
+        mostrarSeccion("seccion-grilla", document.querySelectorAll(".btn-nav")[0]);
+    }
+});
 
 </body>
 </html>
