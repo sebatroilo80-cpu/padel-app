@@ -510,189 +510,243 @@ def admin():
     if not session.get("admin"):
         return redirect("/login")
 
+    active_tab = request.args.get("tab", "grilla")
+    fecha_admin = request.args.get("fecha")
+
+    if not fecha_admin:
+        fecha_admin = datetime.now().strftime("%Y-%m-%d")
+
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
 
-    try:
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS movimientos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                fecha TEXT,
-                tipo TEXT,
-                descripcion TEXT,
-                monto REAL,
-                metodo_pago TEXT
-            )
-        """)
-        conn.commit()
-    except:
-        pass
-
-    fecha_admin = request.args.get("fecha")
-    if not fecha_admin:
-        fecha_admin = date.today().strftime("%Y-%m-%d")
-
+    # =========================
+    # Configuración de precios
+    # =========================
     cursor.execute("""
-        SELECT * FROM reservas
+        SELECT precio_60_dia, precio_60_noche, precio_90_dia, precio_90_noche
+        FROM configuracion
+        ORDER BY id DESC
+        LIMIT 1
+    """)
+    config_row = cursor.fetchone()
+
+    if config_row:
+        config = list(config_row)
+    else:
+        config = [25000, 30000, 35000, 40000]
+
+    # =========================
+    # Datos base agenda
+    # =========================
+    canchas = ["Cancha 1", "Cancha 2", "Cancha 3"]
+
+    horarios = [
+        "08:00","08:30","09:00","09:30",
+        "10:00","10:30","11:00","11:30",
+        "12:00","12:30","13:00","13:30",
+        "14:00","14:30","15:00","15:30",
+        "16:00","16:30","17:00","17:30",
+        "18:00","18:30","19:00","19:30",
+        "20:00","20:30","21:00","21:30",
+        "22:00","22:30","23:00","23:30"
+    ]
+
+    grilla = {}
+    for h in horarios:
+        grilla[h] = {}
+        for cancha in canchas:
+            grilla[h][cancha] = {
+                "estado": "libre",
+                "reserva": None
+            }
+
+    # =========================
+    # Reservas del día para grilla
+    # =========================
+    cursor.execute("""
+        SELECT id, nombre, telefono, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado
+        FROM reservas
+        WHERE fecha = ?
+        ORDER BY horario ASC
+    """, (fecha_admin,))
+    reservas_dia = cursor.fetchall()
+
+    def bloques_reserva(hora_inicio, duracion):
+        if hora_inicio not in horarios:
+            return []
+
+        idx = horarios.index(hora_inicio)
+
+        if duracion == "60 minutos":
+            return horarios[idx:idx+2]
+        elif duracion == "90 minutos":
+            return horarios[idx:idx+3]
+        else:
+            return [hora_inicio]
+
+    for r in reservas_dia:
+        cancha = r[4]
+        duracion = r[5]
+        hora_inicio = r[6]
+
+        bloques = bloques_reserva(hora_inicio, duracion)
+
+        for i, h in enumerate(bloques):
+            if h in grilla and cancha in grilla[h]:
+                grilla[h][cancha]["estado"] = "inicio" if i == 0 else "continuacion"
+                grilla[h][cancha]["reserva"] = r
+
+    # =========================
+    # Todas las reservas
+    # =========================
+    cursor.execute("""
+        SELECT id, nombre, telefono, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado
+        FROM reservas
         ORDER BY fecha DESC, horario ASC
     """)
     reservas = cursor.fetchall()
 
+    # =========================
+    # Egresos cargados
+    # movimientos: id, fecha, tipo, descripcion, monto, metodo_pago
+    # =========================
     cursor.execute("""
-        SELECT * FROM reservas
-        WHERE fecha = ?
-        ORDER BY horario ASC
-    """, (fecha_admin,))
-    reservas_del_dia = cursor.fetchall()
-
-    cursor.execute("""
-        SELECT * FROM movimientos
+        SELECT id, fecha, tipo, descripcion, monto, metodo_pago
+        FROM movimientos
         WHERE tipo = 'egreso'
         ORDER BY fecha DESC, id DESC
     """)
     egresos = cursor.fetchall()
 
+    # =========================
+    # Caja diaria
+    # =========================
     cursor.execute("""
         SELECT COALESCE(SUM(monto), 0)
         FROM movimientos
-        WHERE fecha = ? AND tipo = 'ingreso'
+        WHERE tipo = 'ingreso' AND fecha = ?
     """, (fecha_admin,))
-    ingresos_hoy = cursor.fetchone()[0] or 0
+    ingresos_hoy = float(cursor.fetchone()[0] or 0)
 
     cursor.execute("""
         SELECT COALESCE(SUM(monto), 0)
         FROM movimientos
-        WHERE fecha = ? AND tipo = 'egreso'
+        WHERE tipo = 'egreso' AND fecha = ?
     """, (fecha_admin,))
-    egresos_hoy = cursor.fetchone()[0] or 0
+    egresos_hoy = float(cursor.fetchone()[0] or 0)
+
+    cursor.execute("""
+        SELECT COALESCE(SUM(monto), 0)
+        FROM movimientos
+        WHERE tipo = 'ingreso' AND fecha = ? AND metodo_pago = 'Efectivo'
+    """, (fecha_admin,))
+    efectivo_hoy = float(cursor.fetchone()[0] or 0)
+
+    cursor.execute("""
+        SELECT COALESCE(SUM(monto), 0)
+        FROM movimientos
+        WHERE tipo = 'ingreso' AND fecha = ? AND metodo_pago = 'Transferencia'
+    """, (fecha_admin,))
+    transferencia_hoy = float(cursor.fetchone()[0] or 0)
+
+    cursor.execute("""
+        SELECT COALESCE(SUM(monto), 0)
+        FROM movimientos
+        WHERE tipo = 'ingreso' AND fecha = ? AND metodo_pago = 'Mercado Pago'
+    """, (fecha_admin,))
+    mercado_pago_hoy = float(cursor.fetchone()[0] or 0)
+
+    cursor.execute("""
+        SELECT COALESCE(SUM(monto), 0)
+        FROM movimientos
+        WHERE tipo = 'ingreso' AND fecha = ? AND metodo_pago = 'QR'
+    """, (fecha_admin,))
+    qr_hoy = float(cursor.fetchone()[0] or 0)
 
     total_hoy = ingresos_hoy - egresos_hoy
 
-    cursor.execute("""
-        SELECT COALESCE(SUM(monto), 0)
-        FROM movimientos
-        WHERE fecha = ? AND tipo = 'ingreso' AND metodo_pago = 'Efectivo'
-    """, (fecha_admin,))
-    efectivo_hoy = cursor.fetchone()[0] or 0
+    # =========================
+    # Caja mensual
+    # =========================
+    mes_actual = fecha_admin[:7]   # YYYY-MM
+    anio_actual = fecha_admin[:4]  # YYYY
 
     cursor.execute("""
         SELECT COALESCE(SUM(monto), 0)
         FROM movimientos
-        WHERE fecha = ? AND tipo = 'ingreso' AND metodo_pago = 'Transferencia'
-    """, (fecha_admin,))
-    transferencia_hoy = cursor.fetchone()[0] or 0
+        WHERE tipo = 'ingreso' AND substr(fecha, 1, 7) = ?
+    """, (mes_actual,))
+    ingresos_mes = float(cursor.fetchone()[0] or 0)
 
     cursor.execute("""
         SELECT COALESCE(SUM(monto), 0)
         FROM movimientos
-        WHERE fecha = ? AND tipo = 'ingreso' AND metodo_pago = 'Mercado Pago'
-    """, (fecha_admin,))
-    mercado_pago_hoy = cursor.fetchone()[0] or 0
+        WHERE tipo = 'egreso' AND substr(fecha, 1, 7) = ?
+    """, (mes_actual,))
+    egresos_mes = float(cursor.fetchone()[0] or 0)
+
+    total_mes = ingresos_mes - egresos_mes
+
+    # =========================
+    # Caja anual
+    # =========================
+    cursor.execute("""
+        SELECT COALESCE(SUM(monto), 0)
+        FROM movimientos
+        WHERE tipo = 'ingreso' AND substr(fecha, 1, 4) = ?
+    """, (anio_actual,))
+    ingresos_anio = float(cursor.fetchone()[0] or 0)
 
     cursor.execute("""
         SELECT COALESCE(SUM(monto), 0)
         FROM movimientos
-        WHERE fecha = ? AND tipo = 'ingreso' AND metodo_pago = 'QR'
-    """, (fecha_admin,))
-    qr_hoy = cursor.fetchone()[0] or 0
+        WHERE tipo = 'egreso' AND substr(fecha, 1, 4) = ?
+    """, (anio_actual,))
+    egresos_anio = float(cursor.fetchone()[0] or 0)
 
-    cursor.execute("""
-        SELECT COALESCE(SUM(CASE WHEN tipo='ingreso' THEN monto ELSE 0 END), 0) -
-               COALESCE(SUM(CASE WHEN tipo='egreso' THEN monto ELSE 0 END), 0)
-        FROM movimientos
-        WHERE substr(fecha, 1, 7) = ?
-    """, (fecha_admin[:7],))
-    total_mes = cursor.fetchone()[0] or 0
+    total_anio = ingresos_anio - egresos_anio
 
-    cursor.execute("""
-        SELECT COALESCE(SUM(CASE WHEN tipo='ingreso' THEN monto ELSE 0 END), 0) -
-               COALESCE(SUM(CASE WHEN tipo='egreso' THEN monto ELSE 0 END), 0)
-        FROM movimientos
-        WHERE substr(fecha, 1, 4) = ?
-    """, (fecha_admin[:4],))
-    total_anio = cursor.fetchone()[0] or 0
-
-    meses_nombres = {
+    # =========================
+    # Reporte mensual
+    # =========================
+    nombres_meses = {
         "01": "Enero", "02": "Febrero", "03": "Marzo", "04": "Abril",
         "05": "Mayo", "06": "Junio", "07": "Julio", "08": "Agosto",
         "09": "Septiembre", "10": "Octubre", "11": "Noviembre", "12": "Diciembre"
     }
 
     reporte_mensual = []
-    anio_actual = fecha_admin[:4]
 
-    for mes_num in range(1, 13):
-        mes_str = f"{mes_num:02d}"
-        prefijo = f"{anio_actual}-{mes_str}"
+    for mes in range(1, 13):
+        mes_num = str(mes).zfill(2)
+        clave_mes = f"{anio_actual}-{mes_num}"
 
         cursor.execute("""
             SELECT COALESCE(SUM(monto), 0)
             FROM movimientos
             WHERE tipo = 'ingreso' AND substr(fecha, 1, 7) = ?
-        """, (prefijo,))
-        ingresos_mes = cursor.fetchone()[0] or 0
+        """, (clave_mes,))
+        ingresos = float(cursor.fetchone()[0] or 0)
 
         cursor.execute("""
             SELECT COALESCE(SUM(monto), 0)
             FROM movimientos
             WHERE tipo = 'egreso' AND substr(fecha, 1, 7) = ?
-        """, (prefijo,))
-        egresos_mes = cursor.fetchone()[0] or 0
+        """, (clave_mes,))
+        egresos_mes_item = float(cursor.fetchone()[0] or 0)
+
+        saldo = ingresos - egresos_mes_item
 
         reporte_mensual.append({
-            "mes": meses_nombres[mes_str],
-            "ingresos": ingresos_mes,
-            "egresos": egresos_mes,
-            "saldo": ingresos_mes - egresos_mes
+            "mes": nombres_meses[mes_num],
+            "ingresos": ingresos,
+            "egresos": egresos_mes_item,
+            "saldo": saldo
         })
 
-    cursor.execute("""
-        SELECT precio_60_dia, precio_60_noche, precio_90_dia, precio_90_noche
-        FROM configuracion
-        WHERE id = 1
-    """)
-    config = cursor.fetchone()
-
-    canchas = ["Cancha 1", "Cancha 2", "Cancha 3"]
-
-    horarios = [
-        "08:00","08:30","09:00","09:30","10:00","10:30","11:00","11:30",
-        "12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30",
-        "16:00","16:30","17:00","17:30","18:00","18:30","19:00","19:30",
-        "20:00","20:30","21:00","21:30","22:00","22:30","23:00","23:30"
-    ]
-
-    grilla = {}
-    for horario in horarios:
-        grilla[horario] = {}
-        for cancha in canchas:
-            grilla[horario][cancha] = {"estado": "libre", "reserva": None}
-
-    def slots_reserva(hora_inicio, duracion):
-        try:
-            idx = horarios.index(hora_inicio)
-        except ValueError:
-            return []
-        if duracion == "90 minutos":
-            return horarios[idx:idx+3]
-        return horarios[idx:idx+2]
-
-    for r in reservas_del_dia:
-        cancha = r[4]
-        duracion = r[5]
-        hora_inicio = r[6]
-
-        bloques = slots_reserva(hora_inicio, duracion)
-        for i, h in enumerate(bloques):
-            if h in grilla and cancha in grilla[h]:
-                grilla[h][cancha]["estado"] = "inicio" if i == 0 else "continuacion"
-                grilla[h][cancha]["reserva"] = r
-
-        # =========================
-    # Estadísticas de uso
     # =========================
-
-    # Horarios más usados
+    # Estadísticas
+    # =========================
     cursor.execute("""
         SELECT horario, COUNT(*) as cantidad
         FROM reservas
@@ -705,17 +759,14 @@ def admin():
     max_horarios = 0
 
     for fila in horarios_mas_usados_raw:
-        horario = fila[0]
-        cantidad = fila[1]
+        cantidad = int(fila[1])
         horarios_mas_usados.append({
-            "label": horario,
+            "label": fila[0],
             "cantidad": cantidad
         })
         if cantidad > max_horarios:
             max_horarios = cantidad
 
-    # Días más usados
-    # weekday('%w', fecha): 0=domingo, 1=lunes, ... 6=sábado
     cursor.execute("""
         SELECT strftime('%w', fecha) as dia_num, COUNT(*) as cantidad
         FROM reservas
@@ -739,7 +790,7 @@ def admin():
 
     for fila in dias_mas_usados_raw:
         dia_num = str(fila[0])
-        cantidad = fila[1]
+        cantidad = int(fila[1])
         dias_mas_usados.append({
             "label": nombres_dias.get(dia_num, dia_num),
             "cantidad": cantidad
@@ -747,9 +798,8 @@ def admin():
         if cantidad > max_dias:
             max_dias = cantidad
 
-    # Totales generales
     cursor.execute("SELECT COUNT(*) FROM reservas")
-    total_reservas = cursor.fetchone()[0] or 0
+    total_reservas = int(cursor.fetchone()[0] or 0)
 
     conn.close()
 
@@ -777,6 +827,7 @@ def admin():
         max_horarios=max_horarios,
         max_dias=max_dias,
         total_reservas=total_reservas,
+        active_tab=active_tab
     )    
 
 
