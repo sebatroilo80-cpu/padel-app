@@ -607,12 +607,17 @@ def admin():
     """)
     reservas = cursor.fetchall()
 
-    # =========================
+    ## =========================
     # Egresos cargados
-    # movimientos: id, fecha, tipo, descripcion, monto, metodo_pago
+    # movimientos puede tener 'descripcion' o 'concepto'
     # =========================
-    cursor.execute("""
-        SELECT id, fecha, tipo, descripcion, monto, metodo_pago
+    cursor.execute("PRAGMA table_info(movimientos)")
+    columnas_movimientos = [col[1] for col in cursor.fetchall()]
+
+    campo_texto = "descripcion" if "descripcion" in columnas_movimientos else "concepto"
+
+    cursor.execute(f"""
+        SELECT id, fecha, tipo, {campo_texto} as descripcion, monto, metodo_pago
         FROM movimientos
         WHERE tipo = 'egreso'
         ORDER BY fecha DESC, id DESC
