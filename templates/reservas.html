@@ -2,33 +2,43 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas</title>
 </head>
 <body>
+    <h2>Listado de reservas</h2>
 
-<h2>Listado de reservas</h2>
+    {% if reservas %}
+    <table border="1" cellpadding="10" cellspacing="0">
+        <tr>
+            <th>Cliente</th>
+            <th>Teléfono</th>
+            <th>Fecha</th>
+            <th>Cancha</th>
+            <th>Duración</th>
+            <th>Horario</th>
+            <th>Método</th>
+            <th>Estado</th>
+        </tr>
 
-<table border="1" cellpadding="10">
-    <tr>
-        <th>Fecha</th>
-        <th>Hora</th>
-        <th>Cancha</th>
-        <th>Cliente</th>
-    </tr>
+        {% for r in reservas %}
+        <tr>
+            <td>{{ r[1] }}</td>
+            <td>{{ r[2] }}</td>
+            <td>{{ r[3] }}</td>
+            <td>{{ r[4] }}</td>
+            <td>{{ r[5] }}</td>
+            <td>{{ r[6] }}</td>
+            <td>{{ r[8] }}</td>
+            <td>{{ r[9] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>No hay reservas cargadas.</p>
+    {% endif %}
 
-    {% for r in reservas %}
-    <tr>
-        <td>{{ r[2] }}</td>
-        <td>{{ r[6] }}</td>
-        <td>{{ r[4] }}</td>
-        <td>{{ r[1] }}</td>
-    </tr>
-    {% endfor %}
-
-</table>
-
-<br>
-<a href="/admin">⬅ Volver</a>
-
+    <br>
+    <a href="/admin">⬅ Volver al panel</a>
 </body>
 </html>

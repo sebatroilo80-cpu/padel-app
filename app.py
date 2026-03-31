@@ -1163,10 +1163,16 @@ def reset_db():
 
 @app.route("/reservas")
 def ver_reservas():
+    if not session.get("admin"):
+        return redirect("/login")
+
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM turnos ORDER BY fecha DESC, hora_inicio DESC")
+    cursor.execute("""
+        SELECT * FROM reservas
+        ORDER BY fecha DESC, horario ASC
+    """)
     reservas = cursor.fetchall()
 
     conn.close()
