@@ -944,31 +944,26 @@ def agregar_egreso():
     if not session.get("admin"):
         return redirect("/login")
 
-    fecha = request.form["fecha"]
-    descripcion = request.form["descripcion"]
-    monto = limpiar_numero(request.form.get("monto"))
+    try:
+        fecha = request.form.get("fecha")
+        descripcion = request.form.get("descripcion")
+        monto = limpiar_numero(request.form.get("monto"))
 
-    conn = sqlite3.connect("padel.db")
-    cursor = conn.cursor()
+        conn = sqlite3.connect("padel.db")
+        cursor = conn.cursor()
 
-    cursor.execute("""
-        INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
-        VALUES (?, ?, ?, ?, ?)
-    """, (
-        fecha,
-        "egreso",
-        descripcion,
-        monto,
-        "Egreso"
-    ))
+        cursor.execute("""
+            INSERT INTO egresos (fecha, descripcion, monto)
+            VALUES (?, ?, ?)
+        """, (fecha, descripcion, monto))
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
 
-    conn.commit()
-    conn.close()
+        return redirect("/admin#seccion-caja")
 
-    return redirect("/admin#seccion-caja")
+    except Exception as e:
+        return f"Error al guardar egreso: {str(e)}"
 
 
 @app.route("/eliminar/<int:id>")
