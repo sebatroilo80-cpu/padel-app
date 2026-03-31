@@ -688,6 +688,69 @@ def admin():
                 grilla[h][cancha]["estado"] = "inicio" if i == 0 else "continuacion"
                 grilla[h][cancha]["reserva"] = r
 
+        # =========================
+    # Estadísticas de uso
+    # =========================
+
+    # Horarios más usados
+    cursor.execute("""
+        SELECT horario, COUNT(*) as cantidad
+        FROM reservas
+        GROUP BY horario
+        ORDER BY cantidad DESC, horario ASC
+    """)
+    horarios_mas_usados_raw = cursor.fetchall()
+
+    horarios_mas_usados = []
+    max_horarios = 0
+
+    for fila in horarios_mas_usados_raw:
+        horario = fila[0]
+        cantidad = fila[1]
+        horarios_mas_usados.append({
+            "label": horario,
+            "cantidad": cantidad
+        })
+        if cantidad > max_horarios:
+            max_horarios = cantidad
+
+    # Días más usados
+    # weekday('%w', fecha): 0=domingo, 1=lunes, ... 6=sábado
+    cursor.execute("""
+        SELECT strftime('%w', fecha) as dia_num, COUNT(*) as cantidad
+        FROM reservas
+        GROUP BY dia_num
+        ORDER BY cantidad DESC
+    """)
+    dias_mas_usados_raw = cursor.fetchall()
+
+    nombres_dias = {
+        "0": "Domingo",
+        "1": "Lunes",
+        "2": "Martes",
+        "3": "Miércoles",
+        "4": "Jueves",
+        "5": "Viernes",
+        "6": "Sábado"
+    }
+
+    dias_mas_usados = []
+    max_dias = 0
+
+    for fila in dias_mas_usados_raw:
+        dia_num = str(fila[0])
+        cantidad = fila[1]
+        dias_mas_usados.append({
+            "label": nombres_dias.get(dia_num, dia_num),
+            "cantidad": cantidad
+        })
+        if cantidad > max_dias:
+            max_dias = cantidad
+
+    # Totales generales
+    cursor.execute("SELECT COUNT(*) FROM reservas")
+    total_reservas = cursor.fetchone()[0] or 0
+
     conn.close()
 
     return render_template(
@@ -709,6 +772,11 @@ def admin():
         reservas=reservas,
         egresos=egresos,
         config=config
+        horarios_mas_usados=horarios_mas_usados,
+        dias_mas_usados=dias_mas_usados,
+        max_horarios=max_horarios,
+        max_dias=max_dias,
+        total_reservas=total_reservas,
     )    
 
 
@@ -929,7 +997,8 @@ def eliminar_reserva(id):
     conn.commit()
     conn.close()
 
-    return redirect("/admin")
+    # 🔥 IMPORTANTE: volver a donde estabas
+    return redirect(request.referrer or "/reservas")
 
 @app.route("/confirmar_transferencia/<int:id>")
 def confirmar_transferencia(id):

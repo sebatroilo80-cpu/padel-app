@@ -20,20 +20,13 @@
         </div>
 
         <div class="adminv2-nav">
-
-    <button class="btn-nav activo">📅 Grilla</button>
-
-    <a href="/reservas" class="btn-nav-link">📋 Reservas</a>
-
-    <a href="/configuracion" class="btn-nav-link">⚙️ Configuración</a>
-
-    <button class="btn-nav">📊 Reportes</button>
-
-    <button class="btn-nav">💰 Caja</button>
-
-    <a href="/logout" class="btn-nav-link salir">🚪 Salir</a>
-
-</div>
+            <button class="btn-nav activo" type="button" onclick="mostrarSeccion('seccion-grilla', this)">📅 Grilla</button>
+            <button class="btn-nav" type="button" onclick="mostrarSeccion('seccion-reservas', this)">📋 Reservas</button>
+            <button class="btn-nav" type="button" onclick="mostrarSeccion('seccion-caja', this)">💰 Caja</button>
+            <button class="btn-nav" type="button" onclick="mostrarSeccion('seccion-reportes', this)">📊 Reportes</button>
+            <a href="/configuracion" class="btn-nav-link">⚙️ Configuración</a>
+            <a href="/logout" class="btn-nav-link salir">🚪 Salir</a>
+        </div>
     </aside>
 
     <main class="adminv2-main">
@@ -70,13 +63,13 @@
             </div>
         </section>
 
-        <section class="adminv2-contenido">
-
+        <!-- GRILLA -->
+        <section id="seccion-grilla" class="adminv2-seccion activa">
             <div class="adminv2-grilla-box">
                 <div class="adminv2-section-head">
                     <div>
                         <h2>Agenda del día {{ fecha_admin }}</h2>
-                        <p>Doble clic en una celda libre para cargar una reserva.</p>
+                        <p>Doble clic en una celda libre para cargar una reserva. Doble clic en una ocupada para editar.</p>
                     </div>
                 </div>
 
@@ -136,7 +129,220 @@
                     </table>
                 </div>
             </div>
+        </section>
 
+        <!-- RESERVAS -->
+        <section id="seccion-reservas" class="adminv2-seccion">
+            <div class="adminv2-grilla-box">
+                <div class="adminv2-section-head">
+                    <div>
+                        <h2>Reservas cargadas</h2>
+                        <p>Editar, confirmar, eliminar y avisar al cliente.</p>
+                    </div>
+                    <button class="btn-volver" type="button" onclick="mostrarSeccion('seccion-grilla', document.querySelectorAll('.btn-nav')[0])">← Volver a grilla</button>
+                </div>
+
+                {% if reservas %}
+                <div class="reservas-grid-v2">
+                    {% for r in reservas %}
+                        {% set precio = r[7] %}
+                        {% set pagado = r[10] %}
+                        {% set falta = precio - pagado %}
+
+                        <div class="reserva-card-v2">
+                            <h3>{{ r[1] }}</h3>
+                            <p>📞 {{ r[2] or '-' }}</p>
+                            <p>📅 {{ r[3] }}</p>
+                            <p>🎾 {{ r[4] }}</p>
+                            <p>⏰ {{ r[6] }} · {{ r[5] }}</p>
+                            <p>💳 {{ r[8] }}</p>
+                            <p>📌 {{ r[9] }}</p>
+                            <p>💰 Total: ${{ precio }}</p>
+                            <p>✅ Pagó: ${{ pagado }}</p>
+                            <p>🟡 Falta: ${{ falta }}</p>
+
+                            <div class="reserva-actions-v2">
+                                {% if r[8] == "Transferencia" and r[9] in ["Pendiente reserva", "Pendiente pago total"] %}
+                                <a href="/confirmar_transferencia/{{ r[0] }}" class="btn-accion verde">Confirmar pago</a>
+                                {% endif %}
+
+                                {% if r[2] and r[9] in ["Reserva", "Pagado"] %}
+                                <a href="https://wa.me/{{ r[2] }}?text=Reserva%20confirmada%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AEstado:%20{{ r[9] }}"
+                                   target="_blank"
+                                   class="btn-accion whatsapp">
+                                   WhatsApp cliente
+                                </a>
+                                {% endif %}
+
+                                <a href="/editar/{{ r[0] }}" class="btn-accion azul">Editar</a>
+
+                                <a href="/eliminar/{{ r[0] }}"
+                                   onclick="return confirm('¿Seguro que querés eliminar esta reserva?')"
+                                   class="btn-accion rojo">
+                                   Eliminar
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    <p>No hay reservas todavía.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- CAJA -->
+        <section id="seccion-caja" class="adminv2-seccion">
+            <div class="adminv2-grilla-box">
+                <div class="adminv2-section-head">
+                    <div>
+                        <h2>Caja</h2>
+                        <p>Resumen diario, mensual y anual, con egresos incluidos.</p>
+                    </div>
+                    <button class="btn-volver" type="button" onclick="mostrarSeccion('seccion-grilla', document.querySelectorAll('.btn-nav')[0])">← Volver a grilla</button>
+                </div>
+
+                <div class="caja-grid-v2">
+                    <div class="caja-item-v2"><span>Ingresos del día</span><strong>${{ ingresos_hoy }}</strong></div>
+                    <div class="caja-item-v2"><span>Egresos del día</span><strong>${{ egresos_hoy }}</strong></div>
+                    <div class="caja-item-v2"><span>Saldo del día</span><strong>${{ total_hoy }}</strong></div>
+                    <div class="caja-item-v2"><span>Efectivo</span><strong>${{ efectivo_hoy }}</strong></div>
+                    <div class="caja-item-v2"><span>Transferencia</span><strong>${{ transferencia_hoy }}</strong></div>
+                    <div class="caja-item-v2"><span>Mercado Pago</span><strong>${{ mercado_pago_hoy }}</strong></div>
+                    <div class="caja-item-v2"><span>QR</span><strong>${{ qr_hoy }}</strong></div>
+                    <div class="caja-item-v2"><span>Saldo del mes</span><strong>${{ total_mes }}</strong></div>
+                    <div class="caja-item-v2"><span>Saldo del año</span><strong>${{ total_anio }}</strong></div>
+                </div>
+
+                <div class="adminv2-subbloques">
+                    <div class="subbloque-v2">
+                        <h3>Cargar egreso</h3>
+
+                        <form action="/agregar-egreso" method="POST" class="form-egreso-v2">
+                            <input type="date" name="fecha" class="campo" required>
+                            <input type="text" name="descripcion" placeholder="Descripción del egreso" class="campo" required>
+                            <input type="number" step="0.01" name="monto" placeholder="Monto" class="campo" required>
+                            <button type="submit" class="btn-guardar">Guardar egreso</button>
+                        </form>
+                    </div>
+
+                    <div class="subbloque-v2">
+                        <h3>Egresos cargados</h3>
+
+                        {% if egresos %}
+                            <div class="lista-egresos-v2">
+                                {% for e in egresos %}
+                                <div class="egreso-card-v2">
+                                    <div>
+                                        <strong>{{ e[2] }}</strong>
+                                        <p>📅 {{ e[1] }}</p>
+                                        <p>💸 ${{ e[3] }}</p>
+                                    </div>
+
+                                    <a href="/eliminar-egreso/{{ e[0] }}"
+                                       onclick="return confirm('¿Seguro que querés eliminar este egreso?')"
+                                       class="btn-accion rojo">
+                                       Eliminar
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p>No hay egresos cargados.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- REPORTES -->
+        <section id="seccion-reportes" class="adminv2-seccion">
+            <div class="adminv2-grilla-box">
+                <div class="adminv2-section-head">
+                    <div>
+                        <h2>Reportes y estadísticas</h2>
+                        <p>Horarios y días con más uso.</p>
+                    </div>
+                    <button class="btn-volver" type="button" onclick="mostrarSeccion('seccion-grilla', document.querySelectorAll('.btn-nav')[0])">← Volver a grilla</button>
+                </div>
+
+                <div class="stats-top-v2">
+                    <div class="stat-card-v2">
+                        <span>Total de reservas</span>
+                        <strong>
+                            {% if total_reservas is defined %}
+                                {{ total_reservas }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </strong>
+                    </div>
+
+                    <div class="stat-card-v2">
+                        <span>Horario más usado</span>
+                        <strong>
+                            {% if horarios_mas_usados is defined and horarios_mas_usados %}
+                                {{ horarios_mas_usados[0].label }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </strong>
+                    </div>
+
+                    <div class="stat-card-v2">
+                        <span>Día más usado</span>
+                        <strong>
+                            {% if dias_mas_usados is defined and dias_mas_usados %}
+                                {{ dias_mas_usados[0].label }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="stats-grid-v2">
+                    <div class="stats-box-v2">
+                        <h3>Horarios más usados</h3>
+
+                        {% if horarios_mas_usados is defined and horarios_mas_usados %}
+                            <div class="bars-v2">
+                                {% for item in horarios_mas_usados %}
+                                <div class="bar-row-v2">
+                                    <div class="bar-label-v2">{{ item.label }}</div>
+                                    <div class="bar-track-v2">
+                                        <div class="bar-fill-v2 verde" style="width: {{ (item.cantidad / max_horarios * 100) if max_horarios is defined and max_horarios > 0 else 0 }}%;"></div>
+                                    </div>
+                                    <div class="bar-value-v2">{{ item.cantidad }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p>No hay datos todavía.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="stats-box-v2">
+                        <h3>Días más usados</h3>
+
+                        {% if dias_mas_usados is defined and dias_mas_usados %}
+                            <div class="bars-v2">
+                                {% for item in dias_mas_usados %}
+                                <div class="bar-row-v2">
+                                    <div class="bar-label-v2">{{ item.label }}</div>
+                                    <div class="bar-track-v2">
+                                        <div class="bar-fill-v2 azul" style="width: {{ (item.cantidad / max_dias * 100) if max_dias is defined and max_dias > 0 else 0 }}%;"></div>
+                                    </div>
+                                    <div class="bar-value-v2">{{ item.cantidad }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p>No hay datos todavía.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </section>
 
     </main>
@@ -219,6 +425,25 @@ function calcularPrecioModal() {
     }
 
     texto.innerText = "Precio: $" + precio;
+}
+
+function mostrarSeccion(id, boton) {
+    document.querySelectorAll(".adminv2-seccion").forEach(sec => {
+        sec.classList.remove("activa");
+    });
+
+    document.querySelectorAll(".btn-nav").forEach(btn => {
+        btn.classList.remove("activo");
+    });
+
+    const seccion = document.getElementById(id);
+    if (seccion) {
+        seccion.classList.add("activa");
+    }
+
+    if (boton) {
+        boton.classList.add("activo");
+    }
 }
 
 document.getElementById("modal_duracion").addEventListener("change", calcularPrecioModal);

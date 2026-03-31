@@ -370,3 +370,238 @@ body.adminv2-body {
         align-items: flex-start;
     }
 }
+
+/* ===== SECCIONES ===== */
+
+.adminv2-seccion {
+    display: none;
+}
+
+.adminv2-seccion.activa {
+    display: block;
+}
+
+/* ===== BOTÓN VOLVER ===== */
+
+.btn-volver {
+    border: none;
+    background: #eef2f7;
+    color: #1f2937;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ===== RESERVAS ===== */
+
+.reservas-grid-v2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.reserva-card-v2 {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 16px;
+}
+
+.reserva-card-v2 h3 {
+    margin: 0 0 6px;
+}
+
+.reserva-card-v2 p {
+    margin: 3px 0;
+    font-size: .92rem;
+    color: #4b5563;
+}
+
+.reserva-actions-v2 {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.btn-accion {
+    text-decoration: none;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    font-weight: 700;
+    display: block;
+}
+
+.btn-accion.verde {
+    background: #57b574;
+    color: #fff;
+}
+
+.btn-accion.azul {
+    background: #4d74d9;
+    color: #fff;
+}
+
+.btn-accion.rojo {
+    background: #e74c3c;
+    color: #fff;
+}
+
+.btn-accion.whatsapp {
+    background: #25d366;
+    color: #fff;
+}
+
+/* ===== CAJA ===== */
+
+.caja-grid-v2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.caja-item-v2 {
+    background: #fafcfd;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 14px;
+}
+
+.caja-item-v2 span {
+    display: block;
+    color: #6b7280;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.caja-item-v2 strong {
+    font-size: 1.2rem;
+}
+
+.adminv2-subbloques {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.subbloque-v2 {
+    background: #fafcfd;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 18px;
+}
+
+.form-egreso-v2 {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lista-egresos-v2 {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.egreso-card-v2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 12px;
+}
+
+/* ===== REPORTES ===== */
+
+.stats-top-v2 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 18px;
+    margin-bottom: 22px;
+}
+
+.stat-card-v2 {
+    background: #fafcfd;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.stat-card-v2 span {
+    display: block;
+    color: #6b7280;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.stat-card-v2 strong {
+    font-size: 1.4rem;
+}
+
+.stats-grid-v2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.stats-box-v2 {
+    background: #fafcfd;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 18px;
+}
+
+.bars-v2 {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bar-row-v2 {
+    display: grid;
+    grid-template-columns: 100px 1fr 40px;
+    gap: 8px;
+    align-items: center;
+}
+
+.bar-track-v2 {
+    height: 12px;
+    background: #edf2f7;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.bar-fill-v2 {
+    height: 100%;
+}
+
+.bar-fill-v2.verde {
+    background: #57b574;
+}
+
+.bar-fill-v2.azul {
+    background: #4d74d9;
+}
+
+.bar-value-v2 {
+    font-weight: 800;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 900px) {
+    .adminv2-subbloques,
+    .stats-grid-v2,
+    .stats-top-v2 {
+        grid-template-columns: 1fr;
+    }
+}
