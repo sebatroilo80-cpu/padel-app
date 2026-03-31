@@ -4,41 +4,200 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f6f8fb;
+            color: #1f2937;
+        }
+
+        .contenedor {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 20px 40px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .topbar p {
+            margin: 6px 0 0;
+            color: #6b7280;
+        }
+
+        .btn-volver {
+            text-decoration: none;
+            background: #eef2f7;
+            color: #1f2937;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .grid-reservas {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .card-reserva {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        .card-reserva h3 {
+            margin: 0 0 12px;
+            font-size: 1.2rem;
+        }
+
+        .dato {
+            margin: 6px 0;
+            color: #374151;
+        }
+
+        .estado {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: #eef2f7;
+            color: #1f2937;
+        }
+
+        .acciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            text-decoration: none;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .btn-editar {
+            background: #eaf1ff;
+            color: #365fcf;
+        }
+
+        .btn-eliminar {
+            background: #fdecec;
+            color: #c0392b;
+        }
+
+        .btn-confirmar {
+            background: #e8f7ec;
+            color: #2f8f51;
+        }
+
+        .btn-whatsapp {
+            background: #e8fff0;
+            color: #159447;
+        }
+
+        .vacio {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            padding: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-reservas {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h2>Listado de reservas</h2>
+    <div class="contenedor">
 
-    {% if reservas %}
-    <table border="1" cellpadding="10" cellspacing="0">
-        <tr>
-            <th>Cliente</th>
-            <th>Teléfono</th>
-            <th>Fecha</th>
-            <th>Cancha</th>
-            <th>Duración</th>
-            <th>Horario</th>
-            <th>Método</th>
-            <th>Estado</th>
-        </tr>
+        <div class="topbar">
+            <div>
+                <h1>Reservas cargadas</h1>
+                <p>Desde acá podés editar, confirmar y avisar al cliente.</p>
+            </div>
 
-        {% for r in reservas %}
-        <tr>
-            <td>{{ r[1] }}</td>
-            <td>{{ r[2] }}</td>
-            <td>{{ r[3] }}</td>
-            <td>{{ r[4] }}</td>
-            <td>{{ r[5] }}</td>
-            <td>{{ r[6] }}</td>
-            <td>{{ r[8] }}</td>
-            <td>{{ r[9] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    {% else %}
-        <p>No hay reservas cargadas.</p>
-    {% endif %}
+            <a href="/admin" class="btn-volver">⬅ Volver al panel</a>
+        </div>
 
-    <br>
-    <a href="/admin">⬅ Volver al panel</a>
+        {% if reservas %}
+        <div class="grid-reservas">
+            {% for r in reservas %}
+                {% set precio = r[7] %}
+                {% set pagado = r[10] %}
+                {% set falta = precio - pagado %}
+
+                <div class="card-reserva">
+                    <h3>{{ r[1] }}</h3>
+
+                    <div class="dato">📞 Teléfono: {{ r[2] or '-' }}</div>
+                    <div class="dato">📅 Fecha: {{ r[3] }}</div>
+                    <div class="dato">🎾 Cancha: {{ r[4] }}</div>
+                    <div class="dato">⏳ Duración: {{ r[5] }}</div>
+                    <div class="dato">⏰ Horario: {{ r[6] }}</div>
+                    <div class="dato">💳 Método: {{ r[8] }}</div>
+                    <div class="dato">💰 Total: ${{ precio }}</div>
+                    <div class="dato">✅ Pagó: ${{ pagado }}</div>
+                    <div class="dato">🟡 Falta: ${{ falta }}</div>
+
+                    <div class="estado">{{ r[9] }}</div>
+
+                    <div class="acciones">
+                        <a href="/editar/{{ r[0] }}" class="btn btn-editar">Editar</a>
+
+                        {% if r[8] == "Transferencia" and r[9] in ["Pendiente reserva", "Pendiente pago total"] %}
+                        <a href="/confirmar_transferencia/{{ r[0] }}" class="btn btn-confirmar">Confirmar pago</a>
+                        {% endif %}
+
+                        {% if r[2] and r[9] in ["Reserva", "Pagado"] %}
+                        <a href="https://wa.me/{{ r[2] }}?text=Reserva%20confirmada%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AEstado:%20{{ r[9] }}"
+                           target="_blank"
+                           class="btn btn-whatsapp">
+                           WhatsApp cliente
+                        </a>
+                        {% endif %}
+
+                        <a href="/eliminar/{{ r[0] }}"
+                           onclick="return confirm('¿Seguro que querés eliminar esta reserva?')"
+                           class="btn btn-eliminar">
+                           Eliminar
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <div class="vacio">No hay reservas cargadas.</div>
+        {% endif %}
+
+    </div>
 </body>
 </html>
