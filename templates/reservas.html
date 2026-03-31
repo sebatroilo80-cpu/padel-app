@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservas</title>
+</head>
+<body>
+
+<h2>Listado de reservas</h2>
+
+<table border="1" cellpadding="10">
+    <tr>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Cancha</th>
+        <th>Cliente</th>
+    </tr>
+
+    {% for r in reservas %}
+    <tr>
+        <td>{{ r[2] }}</td>
+        <td>{{ r[6] }}</td>
+        <td>{{ r[4] }}</td>
+        <td>{{ r[1] }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+<br>
+<a href="/admin">⬅ Volver</a>
+
+</body>
+</html>

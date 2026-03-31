@@ -1161,6 +1161,18 @@ def reset_db():
 
     return "Base de datos reseteada"
 
+@app.route("/reservas")
+def ver_reservas():
+    conn = sqlite3.connect("padel.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM turnos ORDER BY fecha DESC, hora_inicio DESC")
+    reservas = cursor.fetchall()
+
+    conn.close()
+
+    return render_template("reservas.html", reservas=reservas)
+
 import os
 
 if __name__ == "__main__":
