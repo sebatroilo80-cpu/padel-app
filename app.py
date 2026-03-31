@@ -771,7 +771,7 @@ def admin():
         reporte_mensual=reporte_mensual,
         reservas=reservas,
         egresos=egresos,
-        config=config
+        config=config,
         horarios_mas_usados=horarios_mas_usados,
         dias_mas_usados=dias_mas_usados,
         max_horarios=max_horarios,
