@@ -607,108 +607,164 @@ def admin():
     """)
     reservas = cursor.fetchall()
 
-    ## =========================
-    # Egresos cargados
-    # movimientos puede tener 'descripcion' o 'concepto'
     # =========================
-    cursor.execute("PRAGMA table_info(movimientos)")
-    columnas_movimientos = [col[1] for col in cursor.fetchall()]
-
-    campo_texto = "descripcion" if "descripcion" in columnas_movimientos else "concepto"
-
-    cursor.execute(f"""
-        SELECT id, fecha, tipo, {campo_texto} as descripcion, monto, metodo_pago
-        FROM movimientos
-        WHERE tipo = 'egreso'
-        ORDER BY fecha DESC, id DESC
+    # Egresos cargados
+    # =========================
+    cursor.execute("""
+        SELECT name
+        FROM sqlite_master
+        WHERE type='table'
     """)
-    egresos = cursor.fetchall()
+    tablas = [t[0] for t in cursor.fetchall()]
+
+    egresos = []
+
+    if "movimientos" in tablas:
+        cursor.execute("PRAGMA table_info(movimientos)")
+        columnas_movimientos = [col[1] for col in cursor.fetchall()]
+        campo_texto = "descripcion" if "descripcion" in columnas_movimientos else "concepto"
+
+        cursor.execute(f"""
+            SELECT id, fecha, tipo, {campo_texto} as descripcion, monto, metodo_pago
+            FROM movimientos
+            WHERE tipo = 'egreso'
+            ORDER BY fecha DESC, id DESC
+        """)
+        egresos = cursor.fetchall()
+
+    elif "egresos" in tablas:
+        cursor.execute("""
+            SELECT id, fecha, 'egreso' as tipo, descripcion, monto, 'Egreso' as metodo_pago
+            FROM egresos
+            ORDER BY fecha DESC, id DESC
+        """)
+        egresos = cursor.fetchall()
 
     # =========================
     # Caja diaria
     # =========================
-    cursor.execute("""
-        SELECT COALESCE(SUM(monto), 0)
-        FROM movimientos
-        WHERE tipo = 'ingreso' AND fecha = ?
-    """, (fecha_admin,))
-    ingresos_hoy = float(cursor.fetchone()[0] or 0)
+    ingresos_hoy = 0.0
+    egresos_hoy = 0.0
+    efectivo_hoy = 0.0
+    transferencia_hoy = 0.0
+    mercado_pago_hoy = 0.0
+    qr_hoy = 0.0
 
-    cursor.execute("""
-        SELECT COALESCE(SUM(monto), 0)
-        FROM movimientos
-        WHERE tipo = 'egreso' AND fecha = ?
-    """, (fecha_admin,))
-    egresos_hoy = float(cursor.fetchone()[0] or 0)
+    if "movimientos" in tablas:
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'ingreso' AND fecha = ?
+        """, (fecha_admin,))
+        ingresos_hoy = float(cursor.fetchone()[0] or 0)
 
-    cursor.execute("""
-        SELECT COALESCE(SUM(monto), 0)
-        FROM movimientos
-        WHERE tipo = 'ingreso' AND fecha = ? AND metodo_pago = 'Efectivo'
-    """, (fecha_admin,))
-    efectivo_hoy = float(cursor.fetchone()[0] or 0)
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'egreso' AND fecha = ?
+        """, (fecha_admin,))
+        egresos_hoy = float(cursor.fetchone()[0] or 0)
 
-    cursor.execute("""
-        SELECT COALESCE(SUM(monto), 0)
-        FROM movimientos
-        WHERE tipo = 'ingreso' AND fecha = ? AND metodo_pago = 'Transferencia'
-    """, (fecha_admin,))
-    transferencia_hoy = float(cursor.fetchone()[0] or 0)
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'ingreso' AND fecha = ? AND metodo_pago = 'Efectivo'
+        """, (fecha_admin,))
+        efectivo_hoy = float(cursor.fetchone()[0] or 0)
 
-    cursor.execute("""
-        SELECT COALESCE(SUM(monto), 0)
-        FROM movimientos
-        WHERE tipo = 'ingreso' AND fecha = ? AND metodo_pago = 'Mercado Pago'
-    """, (fecha_admin,))
-    mercado_pago_hoy = float(cursor.fetchone()[0] or 0)
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'ingreso' AND fecha = ? AND metodo_pago = 'Transferencia'
+        """, (fecha_admin,))
+        transferencia_hoy = float(cursor.fetchone()[0] or 0)
 
-    cursor.execute("""
-        SELECT COALESCE(SUM(monto), 0)
-        FROM movimientos
-        WHERE tipo = 'ingreso' AND fecha = ? AND metodo_pago = 'QR'
-    """, (fecha_admin,))
-    qr_hoy = float(cursor.fetchone()[0] or 0)
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'ingreso' AND fecha = ? AND metodo_pago = 'Mercado Pago'
+        """, (fecha_admin,))
+        mercado_pago_hoy = float(cursor.fetchone()[0] or 0)
+
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'ingreso' AND fecha = ? AND metodo_pago = 'QR'
+        """, (fecha_admin,))
+        qr_hoy = float(cursor.fetchone()[0] or 0)
+
+    elif "egresos" in tablas:
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM egresos
+            WHERE fecha = ?
+        """, (fecha_admin,))
+        egresos_hoy = float(cursor.fetchone()[0] or 0)
 
     total_hoy = ingresos_hoy - egresos_hoy
 
     # =========================
     # Caja mensual
     # =========================
-    mes_actual = fecha_admin[:7]   # YYYY-MM
-    anio_actual = fecha_admin[:4]  # YYYY
+    mes_actual = fecha_admin[:7]
+    anio_actual = fecha_admin[:4]
 
-    cursor.execute("""
-        SELECT COALESCE(SUM(monto), 0)
-        FROM movimientos
-        WHERE tipo = 'ingreso' AND substr(fecha, 1, 7) = ?
-    """, (mes_actual,))
-    ingresos_mes = float(cursor.fetchone()[0] or 0)
+    ingresos_mes = 0.0
+    egresos_mes = 0.0
 
-    cursor.execute("""
-        SELECT COALESCE(SUM(monto), 0)
-        FROM movimientos
-        WHERE tipo = 'egreso' AND substr(fecha, 1, 7) = ?
-    """, (mes_actual,))
-    egresos_mes = float(cursor.fetchone()[0] or 0)
+    if "movimientos" in tablas:
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'ingreso' AND substr(fecha, 1, 7) = ?
+        """, (mes_actual,))
+        ingresos_mes = float(cursor.fetchone()[0] or 0)
+
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'egreso' AND substr(fecha, 1, 7) = ?
+        """, (mes_actual,))
+        egresos_mes = float(cursor.fetchone()[0] or 0)
+
+    elif "egresos" in tablas:
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM egresos
+            WHERE substr(fecha, 1, 7) = ?
+        """, (mes_actual,))
+        egresos_mes = float(cursor.fetchone()[0] or 0)
 
     total_mes = ingresos_mes - egresos_mes
 
     # =========================
     # Caja anual
     # =========================
-    cursor.execute("""
-        SELECT COALESCE(SUM(monto), 0)
-        FROM movimientos
-        WHERE tipo = 'ingreso' AND substr(fecha, 1, 4) = ?
-    """, (anio_actual,))
-    ingresos_anio = float(cursor.fetchone()[0] or 0)
+    ingresos_anio = 0.0
+    egresos_anio = 0.0
 
-    cursor.execute("""
-        SELECT COALESCE(SUM(monto), 0)
-        FROM movimientos
-        WHERE tipo = 'egreso' AND substr(fecha, 1, 4) = ?
-    """, (anio_actual,))
-    egresos_anio = float(cursor.fetchone()[0] or 0)
+    if "movimientos" in tablas:
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'ingreso' AND substr(fecha, 1, 4) = ?
+        """, (anio_actual,))
+        ingresos_anio = float(cursor.fetchone()[0] or 0)
+
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'egreso' AND substr(fecha, 1, 4) = ?
+        """, (anio_actual,))
+        egresos_anio = float(cursor.fetchone()[0] or 0)
+
+    elif "egresos" in tablas:
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM egresos
+            WHERE substr(fecha, 1, 4) = ?
+        """, (anio_actual,))
+        egresos_anio = float(cursor.fetchone()[0] or 0)
 
     total_anio = ingresos_anio - egresos_anio
 
