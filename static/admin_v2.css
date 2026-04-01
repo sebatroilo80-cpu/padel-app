@@ -1204,3 +1204,241 @@ body.adminv2-body {
         width: 100%;
     }
 }
+/* ===== GRILLA APP STYLE ===== */
+
+.grilla-app-box {
+    padding: 22px;
+    border-radius: 24px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+    border: 1px solid #e7ebf0;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+}
+
+.grilla-app-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.grilla-app-topbar h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1f2937;
+}
+
+.grilla-app-topbar p {
+    margin: 6px 0 0;
+    color: #7b8492;
+    font-size: 0.95rem;
+}
+
+.grilla-app-date-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.grilla-app-date-form input[type="date"] {
+    min-height: 44px;
+    border: 1px solid #dbe2ea;
+    border-radius: 12px;
+    padding: 0 12px;
+    background: #fff;
+    color: #1f2937;
+    font-size: 0.95rem;
+}
+
+.grilla-app-date-form button {
+    min-height: 44px;
+    border: none;
+    border-radius: 12px;
+    padding: 0 16px;
+    font-weight: 800;
+    background: linear-gradient(180deg, #68b3e4 0%, #529bd0 100%);
+    color: #fff;
+    cursor: pointer;
+}
+
+.grilla-app-leyenda {
+    margin-bottom: 18px;
+}
+
+.grilla-app-wrap {
+    overflow-x: auto;
+}
+
+.agenda-grid-app {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+}
+
+.agenda-grid-app thead th {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 2;
+    color: #5b6574;
+    font-weight: 800;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 14px 10px;
+    border-bottom: 1px solid #e7ebf0;
+}
+
+.hora-head-app {
+    width: 90px;
+}
+
+.agenda-grid-app tbody td {
+    border-bottom: 1px solid #edf1f5;
+    border-right: 1px solid #edf1f5;
+    vertical-align: top;
+    padding: 0;
+    height: 86px;
+}
+
+.agenda-grid-app tbody tr td:first-child {
+    border-left: 1px solid #edf1f5;
+}
+
+.hora-col-app {
+    background: #fbfcfe;
+    color: #7b8492;
+    font-weight: 800;
+    text-align: center;
+    font-size: 0.95rem;
+    padding: 12px 8px !important;
+    vertical-align: middle !important;
+}
+
+.celda-app {
+    background: #fff;
+}
+
+.modulo-libre-app,
+.modulo-turno-app {
+    min-height: 86px;
+    height: 100%;
+    border-radius: 0;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+}
+
+.modulo-libre-app {
+    background: #ffffff;
+    color: #c0c7d1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.modulo-libre-app:hover {
+    background: #f8fafc;
+}
+
+.modulo-turno-app {
+    padding: 10px 12px;
+    border-left-width: 5px;
+    border-left-style: solid;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.turno-app-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.turno-app-hora {
+    font-size: 0.83rem;
+    font-weight: 800;
+    color: #374151;
+}
+
+.turno-app-tag {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #7b8492;
+    text-transform: uppercase;
+}
+
+.turno-app-nombre {
+    font-size: 1.12rem;
+    line-height: 1.15;
+    color: #1f2937;
+}
+
+.turno-app-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.turno-app-bottom small {
+    font-size: 0.78rem;
+    color: #5b6574;
+    font-weight: 700;
+}
+
+.pago-efectivo.modulo-turno-app {
+    background: #eaf8ef;
+    border-left-color: #38a35b;
+}
+
+.pago-transferencia.modulo-turno-app {
+    background: #edf3ff;
+    border-left-color: #4d74d9;
+}
+
+.pago-mp.modulo-turno-app {
+    background: #e8f7ff;
+    border-left-color: #34a4d8;
+}
+
+.pago-qr.modulo-turno-app {
+    background: #fbf5d9;
+    border-left-color: #b79e20;
+}
+
+.pago-sin-metodo.modulo-turno-app {
+    background: #eef1f3;
+    border-left-color: #9aa4a0;
+}
+
+@media (max-width: 900px) {
+    .grilla-app-topbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .grilla-app-date-form {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .grilla-app-date-form button,
+    .grilla-app-date-form input[type="date"] {
+        width: 100%;
+    }
+
+    .agenda-grid-app thead th,
+    .hora-col-app {
+        font-size: 0.86rem;
+    }
+
+    .turno-app-nombre {
+        font-size: 0.98rem;
+    }
+}

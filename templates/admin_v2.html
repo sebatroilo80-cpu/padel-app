@@ -64,72 +64,89 @@
         </section>
 
         <!-- GRILLA -->
-        <section id="seccion-grilla" class="adminv2-seccion activa">
-            <div class="adminv2-grilla-box">
-                <div class="adminv2-section-head">
-                    <div>
-                        <h2>Agenda del día {{ fecha_admin }}</h2>
-                        <p>Doble clic en una celda libre para cargar una reserva. Doble clic en una ocupada para editar.</p>
-                    </div>
-                </div>
+<section id="seccion-grilla" class="adminv2-seccion {% if active_tab == 'grilla' %}activa{% endif %}">
+    <div class="adminv2-grilla-box grilla-app-box">
+        <div class="grilla-app-topbar">
+            <div>
+                <h2>Grilla de turnos</h2>
+                <p>Agenda del día {{ fecha_admin }}</p>
+            </div>
 
-                <div class="adminv2-leyenda">
-                    <span><i class="lg libre"></i>Libre</span>
-                    <span><i class="lg efectivo"></i>Efectivo</span>
-                    <span><i class="lg transferencia"></i>Transferencia</span>
-                    <span><i class="lg mp"></i>Mercado Pago</span>
-                    <span><i class="lg qr"></i>QR</span>
-                </div>
+            <form method="GET" action="/admin" class="grilla-app-date-form">
+                <input type="hidden" name="tab" value="grilla">
+                <input type="date" name="fecha" value="{{ fecha_admin }}">
+                <button type="submit">Ver agenda</button>
+            </form>
+        </div>
 
-                <div class="adminv2-table-wrap">
-                    <table class="agenda-grid">
-                        <tr>
-                            <th>Horario</th>
-                            <th>Cancha 1</th>
-                            <th>Cancha 2</th>
-                            <th>Cancha 3</th>
-                        </tr>
+        <div class="adminv2-leyenda grilla-app-leyenda">
+            <span><i class="lg libre"></i>Libre</span>
+            <span><i class="lg efectivo"></i>Efectivo</span>
+            <span><i class="lg transferencia"></i>Transferencia</span>
+            <span><i class="lg mp"></i>Mercado Pago</span>
+            <span><i class="lg qr"></i>QR</span>
+        </div>
 
-                        {% for h in horarios %}
-                        <tr>
-                            <td class="hora-col">{{ h }}</td>
+        <div class="grilla-app-wrap">
+            <table class="agenda-grid agenda-grid-app">
+                <thead>
+                    <tr>
+                        <th class="hora-head-app">Hora</th>
+                        <th>Cancha 1</th>
+                        <th>Cancha 2</th>
+                        <th>Cancha 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for h in horarios %}
+                    <tr>
+                        <td class="hora-col hora-col-app">{{ h }}</td>
 
-                            {% for c in ["Cancha 1","Cancha 2","Cancha 3"] %}
-                            <td>
-                                {% if grilla[h][c]["estado"] == "libre" %}
-                                    <div class="modulo modulo-libre"
-                                         ondblclick="abrirModal('{{ fecha_admin }}', '{{ c }}', '{{ h }}')">
-                                        <span class="modulo-titulo">Libre</span>
-                                        <small>Doble clic</small>
-                                    </div>
-                                {% else %}
-                                    {% set reserva = grilla[h][c]["reserva"] %}
-                                    {% set metodo = reserva[8] %}
+                        {% for c in ["Cancha 1","Cancha 2","Cancha 3"] %}
+                        <td class="celda-app">
+                            {% if grilla[h][c]["estado"] == "libre" %}
+                                <div class="modulo modulo-libre modulo-libre-app"
+                                     ondblclick="abrirModal('{{ fecha_admin }}', '{{ c }}', '{{ h }}')">
+                                    <span class="modulo-titulo">Libre</span>
+                                    <small>Doble clic</small>
+                                </div>
+                            {% else %}
+                                {% set reserva = grilla[h][c]["reserva"] %}
+                                {% set metodo = reserva[8] %}
 
-                                    <div class="modulo modulo-turno
-                                        {% if metodo == 'Efectivo' %} pago-efectivo
-                                        {% elif metodo == 'Transferencia' %} pago-transferencia
-                                        {% elif metodo == 'Mercado Pago' %} pago-mp
-                                        {% elif metodo == 'QR' %} pago-qr
-                                        {% else %} pago-sin-metodo
-                                        {% endif %}"
-                                        ondblclick="window.location.href='/editar/{{ reserva[0] }}'">
+                                <div class="modulo modulo-turno modulo-turno-app
+                                    {% if metodo == 'Efectivo' %} pago-efectivo
+                                    {% elif metodo == 'Transferencia' %} pago-transferencia
+                                    {% elif metodo == 'Mercado Pago' %} pago-mp
+                                    {% elif metodo == 'QR' %} pago-qr
+                                    {% else %} pago-sin-metodo
+                                    {% endif %}"
+                                    ondblclick="window.location.href='/editar/{{ reserva[0] }}'">
 
-                                        {% if grilla[h][c]["estado"] == "inicio" %}
-                                            <span class="modulo-titulo">{{ reserva[1] }}</span>
+                                    {% if grilla[h][c]["estado"] == "inicio" %}
+                                        <div class="turno-app-top">
+                                            <span class="turno-app-hora">{{ reserva[6] }}</span>
+                                            <span class="turno-app-tag">{{ reserva[5] }}</span>
+                                        </div>
+
+                                        <span class="modulo-titulo turno-app-nombre">{{ reserva[1] }}</span>
+
+                                        <div class="turno-app-bottom">
                                             <small>{{ metodo }}</small>
                                             <small>{{ reserva[9] }}</small>
-                                        {% endif %}
-                                    </div>
-                                {% endif %}
-                            </td>
-                            {% endfor %}
-                        </tr>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </td>
                         {% endfor %}
-                    </table>
-                </div>
-            </div>
-        </section>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
 
         <<!-- RESERVAS -->
 <section id="seccion-reservas" class="adminv2-seccion {% if active_tab == 'reservas' %}activa{% endif %}">
