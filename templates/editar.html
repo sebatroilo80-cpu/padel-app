@@ -78,13 +78,22 @@
         {% endif %}
 
         {% if reserva[2] and reserva[9] in ["Reserva", "Pagado"] %}
-            <a target="_blank"
-               href="https://wa.me/{{ reserva[2] }}?text=Hola%20{{ reserva[1] }}%2C%20tu%20reserva%20fue%20confirmada.%0A%0AFecha%3A%20{{ reserva[3] }}%0ACancha%3A%20{{ reserva[4] }}%0AHorario%3A%20{{ reserva[6] }}%0ADuracion%3A%20{{ reserva[5] }}%0AEstado%3A%20{{ reserva[9] }}">
-                <button type="button" class="btn-main" style="background:#25D366;color:white;">
-                    Avisar por WhatsApp
-                </button>
-            </a>
-        {% endif %}
+
+    {% if reserva[11] == 1 %}
+        <button type="button" class="btn-main" style="background:#9aa4a0;color:white;">
+            WhatsApp enviado
+        </button>
+    {% else %}
+        <a target="_blank"
+           href="https://wa.me/{{ reserva[2] }}?text=Hola%20{{ reserva[1] }}%2C%20tu%20reserva%20fue%20confirmada.%0A%0AFecha%3A%20{{ reserva[3] }}%0ACancha%3A%20{{ reserva[4] }}%0AHorario%3A%20{{ reserva[6] }}%0ADuracion%3A%20{{ reserva[5] }}%0AEstado%3A%20{{ reserva[9] }}"
+           onclick="setTimeout(function(){ window.location.href='/whatsapp_enviado/{{ reserva[0] }}'; }, 500);">
+            <button type="button" class="btn-main" style="background:#25D366;color:white;">
+                Avisar por WhatsApp
+            </button>
+        </a>
+    {% endif %}
+
+{% endif %}
 
         <a href="/admin?tab=reservas">
             <button type="button" class="btn-secondary">Volver</button>

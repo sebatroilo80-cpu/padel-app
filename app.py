@@ -1088,6 +1088,24 @@ def editar(id):
 
     return render_template("editar.html", reserva=reserva)
 
+@app.route("/whatsapp_enviado/<int:id>")
+def whatsapp_enviado(id):
+    if not session.get("admin"):
+        return redirect("/login")
+
+    conn = sqlite3.connect("padel.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE reservas
+        SET whatsapp_enviado = 1
+        WHERE id = ?
+    """, (id,))
+
+    conn.commit()
+    conn.close()
+
+    return redirect(f"/editar/{id}")
 
 @app.route("/agregar-egreso", methods=["POST"])
 def agregar_egreso():
