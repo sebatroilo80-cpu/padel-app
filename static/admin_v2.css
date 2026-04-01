@@ -1581,3 +1581,16 @@ body.adminv2-body {
         grid-template-columns: 1fr;
     }
 }
+.pago-pendiente.modulo-turno-app,
+.pago-pendiente {
+    background: #fdecec !important;
+    border-left: 5px solid #d93025 !important;
+}
+
+.pago-pendiente .turno-app-hora,
+.pago-pendiente .turno-app-nombre,
+.pago-pendiente .turno-app-bottom small,
+.pago-pendiente .modulo-titulo,
+.pago-pendiente small {
+    color: #8b1e16 !important;
+}
