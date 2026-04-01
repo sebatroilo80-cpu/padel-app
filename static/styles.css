@@ -490,3 +490,71 @@
     </a>
 
 </div>
+
+.edit-container {
+    max-width: 600px;
+    margin: 40px auto;
+    background: #0e0e0e;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    color: white;
+}
+
+.edit-container h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: #d4af37;
+}
+
+.edit-container p {
+    color: #aaa;
+    margin-bottom: 20px;
+}
+
+.edit-container input,
+.edit-container select {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: none;
+    background: #1c1c1c;
+    color: white;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.resumen-box {
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    color: white;
+}
+
+.resumen-box strong {
+    color: #d4af37;
+}
+
+.btn-app {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.btn-guardar {
+    background: #d4af37;
+    color: black;
+}
+
+.btn-volver {
+    background: #2a2a2a;
+    color: white;
+}
