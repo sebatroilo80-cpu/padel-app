@@ -1099,3 +1099,108 @@ body.adminv2-body {
         grid-template-columns: 90px 1fr 36px;
     }
 }
+/* =========================
+   SIDEBAR PREMIUM
+   ========================= */
+
+.adminv2-sidebar {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border-right: 1px solid #e5e7eb;
+    padding: 26px 18px;
+    width: 270px;
+    box-sizing: border-box;
+    box-shadow: 8px 0 24px rgba(15, 23, 42, 0.04);
+}
+
+.adminv2-side-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 26px;
+    padding: 10px 8px 18px;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.logo-header {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    padding: 4px;
+}
+
+.adminv2-brand-text h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    line-height: 1.1;
+    color: #1f2937;
+    font-weight: 800;
+}
+
+.adminv2-brand-text p {
+    margin: 6px 0 0;
+    color: #7b8492;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.adminv2-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.btn-nav,
+.btn-nav-link {
+    text-decoration: none;
+    border: 1px solid #edf1f5;
+    background: #ffffff;
+    color: #253041;
+    padding: 15px 16px;
+    border-radius: 16px;
+    text-align: left;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 54px;
+    box-sizing: border-box;
+    transition: all 0.18s ease;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.03);
+}
+
+.btn-nav:hover,
+.btn-nav-link:hover {
+    transform: translateY(-1px);
+    border-color: #dbe4ee;
+    background: #f9fbfd;
+}
+
+.btn-nav.activo {
+    background: linear-gradient(180deg, #eef8f1 0%, #e7f5ec 100%);
+    color: #1d7c45;
+    border-color: #cfe9d8;
+    box-shadow: 0 10px 22px rgba(52, 168, 83, 0.10);
+}
+
+.btn-nav-link.salir {
+    background: linear-gradient(180deg, #fff4f2 0%, #fdecec 100%);
+    color: #c0392b;
+    border-color: #f4d4cf;
+    box-shadow: 0 10px 22px rgba(192, 57, 43, 0.08);
+}
+
+.btn-nav-link.salir:hover {
+    background: #fdecec;
+}
+
+@media (max-width: 1100px) {
+    .adminv2-sidebar {
+        width: 100%;
+    }
+}

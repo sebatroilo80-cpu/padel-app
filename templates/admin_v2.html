@@ -20,13 +20,13 @@
         </div>
 
         <div class="adminv2-nav">
-            <button class="btn-nav activo" type="button" onclick="mostrarSeccion('seccion-grilla', this)">📅 Grilla</button>
-            <button class="btn-nav" type="button" onclick="mostrarSeccion('seccion-reservas', this)">📋 Reservas</button>
-            <button class="btn-nav" type="button" onclick="mostrarSeccion('seccion-caja', this)">💰 Caja</button>
-            <button class="btn-nav" type="button" onclick="mostrarSeccion('seccion-reportes', this)">📊 Reportes</button>
-            <a href="/configuracion" class="btn-nav-link">⚙️ Configuración</a>
-            <a href="/logout" class="btn-nav-link salir">🚪 Salir</a>
-        </div>
+    <button class="btn-nav {% if active_tab == 'grilla' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-grilla', this)">🗓️ Grilla</button>
+    <button class="btn-nav {% if active_tab == 'reservas' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-reservas', this)">📑 Reservas</button>
+    <button class="btn-nav {% if active_tab == 'caja' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-caja', this)">💳 Caja</button>
+    <button class="btn-nav {% if active_tab == 'reportes' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-reportes', this)">📈 Reportes</button>
+    <a href="/configuracion" class="btn-nav-link">⚙️ Configuración</a>
+    <a href="/logout" class="btn-nav-link salir">↩️ Salir</a>
+</div>
     </aside>
 
     <main class="adminv2-main">
