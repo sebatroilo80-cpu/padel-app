@@ -1187,26 +1187,7 @@ def agregar_egreso():
     """)
     tablas = [t[0] for t in cursor.fetchall()]
 
-    # Si no existe ninguna tabla de egresos, crear egresos
-    if "egresos" not in tablas and "movimientos" not in tablas:
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS egresos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                fecha TEXT NOT NULL,
-                descripcion TEXT NOT NULL,
-                monto REAL NOT NULL
-            )
-        """)
-        tablas.append("egresos")
-
-    # Guardar según la estructura existente
-    if "egresos" in tablas:
-        cursor.execute("""
-            INSERT INTO egresos (fecha, descripcion, monto)
-            VALUES (?, ?, ?)
-        """, (fecha, descripcion, monto))
-
-    elif "movimientos" in tablas:
+    if "movimientos" in tablas:
         cursor.execute("PRAGMA table_info(movimientos)")
         columnas = [col[1] for col in cursor.fetchall()]
         campo_texto = "descripcion" if "descripcion" in columnas else "concepto"
@@ -1221,6 +1202,26 @@ def agregar_egreso():
             monto,
             "Egreso"
         ))
+
+    elif "egresos" in tablas:
+        cursor.execute("""
+            INSERT INTO egresos (fecha, descripcion, monto)
+            VALUES (?, ?, ?)
+        """, (fecha, descripcion, monto))
+
+    else:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS egresos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fecha TEXT NOT NULL,
+                descripcion TEXT NOT NULL,
+                monto REAL NOT NULL
+            )
+        """)
+        cursor.execute("""
+            INSERT INTO egresos (fecha, descripcion, monto)
+            VALUES (?, ?, ?)
+        """, (fecha, descripcion, monto))
 
     conn.commit()
     conn.close()
