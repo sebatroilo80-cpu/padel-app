@@ -163,17 +163,19 @@
                     <p>🟡 Falta: ${{ falta }}</p>
 
                     <div class="reserva-actions-v2">
-                        {% if r[8] == "Transferencia" and r[9] in ["Pendiente reserva", "Pendiente pago total"] %}
-                        <a href="/confirmar_transferencia/{{ r[0] }}" class="btn-accion verde">Confirmar pago</a>
-                        {% endif %}
+                        {% if r[8] == "Transferencia" and r[9] == "Pendiente reserva" %}
+<a href="/confirmar_transferencia/{{ r[0] }}" class="btn-accion verde">Confirmar reserva</a>
+{% elif r[8] == "Transferencia" and r[9] == "Pendiente pago total" %}
+<a href="/confirmar_transferencia/{{ r[0] }}" class="btn-accion verde">Confirmar pago</a>
+{% endif %}
 
                         {% if r[2] and r[9] in ["Reserva", "Pagado"] %}
-                        <a href="https://wa.me/{{ r[2] }}?text=Reserva%20confirmada%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AEstado:%20{{ r[9] }}"
-                           target="_blank"
-                           class="btn-accion whatsapp">
-                           WhatsApp cliente
-                        </a>
-                        {% endif %}
+<a href="https://wa.me/{{ r[2] }}?text=Reserva%20confirmada%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AEstado:%20{{ r[9] }}"
+   target="_blank"
+   class="btn-accion whatsapp">
+   WhatsApp cliente
+</a>
+{% endif %}
 
                         <a href="/editar/{{ r[0] }}" class="btn-accion azul">Editar</a>
 
