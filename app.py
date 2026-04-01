@@ -1179,6 +1179,7 @@ def agregar_egreso():
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
 
+    # Ver tablas existentes
     cursor.execute("""
         SELECT name
         FROM sqlite_master
@@ -1186,6 +1187,19 @@ def agregar_egreso():
     """)
     tablas = [t[0] for t in cursor.fetchall()]
 
+    # Si no existe ninguna tabla de egresos, crear egresos
+    if "egresos" not in tablas and "movimientos" not in tablas:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS egresos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fecha TEXT NOT NULL,
+                descripcion TEXT NOT NULL,
+                monto REAL NOT NULL
+            )
+        """)
+        tablas.append("egresos")
+
+    # Guardar según la estructura existente
     if "egresos" in tablas:
         cursor.execute("""
             INSERT INTO egresos (fecha, descripcion, monto)
@@ -1199,11 +1213,14 @@ def agregar_egreso():
 
         cursor.execute(f"""
             INSERT INTO movimientos (fecha, tipo, {campo_texto}, monto, metodo_pago)
-            VALUES (?, 'egreso', ?, ?, 'Egreso')
-        """, (fecha, descripcion, monto))
-    else:
-        conn.close()
-        return "No existe tabla para guardar egresos"
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            fecha,
+            "egreso",
+            descripcion,
+            monto,
+            "Egreso"
+        ))
 
     conn.commit()
     conn.close()
