@@ -240,12 +240,21 @@
                         {% endif %}
 
                         {% if r[2] and r[9] in ["Reserva", "Pagado"] %}
-                            <a href="https://wa.me/{{ r[2] }}?text=Reserva%20confirmada%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AEstado:%20{{ r[9] }}"
-                               target="_blank"
-                               class="btn-accion whatsapp">
-                               WhatsApp cliente
-                            </a>
-                        {% endif %}
+
+    {% if r[11] == 1 %}
+        <button class="btn-accion gris">
+            WhatsApp enviado
+        </button>
+    {% else %}
+        <a href="https://wa.me/{{ r[2] }}?text=Reserva%20confirmada%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AEstado:%20{{ r[9] }}"
+           target="_blank"
+           onclick="setTimeout(function(){ window.location.href='/whatsapp_enviado/{{ r[0] }}'; }, 500);"
+           class="btn-accion whatsapp">
+           WhatsApp cliente
+        </a>
+    {% endif %}
+
+{% endif %}
 
                         <a href="/editar/{{ r[0] }}" class="btn-accion azul">Editar</a>
 

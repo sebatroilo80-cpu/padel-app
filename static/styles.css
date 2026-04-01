@@ -654,3 +654,8 @@
     background: #25D366;
     color: #fff;
 }
+.btn-accion.gris {
+    background: #9aa4a0;
+    color: white;
+    cursor: default;
+}
