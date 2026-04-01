@@ -5,6 +5,7 @@
     <title>Editar reserva</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body class="app-body">
 
 <div class="app-card">
@@ -14,13 +15,16 @@
 
     <form method="POST">
 
+        <!-- Nombre + Teléfono -->
         <div class="app-group">
             <input type="text" name="nombre" value="{{ reserva[1] }}" placeholder="Nombre">
             <input type="text" name="telefono" value="{{ reserva[2] }}" placeholder="Teléfono">
         </div>
 
+        <!-- Fecha -->
         <input type="date" name="fecha" value="{{ reserva[3] }}">
 
+        <!-- Cancha + Duración -->
         <div class="app-group">
             <select name="cancha">
                 <option value="Cancha 1" {% if reserva[4]=="Cancha 1" %}selected{% endif %}>Cancha 1</option>
@@ -34,8 +38,10 @@
             </select>
         </div>
 
+        <!-- Horario -->
         <input type="time" name="horario" value="{{ reserva[6] }}">
 
+        <!-- Método pago -->
         <select name="metodo_pago">
             <option value="Efectivo" {% if reserva[8]=="Efectivo" %}selected{% endif %}>Efectivo</option>
             <option value="Transferencia" {% if reserva[8]=="Transferencia" %}selected{% endif %}>Transferencia</option>
@@ -43,8 +49,10 @@
             <option value="QR" {% if reserva[8]=="QR" %}selected{% endif %}>QR</option>
         </select>
 
+        <!-- Monto pagado -->
         <input type="number" name="pagado" value="{{ reserva[10] or 0 }}" placeholder="Monto pagado">
 
+        <!-- Resumen -->
         <div class="app-resumen">
             <div>Estado: <b>{{ reserva[9] }}</b></div>
             <div>Total: ${{ reserva[7] }}</div>
@@ -52,13 +60,37 @@
             <div>Falta: ${{ (reserva[7] or 0) - (reserva[10] or 0) }}</div>
         </div>
 
+        <!-- BOTONES -->
         <button class="btn-main">Guardar cambios</button>
 
-    </form>
+        {% if reserva[8] == "Transferencia" and reserva[9] == "Pendiente reserva" %}
+            <a href="/confirmar_transferencia/{{ reserva[0] }}">
+                <button type="button" class="btn-main" style="background:#d4af37;color:black;">
+                    Confirmar reserva
+                </button>
+            </a>
+        {% elif reserva[8] == "Transferencia" and reserva[9] == "Pendiente pago total" %}
+            <a href="/confirmar_transferencia/{{ reserva[0] }}">
+                <button type="button" class="btn-main" style="background:#d4af37;color:black;">
+                    Confirmar pago
+                </button>
+            </a>
+        {% endif %}
 
-    <a href="/admin?tab=reservas">
-        <button class="btn-secondary">Volver</button>
-    </a>
+        {% if reserva[2] and reserva[9] in ["Reserva", "Pagado"] %}
+            <a target="_blank"
+               href="https://wa.me/{{ reserva[2] }}?text=Hola%20{{ reserva[1] }}%2C%20tu%20reserva%20fue%20confirmada.%0A%0AFecha%3A%20{{ reserva[3] }}%0ACancha%3A%20{{ reserva[4] }}%0AHorario%3A%20{{ reserva[6] }}%0ADuracion%3A%20{{ reserva[5] }}%0AEstado%3A%20{{ reserva[9] }}">
+                <button type="button" class="btn-main" style="background:#25D366;color:white;">
+                    Avisar por WhatsApp
+                </button>
+            </a>
+        {% endif %}
+
+        <a href="/admin?tab=reservas">
+            <button type="button" class="btn-secondary">Volver</button>
+        </a>
+
+    </form>
 
 </div>
 

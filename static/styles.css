@@ -645,3 +645,12 @@
     margin-top: 10px;
     cursor: pointer;
 }
+.editapp-btn-confirmar {
+    background: #d4af37;
+    color: #111;
+}
+
+.editapp-btn-whatsapp {
+    background: #25D366;
+    color: #fff;
+}
