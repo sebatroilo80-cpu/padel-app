@@ -250,85 +250,139 @@
     </div>
 </section>
         <!-- CAJA -->
-        <section id="seccion-caja" class="adminv2-seccion">
-            <div class="adminv2-grilla-box">
-                <div class="adminv2-section-head">
-                    <div>
-                        <h2>Caja</h2>
-                        <p>Resumen diario, mensual y anual, con egresos incluidos.</p>
+        <section id="seccion-caja" class="adminv2-seccion {% if active_tab == 'caja' %}activa{% endif %}">
+    <div class="adminv2-grilla-box">
+        <div class="adminv2-section-head reservas-head-v2">
+            <div>
+                <h2>Caja</h2>
+                <p>Resumen diario, mensual y anual, con egresos incluidos.</p>
+            </div>
+            <button class="btn-volver" type="button" onclick="mostrarSeccion('seccion-grilla', document.querySelectorAll('.btn-nav')[0])">
+                ← Volver a grilla
+            </button>
+        </div>
+
+        <div class="caja-cards-pro">
+            <div class="caja-card-pro caja-green">
+                <span>Saldo del día</span>
+                <strong>${{ total_hoy }}</strong>
+            </div>
+
+            <div class="caja-card-pro caja-blue">
+                <span>Saldo del mes</span>
+                <strong>${{ total_mes }}</strong>
+            </div>
+
+            <div class="caja-card-pro caja-violet">
+                <span>Saldo del año</span>
+                <strong>${{ total_anio }}</strong>
+            </div>
+        </div>
+
+        <div class="caja-resumen-grid">
+            <div class="caja-panel-pro">
+                <h3>Resumen diario</h3>
+
+                <div class="caja-datos-grid">
+                    <div class="caja-dato-box">
+                        <span>Ingresos</span>
+                        <strong>${{ ingresos_hoy }}</strong>
                     </div>
-                    <button class="btn-volver" type="button" onclick="mostrarSeccion('seccion-grilla', document.querySelectorAll('.btn-nav')[0])">← Volver a grilla</button>
-                </div>
 
-                <div class="caja-grid-v2">
-                    <div class="caja-item-v2"><span>Ingresos del día</span><strong>${{ ingresos_hoy }}</strong></div>
-                    <div class="caja-item-v2"><span>Egresos del día</span><strong>${{ egresos_hoy }}</strong></div>
-                    <div class="caja-item-v2"><span>Saldo del día</span><strong>${{ total_hoy }}</strong></div>
-                    <div class="caja-item-v2"><span>Efectivo</span><strong>${{ efectivo_hoy }}</strong></div>
-                    <div class="caja-item-v2"><span>Transferencia</span><strong>${{ transferencia_hoy }}</strong></div>
-                    <div class="caja-item-v2"><span>Mercado Pago</span><strong>${{ mercado_pago_hoy }}</strong></div>
-                    <div class="caja-item-v2"><span>QR</span><strong>${{ qr_hoy }}</strong></div>
-                    <div class="caja-item-v2"><span>Saldo del mes</span><strong>${{ total_mes }}</strong></div>
-                    <div class="caja-item-v2"><span>Saldo del año</span><strong>${{ total_anio }}</strong></div>
-                </div>
-
-                <div class="adminv2-subbloques">
-                    <div class="subbloque-v2">
-                        <h3>Cargar egreso</h3>
-
-                        <form action="/agregar-egreso" method="POST" class="form-egreso-v2">
-                            <input type="date" name="fecha" class="campo" required>
-                            <input type="text" name="descripcion" placeholder="Descripción del egreso" class="campo" required>
-                            <input type="number" step="0.01" name="monto" placeholder="Monto" class="campo" required>
-                            <button type="submit" class="btn-guardar">Guardar egreso</button>
-                        </form>
+                    <div class="caja-dato-box">
+                        <span>Egresos</span>
+                        <strong>${{ egresos_hoy }}</strong>
                     </div>
 
-                    <div class="subbloque-v2">
-                        <h3>Egresos cargados</h3>
+                    <div class="caja-dato-box">
+                        <span>Efectivo</span>
+                        <strong>${{ efectivo_hoy }}</strong>
+                    </div>
 
-                        {% if egresos %}
-                            <div class="lista-egresos-v2">
-                                {% for e in egresos %}
-<div class="egreso-card-v2">
+                    <div class="caja-dato-box">
+                        <span>Transferencia</span>
+                        <strong>${{ transferencia_hoy }}</strong>
+                    </div>
 
-    <div class="egreso-linea">
-        <span>📅 Fecha:</span>
-        <strong>{{ e[1] }}</strong>
-    </div>
+                    <div class="caja-dato-box">
+                        <span>Mercado Pago</span>
+                        <strong>${{ mercado_pago_hoy }}</strong>
+                    </div>
 
-    <div class="egreso-linea">
-        <span>🧾 Descripción:</span>
-        <strong>{{ e[3] }}</strong>
-    </div>
-
-    <div class="egreso-linea">
-        <span>💸 Monto:</span>
-        <strong>${{ e[4] }}</strong>
-    </div>
-
-    <a href="/eliminar-egreso/{{ e[0] }}" class="btn-eliminar"
-       onclick="return confirm('¿Eliminar egreso?')">
-        🗑 Eliminar
-    </a>
-
-</div>
-
-                                    <a href="/eliminar-egreso/{{ e[0] }}"
-                                       onclick="return confirm('¿Seguro que querés eliminar este egreso?')"
-                                       class="btn-accion rojo">
-                                       Eliminar
-                                    </a>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <p>No hay egresos cargados.</p>
-                        {% endif %}
+                    <div class="caja-dato-box">
+                        <span>QR</span>
+                        <strong>${{ qr_hoy }}</strong>
                     </div>
                 </div>
             </div>
-        </section>
+
+            <div class="caja-panel-pro">
+                <h3>Cargar egreso</h3>
+
+                <form action="/agregar-egreso" method="POST" class="form-egreso-pro">
+                    <div class="editapp-grid-2">
+                        <div class="editapp-field">
+                            <label>Fecha</label>
+                            <input type="date" name="fecha" class="campo" required>
+                        </div>
+
+                        <div class="editapp-field">
+                            <label>Monto</label>
+                            <input type="number" step="0.01" name="monto" class="campo" placeholder="Monto" required>
+                        </div>
+                    </div>
+
+                    <div class="editapp-field">
+                        <label>Descripción</label>
+                        <input type="text" name="descripcion" class="campo" placeholder="Descripción del egreso" required>
+                    </div>
+
+                    <button type="submit" class="btn-accion verde btn-egreso-full">Guardar egreso</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="caja-panel-pro" style="margin-top:18px;">
+            <h3>Egresos cargados</h3>
+
+            {% if egresos %}
+                <div class="tabla-egresos-wrap">
+                    <table class="tabla-egresos-v2">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Monto</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for e in egresos %}
+                            <tr>
+                                <td>{{ e[1] }}</td>
+                                <td>{{ e[3] }}</td>
+                                <td>${{ e[4] }}</td>
+                                <td>
+                                    <a href="/eliminar-egreso/{{ e[0] }}"
+                                       onclick="return confirm('¿Eliminar egreso?')"
+                                       class="btn-accion rojo">
+                                       Eliminar
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="reservas-vacio-v2">
+                    <h3>No hay egresos cargados</h3>
+                    <p>Cuando agregues egresos, van a aparecer acá.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
 
         <!-- REPORTES -->
         <section id="seccion-reportes" class="adminv2-seccion">
