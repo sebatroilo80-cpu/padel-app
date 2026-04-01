@@ -558,3 +558,90 @@
     background: #2a2a2a;
     color: white;
 }
+/* =========================
+   APP UI PREMIUM
+   ========================= */
+
+.app-body {
+    background: #0c0c0c;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px 15px;
+}
+
+.app-card {
+    width: 100%;
+    max-width: 420px;
+    background: #121212;
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.7);
+    color: white;
+}
+
+.app-card h1 {
+    text-align: center;
+    margin-bottom: 5px;
+    color: #d4af37;
+}
+
+.sub {
+    text-align: center;
+    color: #aaa;
+    margin-bottom: 20px;
+}
+
+.app-card input,
+.app-card select {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #1c1c1c;
+    color: white;
+    font-size: 15px;
+}
+
+.app-group {
+    display: flex;
+    gap: 10px;
+}
+
+.app-resumen {
+    background: #1a1a1a;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 15px 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.btn-main {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: #d4af37;
+    color: black;
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.btn-main:hover {
+    background: #c19c2f;
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #2a2a2a;
+    color: white;
+    margin-top: 10px;
+    cursor: pointer;
+}

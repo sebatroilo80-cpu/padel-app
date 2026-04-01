@@ -3,40 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <title>Configuración</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body>
+<body class="app-body">
 
-<div class="contenedor" style="max-width: 500px;">
+<div class="app-card">
 
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-        <img src="/static/logo.png" style="width: 40px;">
-        <h2 style="margin: 0;">Configuración de precios</h2>
-    </div>
+    <h1>Configuración</h1>
+    <p class="sub">Precios del sistema</p>
 
-    <p style="margin-bottom: 15px; color: #555;">
-        Ingresar los precios sin puntos. Ejemplo: 25000
-    </p>
+    <form method="POST">
 
-    <form method="POST" action="/configuracion">
-        <label>60 minutos (08:00 a 17:59)</label>
-        <input type="number" name="precio_60_dia" class="campo" value="{{ config[0] }}" placeholder="Ej: 25000">
+        <label>60 min (día)</label>
+        <input type="number" name="p60d" value="{{ config[0] }}">
 
-        <label>60 minutos (18:00 a 00:00)</label>
-        <input type="number" name="precio_60_noche" class="campo" value="{{ config[1] }}" placeholder="Ej: 30000">
+        <label>60 min (noche)</label>
+        <input type="number" name="p60n" value="{{ config[1] }}">
 
-        <label>90 minutos (08:00 a 17:59)</label>
-        <input type="number" name="precio_90_dia" class="campo" value="{{ config[2] }}" placeholder="Ej: 35000">
+        <label>90 min (día)</label>
+        <input type="number" name="p90d" value="{{ config[2] }}">
 
-        <label>90 minutos (18:00 a 00:00)</label>
-        <input type="number" name="precio_90_noche" class="campo" value="{{ config[3] }}" placeholder="Ej: 40000">
+        <label>90 min (noche)</label>
+        <input type="number" name="p90n" value="{{ config[3] }}">
 
-        <button type="submit" class="boton" style="margin-top: 15px;">Guardar precios</button>
+        <button class="btn-main">Guardar configuración</button>
+
     </form>
 
-    <a href="/admin" style="display:inline-block; margin-top:10px; text-decoration:none; background:#2563eb; color:white; padding:10px 14px; border-radius:10px;">
-        Volver al panel
+    <a href="/admin">
+        <button class="btn-secondary">Volver</button>
     </a>
+
 </div>
 
 </body>

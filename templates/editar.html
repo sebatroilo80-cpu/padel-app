@@ -2,58 +2,64 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar reserva</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body>
+<body class="app-body">
 
-<div class="edit-container">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="width:90px; border-radius:12px; margin-bottom:18px;">
+<div class="app-card">
 
     <h1>Editar reserva</h1>
-    <p>37 Pádel Club</p>
+    <p class="sub">37 Pádel Club</p>
 
     <form method="POST">
-        <input type="text" name="nombre" value="{{ reserva[1] }}" placeholder="Nombre">
-        <input type="text" name="telefono" value="{{ reserva[2] }}" placeholder="Teléfono">
+
+        <div class="app-group">
+            <input type="text" name="nombre" value="{{ reserva[1] }}" placeholder="Nombre">
+            <input type="text" name="telefono" value="{{ reserva[2] }}" placeholder="Teléfono">
+        </div>
+
         <input type="date" name="fecha" value="{{ reserva[3] }}">
 
-        <select name="cancha">
-            <option value="Cancha 1" {% if reserva[4] == "Cancha 1" %}selected{% endif %}>Cancha 1</option>
-            <option value="Cancha 2" {% if reserva[4] == "Cancha 2" %}selected{% endif %}>Cancha 2</option>
-            <option value="Cancha 3" {% if reserva[4] == "Cancha 3" %}selected{% endif %}>Cancha 3</option>
-        </select>
+        <div class="app-group">
+            <select name="cancha">
+                <option value="Cancha 1" {% if reserva[4]=="Cancha 1" %}selected{% endif %}>Cancha 1</option>
+                <option value="Cancha 2" {% if reserva[4]=="Cancha 2" %}selected{% endif %}>Cancha 2</option>
+                <option value="Cancha 3" {% if reserva[4]=="Cancha 3" %}selected{% endif %}>Cancha 3</option>
+            </select>
 
-        <select name="duracion">
-            <option value="60 minutos" {% if reserva[5] == "60 minutos" %}selected{% endif %}>60 minutos</option>
-            <option value="90 minutos" {% if reserva[5] == "90 minutos" %}selected{% endif %}>90 minutos</option>
-        </select>
+            <select name="duracion">
+                <option value="60 minutos" {% if reserva[5]=="60 minutos" %}selected{% endif %}>60 minutos</option>
+                <option value="90 minutos" {% if reserva[5]=="90 minutos" %}selected{% endif %}>90 minutos</option>
+            </select>
+        </div>
 
         <input type="time" name="horario" value="{{ reserva[6] }}">
 
         <select name="metodo_pago">
-            <option value="Efectivo" {% if reserva[8] == "Efectivo" %}selected{% endif %}>Efectivo</option>
-            <option value="Transferencia" {% if reserva[8] == "Transferencia" %}selected{% endif %}>Transferencia</option>
-            <option value="Mercado Pago" {% if reserva[8] == "Mercado Pago" %}selected{% endif %}>Mercado Pago</option>
-            <option value="QR" {% if reserva[8] == "QR" %}selected{% endif %}>QR</option>
+            <option value="Efectivo" {% if reserva[8]=="Efectivo" %}selected{% endif %}>Efectivo</option>
+            <option value="Transferencia" {% if reserva[8]=="Transferencia" %}selected{% endif %}>Transferencia</option>
+            <option value="Mercado Pago" {% if reserva[8]=="Mercado Pago" %}selected{% endif %}>Mercado Pago</option>
+            <option value="QR" {% if reserva[8]=="QR" %}selected{% endif %}>QR</option>
         </select>
 
-        <input type="number" step="0.01" name="pagado" value="{{ reserva[10] or 0 }}" placeholder="Monto pagado">
+        <input type="number" name="pagado" value="{{ reserva[10] or 0 }}" placeholder="Monto pagado">
 
-        <div class="resumen-box">
-            <div><strong>Estado:</strong> {{ reserva[9] }}</div>
-            <div><strong>Precio total:</strong> ${{ reserva[7] }}</div>
-            <div><strong>Pagó:</strong> ${{ reserva[10] or 0 }}</div>
-            <div><strong>Falta:</strong> ${{ (reserva[7] or 0) - (reserva[10] or 0) }}</div>
+        <div class="app-resumen">
+            <div>Estado: <b>{{ reserva[9] }}</b></div>
+            <div>Total: ${{ reserva[7] }}</div>
+            <div>Pagó: ${{ reserva[10] or 0 }}</div>
+            <div>Falta: ${{ (reserva[7] or 0) - (reserva[10] or 0) }}</div>
         </div>
 
-        <button type="submit" class="btn-app btn-guardar">Guardar cambios</button>
+        <button class="btn-main">Guardar cambios</button>
+
     </form>
 
     <a href="/admin?tab=reservas">
-        <button type="button" class="btn-app btn-volver">Volver</button>
+        <button class="btn-secondary">Volver</button>
     </a>
+
 </div>
 
 </body>
