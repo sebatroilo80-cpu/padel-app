@@ -1067,7 +1067,7 @@ def editar(id):
         conn.commit()
         conn.close()
 
-        return redirect("/reservas")
+        return redirect(f"/editar/{id}")
 
     cursor.execute("SELECT * FROM reservas WHERE id = ?", (id,))
     reserva = cursor.fetchone()
@@ -1202,7 +1202,7 @@ def confirmar_transferencia(id):
         descripcion = f"Pago total confirmado reserva #{id} - {nombre} - {cancha} - {horario}"
     else:
         conn.close()
-        return f"No se puede confirmar esta reserva porque su estado actual es: {estado_pago}"
+        return redirect(f"/editar/{id}")
 
     cursor.execute("""
         UPDATE reservas
@@ -1215,20 +1215,32 @@ def confirmar_transferencia(id):
     ))
 
     cursor.execute("""
-        INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
-        VALUES (?, ?, ?, ?, ?)
-    """, (
-        fecha,
-        "ingreso",
-        descripcion,
-        monto_confirmado,
-        metodo_pago
-    ))
+        SELECT name
+        FROM sqlite_master
+        WHERE type='table'
+    """)
+    tablas = [t[0] for t in cursor.fetchall()]
+
+    if "movimientos" in tablas:
+        cursor.execute("PRAGMA table_info(movimientos)")
+        columnas = [col[1] for col in cursor.fetchall()]
+        campo_texto = "descripcion" if "descripcion" in columnas else "concepto"
+
+        cursor.execute(f"""
+            INSERT INTO movimientos (fecha, tipo, {campo_texto}, monto, metodo_pago)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            fecha,
+            "ingreso",
+            descripcion,
+            monto_confirmado,
+            metodo_pago
+        ))
 
     conn.commit()
     conn.close()
 
-    return redirect("/reservas")
+    return redirect(f"/editar/{id}")
 
 @app.route("/eliminar-egreso/<int:id>")
 def eliminar_egreso(id):
