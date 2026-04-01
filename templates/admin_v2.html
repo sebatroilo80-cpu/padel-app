@@ -131,15 +131,17 @@
             </div>
         </section>
 
-        <!-- RESERVAS -->
-        <section id="seccion-reservas" class="adminv2-seccion {% if active_tab == 'reservas' %}activa{% endif %}">
+        <<!-- RESERVAS -->
+<section id="seccion-reservas" class="adminv2-seccion {% if active_tab == 'reservas' %}activa{% endif %}">
     <div class="adminv2-grilla-box">
-        <div class="adminv2-section-head">
+        <div class="adminv2-section-head reservas-head-v2">
             <div>
                 <h2>Reservas cargadas</h2>
-                <p>Editar, confirmar, eliminar y avisar al cliente.</p>
+                <p>Gestioná, confirmá y avisá a tus clientes desde un solo lugar.</p>
             </div>
-            <button class="btn-volver" type="button" onclick="mostrarSeccion('seccion-grilla', document.querySelectorAll('.btn-nav')[0])">← Volver a grilla</button>
+            <button class="btn-volver" type="button" onclick="mostrarSeccion('seccion-grilla', document.querySelectorAll('.btn-nav')[0])">
+                ← Volver a grilla
+            </button>
         </div>
 
         {% if reservas and reservas|length > 0 %}
@@ -149,33 +151,84 @@
                 {% set pagado = r[10] or 0 %}
                 {% set falta = precio - pagado %}
 
-                <div class="reserva-card-v2">
-                    <h3>{{ r[1] }}</h3>
-                    <p>📞 {{ r[2] or '-' }}</p>
-                    <p>📅 {{ r[3] }}</p>
-                    <p>🎾 {{ r[4] }}</p>
-                    <p>⏱ {{ r[5] }}</p>
-                    <p>🕐 {{ r[6] }}</p>
-                    <p>💳 {{ r[8] or '-' }}</p>
-                    <p>📌 {{ r[9] or '-' }}</p>
-                    <p>💰 Total: ${{ precio }}</p>
-                    <p>✅ Pagó: ${{ pagado }}</p>
-                    <p>🟡 Falta: ${{ falta }}</p>
+                <div class="reserva-card-v2 reserva-card-pro">
+                    <div class="reserva-card-top">
+                        <div>
+                            <h3>{{ r[1] }}</h3>
+                            <p class="reserva-subinfo">ID #{{ r[0] }} · {{ r[3] }}</p>
+                        </div>
 
-                    <div class="reserva-actions-v2">
+                        <div class="reserva-badges">
+                            <span class="badge-metodo">{{ r[8] or '-' }}</span>
+                            <span class="badge-estado
+                                {% if r[9] == 'Pagado' %}badge-pagado
+                                {% elif r[9] == 'Reserva' %}badge-reserva
+                                {% elif r[9] == 'Pendiente reserva' %}badge-pendiente
+                                {% elif r[9] == 'Pendiente pago total' %}badge-pendiente
+                                {% else %}badge-neutral
+                                {% endif %}">
+                                {{ r[9] or '-' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="reserva-info-grid">
+                        <div class="reserva-info-item">
+                            <span>📞 Teléfono</span>
+                            <strong>{{ r[2] or '-' }}</strong>
+                        </div>
+
+                        <div class="reserva-info-item">
+                            <span>🎾 Cancha</span>
+                            <strong>{{ r[4] }}</strong>
+                        </div>
+
+                        <div class="reserva-info-item">
+                            <span>⏱ Duración</span>
+                            <strong>{{ r[5] }}</strong>
+                        </div>
+
+                        <div class="reserva-info-item">
+                            <span>🕐 Horario</span>
+                            <strong>{{ r[6] }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="reserva-montos-grid">
+                        <div class="reserva-monto-box">
+                            <span>Total</span>
+                            <strong>${{ precio }}</strong>
+                        </div>
+
+                        <div class="reserva-monto-box">
+                            <span>Pagó</span>
+                            <strong>${{ pagado }}</strong>
+                        </div>
+
+                        <div class="reserva-monto-box">
+                            <span>Falta</span>
+                            <strong>${{ falta }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="reserva-actions-v2 reserva-actions-pro">
                         {% if r[8] == "Transferencia" and r[9] == "Pendiente reserva" %}
-<a href="/confirmar_transferencia/{{ r[0] }}" class="btn-accion verde">Confirmar reserva</a>
-{% elif r[8] == "Transferencia" and r[9] == "Pendiente pago total" %}
-<a href="/confirmar_transferencia/{{ r[0] }}" class="btn-accion verde">Confirmar pago</a>
-{% endif %}
+                            <a href="/confirmar_transferencia/{{ r[0] }}" class="btn-accion verde">
+                                Confirmar reserva
+                            </a>
+                        {% elif r[8] == "Transferencia" and r[9] == "Pendiente pago total" %}
+                            <a href="/confirmar_transferencia/{{ r[0] }}" class="btn-accion verde">
+                                Confirmar pago
+                            </a>
+                        {% endif %}
 
                         {% if r[2] and r[9] in ["Reserva", "Pagado"] %}
-<a href="https://wa.me/{{ r[2] }}?text=Reserva%20confirmada%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AEstado:%20{{ r[9] }}"
-   target="_blank"
-   class="btn-accion whatsapp">
-   WhatsApp cliente
-</a>
-{% endif %}
+                            <a href="https://wa.me/{{ r[2] }}?text=Reserva%20confirmada%0AFecha:%20{{ r[3] }}%0ACancha:%20{{ r[4] }}%0AHorario:%20{{ r[6] }}%0ADuracion:%20{{ r[5] }}%0AEstado:%20{{ r[9] }}"
+                               target="_blank"
+                               class="btn-accion whatsapp">
+                               WhatsApp cliente
+                            </a>
+                        {% endif %}
 
                         <a href="/editar/{{ r[0] }}" class="btn-accion azul">Editar</a>
 
@@ -189,7 +242,10 @@
             {% endfor %}
         </div>
         {% else %}
-            <p>No hay reservas cargadas.</p>
+            <div class="reservas-vacio-v2">
+                <h3>No hay reservas cargadas</h3>
+                <p>Cuando entren reservas nuevas, van a aparecer acá.</p>
+            </div>
         {% endif %}
     </div>
 </section>

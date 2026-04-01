@@ -665,3 +665,182 @@ body.adminv2-body {
 .tabla-egresos-v2 tr:last-child td {
     border-bottom: none;
 }
+
+/* ===== RESERVAS PRO ===== */
+
+.reservas-head-v2 {
+    align-items: center;
+}
+
+.reserva-card-pro {
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+    border: 1px solid #e7ebf0;
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.reserva-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.reserva-card-top h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #1f2937;
+}
+
+.reserva-subinfo {
+    margin: 6px 0 0;
+    color: #7b8492;
+    font-size: 0.92rem;
+}
+
+.reserva-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.badge-metodo,
+.badge-estado {
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.badge-metodo {
+    background: #eef2f7;
+    color: #344054;
+}
+
+.badge-pagado {
+    background: #e9f8ee;
+    color: #1f8f4f;
+}
+
+.badge-reserva {
+    background: #eef5ff;
+    color: #365fcf;
+}
+
+.badge-pendiente {
+    background: #fff8e8;
+    color: #b58105;
+}
+
+.badge-neutral {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.reserva-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.reserva-info-item {
+    background: #f8fafc;
+    border: 1px solid #e8edf3;
+    border-radius: 16px;
+    padding: 12px 14px;
+}
+
+.reserva-info-item span {
+    display: block;
+    font-size: 0.82rem;
+    color: #7b8492;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.reserva-info-item strong {
+    color: #1f2937;
+    font-size: 1rem;
+}
+
+.reserva-montos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.reserva-monto-box {
+    background: linear-gradient(180deg, #fbfcff 0%, #f5f7fb 100%);
+    border: 1px solid #e6ebf2;
+    border-radius: 16px;
+    padding: 14px;
+}
+
+.reserva-monto-box span {
+    display: block;
+    font-size: 0.82rem;
+    color: #7b8492;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.reserva-monto-box strong {
+    font-size: 1.1rem;
+    color: #1f2937;
+}
+
+.reserva-actions-pro {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.reserva-actions-pro .btn-accion {
+    text-align: center;
+    font-size: 0.95rem;
+    padding: 12px 14px;
+    border-radius: 14px;
+    font-weight: 800;
+}
+
+.reservas-vacio-v2 {
+    background: #fafbfd;
+    border: 1px dashed #dbe3ec;
+    border-radius: 20px;
+    padding: 26px;
+    text-align: center;
+    margin-top: 18px;
+}
+
+.reservas-vacio-v2 h3 {
+    margin: 0 0 8px;
+    color: #1f2937;
+}
+
+.reservas-vacio-v2 p {
+    margin: 0;
+    color: #7b8492;
+}
+
+@media (max-width: 900px) {
+    .reserva-card-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .reserva-badges {
+        align-items: flex-start;
+    }
+
+    .reserva-info-grid,
+    .reserva-montos-grid,
+    .reserva-actions-pro {
+        grid-template-columns: 1fr;
+    }
+}
