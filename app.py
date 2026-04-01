@@ -548,13 +548,15 @@ def admin():
 
     tiene_movimientos = "movimientos" in tablas
     tiene_egresos = "egresos" in tablas
+    tiene_reservas = "reservas" in tablas
+    tiene_config = "configuracion" in tablas
 
     # =========================
     # Configuración de precios
     # =========================
     config = [25000, 30000, 35000, 40000]
 
-    if "configuracion" in tablas:
+    if tiene_config:
         cursor.execute("""
             SELECT precio_60_dia, precio_60_noche, precio_90_dia, precio_90_noche
             FROM configuracion
@@ -592,14 +594,14 @@ def admin():
             }
 
     # =========================
-    # Reservas del día para grilla
+    # Reservas
     # =========================
     reservas_dia = []
     reservas = []
 
-    if "reservas" in tablas:
+    if tiene_reservas:
         cursor.execute("""
-            SELECT id, nombre, telefono, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado
+            SELECT id, nombre, telefono, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado, whatsapp_enviado
             FROM reservas
             WHERE fecha = ?
             ORDER BY horario ASC
@@ -631,18 +633,15 @@ def admin():
                     grilla[h][cancha]["estado"] = "inicio" if i == 0 else "continuacion"
                     grilla[h][cancha]["reserva"] = r
 
-        # =========================
-        # Todas las reservas
-        # =========================
         cursor.execute("""
-            SELECT id, nombre, telefono, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado
+            SELECT id, nombre, telefono, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado, whatsapp_enviado
             FROM reservas
             ORDER BY fecha DESC, horario ASC
         """)
         reservas = cursor.fetchall()
 
     # =========================
-    # Egresos cargados
+    # Egresos cargados (UNIFICADOS)
     # =========================
     egresos = []
 
@@ -655,17 +654,17 @@ def admin():
             SELECT id, fecha, tipo, {campo_texto} as descripcion, monto, metodo_pago
             FROM movimientos
             WHERE tipo = 'egreso'
-            ORDER BY fecha DESC, id DESC
         """)
-        egresos = cursor.fetchall()
+        egresos.extend(cursor.fetchall())
 
-    elif tiene_egresos:
+    if tiene_egresos:
         cursor.execute("""
             SELECT id, fecha, 'egreso' as tipo, descripcion, monto, 'Egreso' as metodo_pago
             FROM egresos
-            ORDER BY fecha DESC, id DESC
         """)
-        egresos = cursor.fetchall()
+        egresos.extend(cursor.fetchall())
+
+    egresos.sort(key=lambda x: (x[1], x[0]), reverse=True)
 
     # =========================
     # Caja diaria
@@ -690,7 +689,7 @@ def admin():
             FROM movimientos
             WHERE tipo = 'egreso' AND fecha = ?
         """, (fecha_admin,))
-        egresos_hoy = float(cursor.fetchone()[0] or 0)
+        egresos_hoy += float(cursor.fetchone()[0] or 0)
 
         cursor.execute("""
             SELECT COALESCE(SUM(monto), 0)
@@ -720,13 +719,13 @@ def admin():
         """, (fecha_admin,))
         qr_hoy = float(cursor.fetchone()[0] or 0)
 
-    elif tiene_egresos:
+    if tiene_egresos:
         cursor.execute("""
             SELECT COALESCE(SUM(monto), 0)
             FROM egresos
             WHERE fecha = ?
         """, (fecha_admin,))
-        egresos_hoy = float(cursor.fetchone()[0] or 0)
+        egresos_hoy += float(cursor.fetchone()[0] or 0)
 
     total_hoy = ingresos_hoy - egresos_hoy
 
@@ -749,15 +748,15 @@ def admin():
             FROM movimientos
             WHERE tipo = 'egreso' AND substr(fecha, 1, 7) = ?
         """, (mes_actual,))
-        egresos_mes = float(cursor.fetchone()[0] or 0)
+        egresos_mes += float(cursor.fetchone()[0] or 0)
 
-    elif tiene_egresos:
+    if tiene_egresos:
         cursor.execute("""
             SELECT COALESCE(SUM(monto), 0)
             FROM egresos
             WHERE substr(fecha, 1, 7) = ?
         """, (mes_actual,))
-        egresos_mes = float(cursor.fetchone()[0] or 0)
+        egresos_mes += float(cursor.fetchone()[0] or 0)
 
     total_mes = ingresos_mes - egresos_mes
 
@@ -780,15 +779,15 @@ def admin():
             FROM movimientos
             WHERE tipo = 'egreso' AND substr(fecha, 1, 4) = ?
         """, (anio_actual,))
-        egresos_anio = float(cursor.fetchone()[0] or 0)
+        egresos_anio += float(cursor.fetchone()[0] or 0)
 
-    elif tiene_egresos:
+    if tiene_egresos:
         cursor.execute("""
             SELECT COALESCE(SUM(monto), 0)
             FROM egresos
             WHERE substr(fecha, 1, 4) = ?
         """, (anio_actual,))
-        egresos_anio = float(cursor.fetchone()[0] or 0)
+        egresos_anio += float(cursor.fetchone()[0] or 0)
 
     total_anio = ingresos_anio - egresos_anio
 
@@ -823,15 +822,15 @@ def admin():
                 FROM movimientos
                 WHERE tipo = 'egreso' AND substr(fecha, 1, 7) = ?
             """, (clave_mes,))
-            egresos_mes_item = float(cursor.fetchone()[0] or 0)
+            egresos_mes_item += float(cursor.fetchone()[0] or 0)
 
-        elif tiene_egresos:
+        if tiene_egresos:
             cursor.execute("""
                 SELECT COALESCE(SUM(monto), 0)
                 FROM egresos
                 WHERE substr(fecha, 1, 7) = ?
             """, (clave_mes,))
-            egresos_mes_item = float(cursor.fetchone()[0] or 0)
+            egresos_mes_item += float(cursor.fetchone()[0] or 0)
 
         saldo = ingresos - egresos_mes_item
 
@@ -851,7 +850,7 @@ def admin():
     max_dias = 0
     total_reservas = 0
 
-    if "reservas" in tablas:
+    if tiene_reservas:
         cursor.execute("""
             SELECT horario, COUNT(*) as cantidad
             FROM reservas
