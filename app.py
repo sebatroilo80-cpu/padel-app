@@ -17,6 +17,19 @@ BASE_URL = (os.getenv("BASE_URL") or "http://127.0.0.1:5000").rstrip("/")
 app = Flask(__name__)
 app.secret_key = "clave_secreta_37"
 
+# ===== FIX BASE DE DATOS (WhatsApp enviado) =====
+conn = sqlite3.connect("padel.db")
+cursor = conn.cursor()
+
+cursor.execute("PRAGMA table_info(reservas)")
+columnas = [col[1] for col in cursor.fetchall()]
+
+if "whatsapp_enviado" not in columnas:
+    cursor.execute("ALTER TABLE reservas ADD COLUMN whatsapp_enviado INTEGER DEFAULT 0")
+
+conn.commit()
+conn.close()
+
 init_db()
 
 
