@@ -440,3 +440,53 @@
     color: white;
     font-weight: bold;
 }
+<div class="edit-container">
+
+    <h1>Editar reserva</h1>
+    <p>37 Pádel Club</p>
+
+    <form method="POST">
+
+        <input type="text" name="nombre" value="{{ reserva[1] }}" placeholder="Nombre">
+        <input type="text" name="telefono" value="{{ reserva[2] }}" placeholder="Teléfono">
+
+        <input type="date" name="fecha" value="{{ reserva[3] }}">
+
+        <select name="cancha">
+            <option {{ 'selected' if reserva[4]=='Cancha 1' else '' }}>Cancha 1</option>
+            <option {{ 'selected' if reserva[4]=='Cancha 2' else '' }}>Cancha 2</option>
+            <option {{ 'selected' if reserva[4]=='Cancha 3' else '' }}>Cancha 3</option>
+        </select>
+
+        <select name="duracion">
+            <option {{ 'selected' if reserva[5]=='60 minutos' else '' }}>60 minutos</option>
+            <option {{ 'selected' if reserva[5]=='90 minutos' else '' }}>90 minutos</option>
+        </select>
+
+        <input type="time" name="horario" value="{{ reserva[6] }}">
+
+        <select name="metodo_pago">
+            <option {{ 'selected' if reserva[8]=='Efectivo' else '' }}>Efectivo</option>
+            <option {{ 'selected' if reserva[8]=='Transferencia' else '' }}>Transferencia</option>
+            <option {{ 'selected' if reserva[8]=='Mercado Pago' else '' }}>Mercado Pago</option>
+            <option {{ 'selected' if reserva[8]=='QR' else '' }}>QR</option>
+        </select>
+
+        <input type="number" name="pagado" value="{{ reserva[10] }}">
+
+        <div class="resumen-box">
+            <div><strong>Estado:</strong> {{ reserva[9] }}</div>
+            <div><strong>Precio total:</strong> ${{ reserva[7] }}</div>
+            <div><strong>Pagó:</strong> ${{ reserva[10] }}</div>
+            <div><strong>Falta:</strong> ${{ reserva[7] - reserva[10] }}</div>
+        </div>
+
+        <button class="btn-app btn-guardar">Guardar cambios</button>
+
+    </form>
+
+    <a href="/admin#seccion-reservas">
+        <button class="btn-app btn-volver">Volver</button>
+    </a>
+
+</div>
