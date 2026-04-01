@@ -385,94 +385,100 @@
 </section>
 
         <!-- REPORTES -->
-        <section id="seccion-reportes" class="adminv2-seccion">
-            <div class="adminv2-grilla-box">
-                <div class="adminv2-section-head">
-                    <div>
-                        <h2>Reportes y estadísticas</h2>
-                        <p>Horarios y días con más uso.</p>
-                    </div>
-                    <button class="btn-volver" type="button" onclick="mostrarSeccion('seccion-grilla', document.querySelectorAll('.btn-nav')[0])">← Volver a grilla</button>
-                </div>
-
-                <div class="stats-top-v2">
-                    <div class="stat-card-v2">
-                        <span>Total de reservas</span>
-                        <strong>
-                            {% if total_reservas is defined %}
-                                {{ total_reservas }}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </strong>
-                    </div>
-
-                    <div class="stat-card-v2">
-                        <span>Horario más usado</span>
-                        <strong>
-                            {% if horarios_mas_usados is defined and horarios_mas_usados %}
-                                {{ horarios_mas_usados[0].label }}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </strong>
-                    </div>
-
-                    <div class="stat-card-v2">
-                        <span>Día más usado</span>
-                        <strong>
-                            {% if dias_mas_usados is defined and dias_mas_usados %}
-                                {{ dias_mas_usados[0].label }}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </strong>
-                    </div>
-                </div>
-
-                <div class="stats-grid-v2">
-                    <div class="stats-box-v2">
-                        <h3>Horarios más usados</h3>
-
-                        {% if horarios_mas_usados is defined and horarios_mas_usados %}
-                            <div class="bars-v2">
-                                {% for item in horarios_mas_usados %}
-                                <div class="bar-row-v2">
-                                    <div class="bar-label-v2">{{ item.label }}</div>
-                                    <div class="bar-track-v2">
-                                        <div class="bar-fill-v2 verde" style="width: {{ (item.cantidad / max_horarios * 100) if max_horarios is defined and max_horarios > 0 else 0 }}%;"></div>
-                                    </div>
-                                    <div class="bar-value-v2">{{ item.cantidad }}</div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <p>No hay datos todavía.</p>
-                        {% endif %}
-                    </div>
-
-                    <div class="stats-box-v2">
-                        <h3>Días más usados</h3>
-
-                        {% if dias_mas_usados is defined and dias_mas_usados %}
-                            <div class="bars-v2">
-                                {% for item in dias_mas_usados %}
-                                <div class="bar-row-v2">
-                                    <div class="bar-label-v2">{{ item.label }}</div>
-                                    <div class="bar-track-v2">
-                                        <div class="bar-fill-v2 azul" style="width: {{ (item.cantidad / max_dias * 100) if max_dias is defined and max_dias > 0 else 0 }}%;"></div>
-                                    </div>
-                                    <div class="bar-value-v2">{{ item.cantidad }}</div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <p>No hay datos todavía.</p>
-                        {% endif %}
-                    </div>
-                </div>
+        <section id="seccion-reportes" class="adminv2-seccion {% if active_tab == 'reportes' %}activa{% endif %}">
+    <div class="adminv2-grilla-box">
+        <div class="adminv2-section-head reservas-head-v2">
+            <div>
+                <h2>Reportes y estadísticas</h2>
+                <p>Visualizá rápidamente los horarios y días con más movimiento.</p>
             </div>
-        </section>
+            <button class="btn-volver" type="button" onclick="mostrarSeccion('seccion-grilla', document.querySelectorAll('.btn-nav')[0])">
+                ← Volver a grilla
+            </button>
+        </div>
+
+        <div class="reportes-top-cards">
+            <div class="reporte-top-card top-blue">
+                <span>Total de reservas</span>
+                <strong>{{ total_reservas or 0 }}</strong>
+            </div>
+
+            <div class="reporte-top-card top-green">
+                <span>Horario más usado</span>
+                <strong>
+                    {% if horarios_mas_usados %}
+                        {{ horarios_mas_usados[0].label }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="reporte-top-card top-violet">
+                <span>Día más usado</span>
+                <strong>
+                    {% if dias_mas_usados %}
+                        {{ dias_mas_usados[0].label }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </strong>
+            </div>
+        </div>
+
+        <div class="reportes-grid-pro">
+            <div class="reporte-panel-pro">
+                <h3>Horarios más usados</h3>
+
+                {% if horarios_mas_usados %}
+                    <div class="bars-v2">
+                        {% for item in horarios_mas_usados %}
+                        <div class="bar-row-v2">
+                            <div class="bar-label-v2">{{ item.label }}</div>
+                            <div class="bar-track-v2">
+                                <div class="bar-fill-v2 verde"
+                                     style="width: {{ (item.cantidad / max_horarios * 100) if max_horarios > 0 else 0 }}%;">
+                                </div>
+                            </div>
+                            <div class="bar-value-v2">{{ item.cantidad }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="reservas-vacio-v2">
+                        <h3>Sin datos</h3>
+                        <p>Todavía no hay estadísticas de horarios.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="reporte-panel-pro">
+                <h3>Días más usados</h3>
+
+                {% if dias_mas_usados %}
+                    <div class="bars-v2">
+                        {% for item in dias_mas_usados %}
+                        <div class="bar-row-v2">
+                            <div class="bar-label-v2">{{ item.label }}</div>
+                            <div class="bar-track-v2">
+                                <div class="bar-fill-v2 azul"
+                                     style="width: {{ (item.cantidad / max_dias * 100) if max_dias > 0 else 0 }}%;">
+                                </div>
+                            </div>
+                            <div class="bar-value-v2">{{ item.cantidad }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="reservas-vacio-v2">
+                        <h3>Sin datos</h3>
+                        <p>Todavía no hay estadísticas de días.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
 
     </main>
 </div>

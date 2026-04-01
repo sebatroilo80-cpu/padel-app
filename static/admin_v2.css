@@ -983,3 +983,119 @@ body.adminv2-body {
         grid-template-columns: 1fr;
     }
 }
+/* ===== REPORTES PRO ===== */
+
+.reportes-top-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 18px;
+    margin-bottom: 18px;
+}
+
+.reporte-top-card {
+    border-radius: 20px;
+    padding: 18px;
+    border: 1px solid #e7ebf0;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.reporte-top-card span {
+    display: block;
+    color: #7b8492;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.reporte-top-card strong {
+    font-size: 1.6rem;
+    color: #1f2937;
+}
+
+.top-blue {
+    background: linear-gradient(180deg, #eef5ff 0%, #ffffff 100%);
+}
+
+.top-green {
+    background: linear-gradient(180deg, #eef9f1 0%, #ffffff 100%);
+}
+
+.top-violet {
+    background: linear-gradient(180deg, #f4f0ff 0%, #ffffff 100%);
+}
+
+.reportes-grid-pro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.reporte-panel-pro {
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+    border: 1px solid #e7ebf0;
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.reporte-panel-pro h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: #1f2937;
+}
+
+.bars-v2 {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bar-row-v2 {
+    display: grid;
+    grid-template-columns: 110px 1fr 42px;
+    align-items: center;
+    gap: 10px;
+}
+
+.bar-label-v2 {
+    font-weight: 700;
+    color: #374151;
+    font-size: 0.92rem;
+}
+
+.bar-track-v2 {
+    height: 14px;
+    background: #edf2f7;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.bar-fill-v2 {
+    height: 100%;
+    border-radius: 999px;
+}
+
+.bar-fill-v2.verde {
+    background: linear-gradient(90deg, #57b574, #7ad393);
+}
+
+.bar-fill-v2.azul {
+    background: linear-gradient(90deg, #4d74d9, #77a2ff);
+}
+
+.bar-value-v2 {
+    text-align: right;
+    font-weight: 800;
+    color: #1f2937;
+}
+
+@media (max-width: 900px) {
+    .reportes-top-cards,
+    .reportes-grid-pro {
+        grid-template-columns: 1fr;
+    }
+
+    .bar-row-v2 {
+        grid-template-columns: 90px 1fr 36px;
+    }
+}
