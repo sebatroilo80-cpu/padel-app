@@ -1052,6 +1052,20 @@ def editar(id):
     cursor = conn.cursor()
 
     if request.method == "POST":
+        # Buscar reserva actual antes de modificar
+        cursor.execute("""
+            SELECT nombre, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado
+            FROM reservas
+            WHERE id = ?
+        """, (id,))
+        reserva_actual = cursor.fetchone()
+
+        if not reserva_actual:
+            conn.close()
+            return "Reserva no encontrada"
+
+        pagado_anterior = float(reserva_actual[8] or 0)
+
         nombre = request.form["nombre"]
         fecha = request.form["fecha"]
         cancha = request.form["cancha"]
@@ -1071,11 +1085,57 @@ def editar(id):
 
         estado_pago = calcular_estado_desde_pagado(precio, pagado)
 
+        # Actualizar reserva
         cursor.execute("""
             UPDATE reservas
             SET nombre = ?, fecha = ?, cancha = ?, duracion = ?, horario = ?, metodo_pago = ?, estado_pago = ?, precio = ?, pagado = ?
             WHERE id = ?
-        """, (nombre, fecha, cancha, duracion, horario, metodo_pago, estado_pago, precio, pagado, id))
+        """, (
+            nombre,
+            fecha,
+            cancha,
+            duracion,
+            horario,
+            metodo_pago,
+            estado_pago,
+            precio,
+            pagado,
+            id
+        ))
+
+        # Ver qué tablas existen
+        cursor.execute("""
+            SELECT name
+            FROM sqlite_master
+            WHERE type='table'
+        """)
+        tablas = [t[0] for t in cursor.fetchall()]
+
+        # Si aumentó el monto pagado, registrar SOLO la diferencia en caja
+        diferencia = float(pagado) - float(pagado_anterior)
+
+        if diferencia > 0 and "movimientos" in tablas:
+            cursor.execute("PRAGMA table_info(movimientos)")
+            columnas = [col[1] for col in cursor.fetchall()]
+            campo_texto = "descripcion" if "descripcion" in columnas else "concepto"
+
+            if float(pagado_anterior) == 0 and float(pagado) == float(precio):
+                texto_mov = f"Pago total reserva #{id} - {nombre} - {cancha} - {horario}"
+            elif float(pagado_anterior) > 0 and float(pagado) == float(precio):
+                texto_mov = f"Saldo completado reserva #{id} - {nombre} - {cancha} - {horario}"
+            else:
+                texto_mov = f"Pago adicional reserva #{id} - {nombre} - {cancha} - {horario}"
+
+            cursor.execute(f"""
+                INSERT INTO movimientos (fecha, tipo, {campo_texto}, monto, metodo_pago)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                fecha,
+                "ingreso",
+                texto_mov,
+                diferencia,
+                metodo_pago
+            ))
 
         conn.commit()
         conn.close()
