@@ -10,6 +10,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+TELEGRAM_TOKEN = "8789475526:AAGutuZ0izEkKi8kcSTHW8_JFjHBOPs6pms"
+TELEGRAM_CHAT_ID = "7828571382"
+
+def enviar_telegram(mensaje):
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+    data = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": mensaje
+    }
+    try:
+        requests.post(url, data=data, timeout=10)
+    except:
+        pass
+
 MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN") or ""
 print("TOKEN MP:", MP_ACCESS_TOKEN[:12])
 BASE_URL = (os.getenv("BASE_URL") or "http://127.0.0.1:5000").rstrip("/")
@@ -346,8 +360,22 @@ def reservar():
             metodo_pago
         ))
 
+        mensaje = f"""
+        📲 Nueva reserva
+
+        👤 {nombre}
+        📅 {fecha}
+        ⏰ {horario}
+        🏟️ {cancha}
+        💰 ${precio}
+        💳 {metodo_pago}
+        """
+
+        enviar_telegram(mensaje)
+
         conn.commit()
         conn.close()
+        
         return redirect("/?ok=1")
 
     if metodo_pago == "Mercado Pago":
