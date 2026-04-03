@@ -440,56 +440,7 @@
     color: white;
     font-weight: bold;
 }
-<div class="edit-container">
 
-    <h1>Editar reserva</h1>
-    <p>37 Pádel Club</p>
-
-    <form method="POST">
-
-        <input type="text" name="nombre" value="{{ reserva[1] }}" placeholder="Nombre">
-        <input type="text" name="telefono" value="{{ reserva[2] }}" placeholder="Teléfono">
-
-        <input type="date" name="fecha" value="{{ reserva[3] }}">
-
-        <select name="cancha">
-            <option {{ 'selected' if reserva[4]=='Cancha 1' else '' }}>Cancha 1</option>
-            <option {{ 'selected' if reserva[4]=='Cancha 2' else '' }}>Cancha 2</option>
-            <option {{ 'selected' if reserva[4]=='Cancha 3' else '' }}>Cancha 3</option>
-        </select>
-
-        <select name="duracion">
-            <option {{ 'selected' if reserva[5]=='60 minutos' else '' }}>60 minutos</option>
-            <option {{ 'selected' if reserva[5]=='90 minutos' else '' }}>90 minutos</option>
-        </select>
-
-        <input type="time" name="horario" value="{{ reserva[6] }}">
-
-        <select name="metodo_pago">
-            <option {{ 'selected' if reserva[8]=='Efectivo' else '' }}>Efectivo</option>
-            <option {{ 'selected' if reserva[8]=='Transferencia' else '' }}>Transferencia</option>
-            <option {{ 'selected' if reserva[8]=='Mercado Pago' else '' }}>Mercado Pago</option>
-            <option {{ 'selected' if reserva[8]=='QR' else '' }}>QR</option>
-        </select>
-
-        <input type="number" name="pagado" value="{{ reserva[10] }}">
-
-        <div class="resumen-box">
-            <div><strong>Estado:</strong> {{ reserva[9] }}</div>
-            <div><strong>Precio total:</strong> ${{ reserva[7] }}</div>
-            <div><strong>Pagó:</strong> ${{ reserva[10] }}</div>
-            <div><strong>Falta:</strong> ${{ reserva[7] - reserva[10] }}</div>
-        </div>
-
-        <button class="btn-app btn-guardar">Guardar cambios</button>
-
-    </form>
-
-    <a href="/admin#seccion-reservas">
-        <button class="btn-app btn-volver">Volver</button>
-    </a>
-
-</div>
 
 .edit-container {
     max-width: 600px;
@@ -660,540 +611,29 @@
     cursor: default;
 }
 /* =========================
-   PORTAL CLIENTE PRO
+   PORTAL CLIENTE FINAL
    ========================= */
-
-.portal-pro {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 20px 16px 36px;
-}
-
-.hero-reserva-pro {
-    background: linear-gradient(135deg, #0f172a 0%, #111827 55%, #1e293b 100%);
-    color: #fff;
-    border-radius: 28px;
-    padding: 24px 22px;
-    margin-bottom: 18px;
-    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.18);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.hero-badge {
-    display: inline-flex;
-    align-self: flex-start;
-    padding: 7px 12px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.14);
-    font-size: 0.85rem;
-    font-weight: 800;
-    letter   
-    /* ===== ESTILO APP MODERNA (CLARO) ===== */
-
-.portal-pro {
-    max-width: 520px;
-    margin: auto;
-    padding: 16px;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-/* HEADER */
-.hero-reserva-pro {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    text-align: center;
-}
-
-.hero-badge {
-    font-size: 12px;
-    color: #3b82f6;
-    margin-bottom: 6px;
-    display: block;
-    font-weight: 600;
-}
-
-.hero-texto-pro h1 {
-    margin: 0;
-    font-size: 22px;
-    color: #111;
-}
-
-.hero-texto-pro p {
-    font-size: 13px;
-    color: #666;
-}
-
-/* BOX */
-.portal-box-principal {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-}
-
-/* TITULOS */
-.portal-header-mini h2 {
-    font-size: 15px;
-    margin-bottom: 4px;
-    color: #111;
-}
-
-.portal-header-mini p {
-    font-size: 12px;
-    color: #777;
-}
-
-/* DIAS */
-.dias-app-pro {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    margin: 10px 0;
-}
-
-.dia-card-pro {
-    background: #f3f4f6;
-    border-radius: 12px;
-    padding: 10px;
-    min-width: 70px;
-    border: none;
-}
-
-.dia-card-pro.activa {
-    background: #3b82f6;
-    color: white;
-}
-
-/* ALERTA */
-.alerta-pro {
-    background: #eff6ff;
-    border-radius: 10px;
-    padding: 10px;
-    margin-top: 10px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    color: #1d4ed8;
-}
-
-/* DURACION */
-.duraciones-app-pro {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.duracion-app-card-pro {
-    flex: 1;
-    background: #f3f4f6;
-    border-radius: 14px;
-    padding: 14px;
-    text-align: center;
-    border: none;
-}
-
-.duracion-app-card-pro.activa {
-    background: #3b82f6;
-    color: white;
-}
-
-/* CANCHAS */
-.cancha-card-app-pro {
-    background: white;
-    border-radius: 18px;
-    padding: 14px;
-    margin-bottom: 14px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-}
-
-.cancha-header-app-pro {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.cancha-icono-app {
-    font-size: 22px;
-    margin-right: 10px;
-}
-
-/* HORARIOS */
-.slots-grid-app-pro {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-}
-
-.slot-card {
-    border-radius: 12px;
-    padding: 10px;
-    font-size: 12px;
-}
-
-/* LIBRE */
-.slot-libre-pro {
-    background: white;
-    border: 1px solid #e5e7eb;
-}
-
-.slot-libre-pro:hover {
-    border-color: #3b82f6;
-}
-
-.slot-libre-pro.activa {
-    background: #3b82f6;
-    color: white;
-}
-
-/* OCUPADO */
-.slot-ocupado-pro {
-    background: #f3f4f6;
-    color: #9ca3af;
-}
-
-/* FORM */
-.form-app-box-pro {
-    background: white;
-    border-radius: 18px;
-    padding: 16px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
-}
-
-.form-app-header-pro {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.form-app-icono-pro {
-    font-size: 22px;
-}
-
-/* INPUTS */
-.campo-app-pro {
-    border-radius: 12px;
-    padding: 12px;
-    border: 1px solid #e5e7eb;
-}
-
-/* OPCIONES */
-.opciones-grid-app-pro {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.opcion-card-app-pro {
-    flex: 1;
-    background: #f3f4f6;
-    border-radius: 14px;
-    padding: 12px;
-    text-align: center;
-}
-
-.opcion-card-app-pro.activa {
-    background: #3b82f6;
-    color: white;
-}
-
-/* PRECIO */
-.precio-app-box-pro {
-    background: #f9fafb;
-    padding: 12px;
-    border-radius: 12px;
-    margin-top: 12px;
-    font-size: 14px;
-}
-
-/* BOTON FINAL */
-.boton-app-final-pro {
-    width: 100%;
-    background: #3b82f6;
-    color: white;
-    border: none;
-    padding: 14px;
-    border-radius: 14px;
-    font-weight: bold;
-    margin-top: 14px;
-}
-
-/* MOBILE */
-@media (max-width: 480px) {
-    .slots-grid-app-pro {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-/* ===== ESTILO MERCADO PAGO / APP MODERNA ===== */
 
 body.cliente-body {
     background: #f5f7fb;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #1f2937;
 }
 
-/* CONTENEDOR */
-.nuevo-portal {
-    max-width: 520px;
-    margin: auto;
-    padding: 16px;
+.portal-pro {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 20px 16px 36px;
 }
 
-/* HERO */
-.hero-reserva {
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
-    display: flex;
-    gap: 14px;
-    align-items: center;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.05);
-    margin-bottom: 16px;
-}
-
-.hero-icono {
-    font-size: 28px;
-}
-
-.hero-texto h1 {
-    font-size: 20px;
-    margin: 0;
-    color: #111;
-}
-
-.hero-texto p {
-    font-size: 13px;
-    color: #6b7280;
-    margin: 2px 0 0;
-}
-
-/* BOX */
-.cliente-box {
-    background: white;
-    border-radius: 18px;
-    padding: 16px;
-    margin-bottom: 14px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-}
-
-/* DIAS */
-.dias-app {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    margin-bottom: 10px;
-}
-
-.dia-card {
-    background: #eef2f7;
-    border-radius: 14px;
-    padding: 10px;
-    min-width: 70px;
-    text-align: center;
-    border: none;
-}
-
-.dia-card.activa {
-    background: #009ee3;
-    color: white;
-}
-
-.dia-titulo {
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.dia-numero {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.dia-mes {
-    font-size: 10px;
-}
-
-/* ALERTA */
-.alerta-horario {
-    background: #e7f3ff;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 13px;
-    color: #0077cc;
-}
-
-/* DURACION */
-.duraciones-app {
-    display: flex;
-    gap: 10px;
-}
-
-.duracion-app-card {
-    flex: 1;
-    background: #eef2f7;
-    padding: 14px;
-    border-radius: 14px;
-    border: none;
-}
-
-.duracion-app-card.activa {
-    background: #009ee3;
-    color: white;
-}
-
-/* CANCHAS */
-.cancha-card-app {
-    background: white;
-    border-radius: 18px;
-    padding: 14px;
-    margin-bottom: 14px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-}
-
-.cancha-header-app {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-/* HORARIOS */
-.slots-grid-app {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-}
-
-.slot-card {
-    border-radius: 12px;
-    padding: 10px;
-    text-align: center;
-}
-
-/* LIBRE */
-.slot-libre {
-    background: white;
-    border: 1px solid #e5e7eb;
-}
-
-.slot-libre:hover {
-    border-color: #009ee3;
-}
-
-.slot-libre.activa {
-    background: #009ee3;
-    color: white;
-}
-
-/* OCUPADO */
-.slot-ocupado {
-    background: #f3f4f6;
-    color: #9ca3af;
-}
-
-/* FORM */
-.form-app-box {
-    background: white;
-    border-radius: 18px;
-    padding: 16px;
-}
-
-/* INPUTS */
-.campo-app {
-    width: 100%;
-    border-radius: 12px;
-    padding: 12px;
-    border: 1px solid #e5e7eb;
-}
-
-/* OPCIONES */
-.opciones-grid-app {
-    display: flex;
-    gap: 10px;
-}
-
-.opcion-card-app {
-    flex: 1;
-    background: #eef2f7;
-    border-radius: 14px;
-    padding: 12px;
-    text-align: center;
-}
-
-.opcion-card-app.activa {
-    background: #009ee3;
-    color: white;
-}
-
-/* TRANSFERENCIA */
-.bloque-transferencia-app {
-    background: #f9fafb;
-    padding: 12px;
-    border-radius: 12px;
-}
-
-/* PRECIO */
-.precio-app-box {
-    background: #f9fafb;
-    padding: 12px;
-    border-radius: 12px;
-    margin-top: 10px;
-}
-
-/* BOTON */
-.boton-app-final {
-    width: 100%;
-    background: #009ee3;
-    color: white;
-    border: none;
-    padding: 14px;
-    border-radius: 14px;
-    font-weight: bold;
-    margin-top: 12px;
-}
-
-/* MOBILE */
-@media (max-width: 480px) {
-    .slots-grid-app {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}/* FIX HEADER (barra superior) */
-.hero-reserva {
-    background: #ffffff !important;
-    border-radius: 18px;
-    padding: 18px 16px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-    border: 1px solid #e5e7eb;
-}
-
-.hero-texto h1 {
-    color: #111827 !important;
-    font-size: 20px;
-    font-weight: 800;
-}
-
-.hero-texto p {
-    color: #6b7280 !important;
-    font-size: 13px;
-}
-
-.hero-icono {
-    font-size: 26px;
-}
-/* ===== HEADER APP PRO ===== */
-
+/* HEADER PREMIUM NEGRO / DORADO */
 .hero-app-top {
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-    border: 1px solid #e6edf5;
+    background: linear-gradient(145deg, #0b0b0b, #111111);
     border-radius: 22px;
     padding: 18px;
     margin-bottom: 18px;
-    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
-    animation: heroFadeUp 0.45s ease;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+    border: 1px solid rgba(212,175,55,0.22);
 }
 
 .hero-app-brand {
@@ -1202,30 +642,25 @@ body.cliente-body {
     gap: 14px;
 }
 
-.hero-app-logo {
+.hero-app-logo-texto {
     width: 58px;
     height: 58px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #009ee3 0%, #2563eb 100%);
+    border-radius: 16px;
+    background: linear-gradient(135deg, #d4af37, #f1d77a);
+    color: #111;
+    font-size: 1.3rem;
+    font-weight: 900;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.18);
-    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(212,175,55,0.35);
     flex-shrink: 0;
-}
-
-.hero-app-logo img {
-    width: 78%;
-    height: 78%;
-    object-fit: contain;
-    display: block;
 }
 
 .hero-app-texto {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
 
 .hero-app-chip {
@@ -1233,8 +668,8 @@ body.cliente-body {
     align-self: flex-start;
     padding: 5px 10px;
     border-radius: 999px;
-    background: #eaf4ff;
-    color: #0a66c2;
+    background: rgba(212,175,55,0.14);
+    color: #d4af37;
     font-size: 0.76rem;
     font-weight: 800;
 }
@@ -1243,214 +678,513 @@ body.cliente-body {
     margin: 0;
     font-size: 1.45rem;
     line-height: 1.05;
-    color: #111827;
+    color: #ffffff;
     font-weight: 900;
 }
 
 .hero-app-texto p {
     margin: 0;
-    font-size: 0.92rem;
+    font-size: 0.9rem;
+    color: #d1d5db;
+}
+
+.hero-app-top::after {
+    content: "";
+    display: block;
+    margin-top: 12px;
+    height: 2px;
+    width: 42px;
+    background: linear-gradient(90deg, #d4af37, transparent);
+    border-radius: 2px;
+}
+
+/* BOXES */
+.portal-box-principal,
+.form-app-box-pro,
+.cancha-card-app-pro {
+    background: #ffffff;
+    border: 1px solid #e6edf5;
+    border-radius: 24px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.portal-box-principal {
+    padding: 18px;
+    margin-bottom: 16px;
+}
+
+.form-app-box-pro {
+    padding: 18px;
+    margin-top: 18px;
+}
+
+.portal-header-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.portal-header-mini h2 {
+    margin: 0;
+    font-size: 1.08rem;
+    color: #111827;
+    font-weight: 900;
+}
+
+.portal-header-mini p {
+    margin: 0;
+    font-size: 0.9rem;
     color: #6b7280;
-    font-weight: 500;
 }
 
-@keyframes heroFadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+/* DIAS */
+.dias-app-pro {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin: 10px 0 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.dias-app-pro::-webkit-scrollbar {
+    display: none;
+}
+
+.dia-card-pro {
+    min-width: 84px;
+    border-radius: 18px;
+    padding: 12px 10px;
+    border: 1px solid #e2eaf2;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    transition: 0.16s ease;
+}
+
+.dia-card-pro.activa {
+    background: linear-gradient(135deg, #d4af37 0%, #b99220 100%);
+    color: #111;
+    border-color: transparent;
+    box-shadow: 0 12px 22px rgba(212,175,55,0.20);
+}
+
+.dia-card-pro .dia-titulo {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 800;
+    margin-bottom: 3px;
+}
+
+.dia-card-pro .dia-numero {
+    display: block;
+    font-size: 1.2rem;
+    line-height: 1;
+    font-weight: 900;
+    margin-bottom: 2px;
+}
+
+.dia-card-pro .dia-mes {
+    display: block;
+    font-size: 0.78rem;
+    opacity: 0.9;
+}
+
+/* ALERTA */
+.alerta-pro {
+    margin-top: 14px;
+    background: #fff8e7;
+    border: 1px solid #f0dfaa;
+    border-radius: 16px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #8a6a12;
+    font-size: 0.92rem;
+    font-weight: 800;
+}
+
+/* DURACION */
+.bloque-duracion-pro {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #edf2f7;
+}
+
+.duraciones-app-pro {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.duracion-app-card-pro {
+    border-radius: 20px;
+    border: 1px solid #e2eaf2;
+    background: #ffffff;
+    padding: 16px 14px;
+    text-align: left;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.04);
+    transition: 0.16s ease;
+}
+
+.duracion-app-card-pro.activa {
+    border-color: #d4af37;
+    background: linear-gradient(180deg, #fffaf0 0%, #ffffff 100%);
+    box-shadow: 0 10px 18px rgba(212,175,55,0.12);
+}
+
+.duracion-icono {
+    display: block;
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+}
+
+.duracion-main {
+    display: block;
+    font-size: 1rem;
+    color: #111827;
+    font-weight: 900;
+    margin-bottom: 3px;
+}
+
+.duracion-app-card-pro small {
+    color: #6b7280;
+    font-size: 0.82rem;
+}
+
+/* CANCHAS */
+.cliente-canchas-app-pro {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.cancha-card-app-pro {
+    padding: 16px;
+}
+
+.cancha-header-app-pro {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #eff3f7;
+}
+
+.cancha-icono-app {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff6db;
+    color: #b99220;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-right: 0;
+}
+
+.cancha-header-app-pro h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #111827;
+    font-weight: 900;
+}
+
+.cancha-header-app-pro p {
+    margin: 2px 0 0;
+    font-size: 0.88rem;
+    color: #6b7280;
+}
+
+.slots-grid-app-pro {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+/* HORARIOS */
+.slot-card {
+    min-height: 66px;
+    border-radius: 16px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.82rem;
+    text-align: center;
+}
+
+.slot-libre-pro {
+    border: 1px solid #dce8f5;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.03);
+    transition: 0.15s ease;
+}
+
+.slot-libre-pro:hover {
+    border-color: #d4af37;
+    box-shadow: 0 10px 18px rgba(212,175,55,0.10);
+}
+
+.slot-libre-pro.activa {
+    background: linear-gradient(135deg, #d4af37 0%, #b99220 100%);
+    border-color: transparent;
+    box-shadow: 0 12px 20px rgba(212,175,55,0.20);
+}
+
+.slot-libre-pro .slot-hora {
+    color: #111827;
+    font-weight: 800;
+}
+
+.slot-libre-pro .slot-precio {
+    color: #8a6a12;
+    font-weight: 900;
+}
+
+.slot-libre-pro.activa .slot-hora,
+.slot-libre-pro.activa .slot-precio {
+    color: #111;
+}
+
+.slot-ocupado-pro {
+    background: #f3f5f8;
+    border: 1px solid #e4e9ef;
+    color: #9aa4b2;
+}
+
+.slot-estado {
+    font-size: 0.76rem;
+    font-weight: 800;
+    color: #9aa4b2;
+}
+
+/* FORM HEADER */
+.form-app-header-pro {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.form-app-icono-pro {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #d4af37 0%, #b99220 100%);
+    color: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    box-shadow: 0 12px 22px rgba(212,175,55,0.18);
+    flex-shrink: 0;
+}
+
+/* RESUMEN */
+.resumen-app-pro {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.resumen-app-pro .resumen-app-item {
+    background: #fffaf0;
+    border: 1px solid #f1e2b4;
+    border-radius: 16px;
+    padding: 14px;
+}
+
+.resumen-app-pro .resumen-app-item span {
+    display: block;
+    font-size: 0.82rem;
+    color: #8a6a12;
+    margin-bottom: 4px;
+}
+
+.resumen-app-pro .resumen-app-item strong {
+    display: block;
+    font-size: 0.96rem;
+    color: #111827;
+    font-weight: 900;
+}
+
+/* INPUTS */
+.datos-app-grid-pro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.campo-wrap-pro {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campo-wrap-pro label {
+    font-size: 0.88rem;
+    color: #4b5563;
+    font-weight: 800;
+}
+
+.campo-app-pro {
+    min-height: 50px;
+    border-radius: 16px;
+    border: 1px solid #dbe5ef;
+    background: #ffffff;
+    padding: 0 14px;
+    color: #111827;
+    font-size: 0.95rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.campo-app-pro:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
+}
+
+/* OPCIONES */
+.bloque-app-opciones-pro {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #edf2f7;
+}
+
+.opciones-grid-app-pro {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.opcion-card-app-pro {
+    border-radius: 18px;
+    border: 1px solid #e2eaf2;
+    background: #ffffff;
+    padding: 16px 12px;
+    text-align: center;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.04);
+    transition: 0.16s ease;
+}
+
+.opcion-card-app-pro.activa {
+    border-color: #d4af37;
+    background: linear-gradient(180deg, #fffaf0 0%, #ffffff 100%);
+    box-shadow: 0 10px 18px rgba(212,175,55,0.12);
+}
+
+.opcion-icono-app {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 6px;
+}
+
+.opcion-titulo-app {
+    display: block;
+    color: #111827;
+    font-weight: 900;
+    margin-bottom: 2px;
+}
+
+.opcion-texto-app {
+    display: block;
+    color: #6b7280;
+    font-size: 0.82rem;
+}
+
+/* TRANSFERENCIA */
+.bloque-transferencia-app-pro {
+    background: #111;
+    color: #fff;
+    padding: 16px;
+    border-radius: 18px;
+    line-height: 1.55;
+}
+
+/* PRECIO */
+.precio-app-box-pro {
+    margin-top: 16px;
+    background: linear-gradient(180deg, #fffaf0 0%, #ffffff 100%);
+    border: 1px solid #f1e2b4;
+    border-radius: 18px;
+    padding: 16px;
+}
+
+.precio-app-box-pro p {
+    margin: 0 0 6px;
+    color: #111827;
+    font-weight: 800;
+}
+
+.precio-app-box-pro p:last-child {
+    margin-bottom: 0;
+}
+
+/* BOTON FINAL */
+.boton-app-final-pro {
+    width: 100%;
+    min-height: 54px;
+    border-radius: 18px;
+    border: none;
+    background: linear-gradient(135deg, #d4af37 0%, #b99220 100%);
+    color: #111;
+    font-size: 1rem;
+    font-weight: 900;
+    box-shadow: 0 14px 28px rgba(212,175,55,0.18);
+    transition: 0.16s ease;
+    margin-top: 16px;
+}
+
+.boton-app-final-pro:hover {
+    transform: translateY(-1px);
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+    .duraciones-app-pro,
+    .resumen-app-pro,
+    .datos-app-grid-pro,
+    .opciones-grid-app-pro {
+        grid-template-columns: 1fr;
     }
 }
 
-@media (max-width: 520px) {
-    .hero-app-top {
-        padding: 16px;
-    }
-
-    .hero-app-brand {
-        gap: 12px;
-    }
-
-    .hero-app-logo {
-        width: 52px;
-        height: 52px;
-        border-radius: 16px;
+@media (max-width: 640px) {
+    .portal-pro {
+        padding: 14px 12px 28px;
     }
 
     .hero-app-texto h1 {
         font-size: 1.25rem;
     }
 
-    .hero-app-texto p {
-        font-size: 0.86rem;
+    .dia-card-pro {
+        min-width: 80px;
     }
-}
-/* FIX LOGO HEADER */
-.hero-app-logo {
-    width: 56px;
-    height: 56px;
-    border-radius: 14px;
-    overflow: hidden;
-    flex-shrink: 0;
-}
 
-.hero-app-logo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* 🔥 clave */
-    display: block;
-}
-.hero-app-logo {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    background: #111;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.hero-app-logo img {
-    width: 36px;
-    height: 36px;
-    object-fit: contain;
-}
-/* ===== HEADER PREMIUM NEGRO + DORADO ===== */
-
-.hero-app-top {
-    background: linear-gradient(145deg, #0b0b0b, #111111);
-    border-radius: 22px;
-    padding: 18px;
-    margin-bottom: 18px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-    border: 1px solid rgba(212,175,55,0.25);
-    animation: heroFadeUp 0.5s ease;
-}
-
-/* CONTENIDO */
-.hero-app-brand {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-/* LOGO */
-.hero-app-logo {
-    width: 58px;
-    height: 58px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #d4af37, #f1d77a);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 6px 18px rgba(212,175,55,0.4);
-}
-
-.hero-app-logo img {
-    width: 38px;
-    height: 38px;
-    object-fit: contain;
-}
-
-/* TEXTO */
-.hero-app-texto {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-/* CHIP */
-.hero-app-chip {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #d4af37;
-    letter-spacing: 0.5px;
-}
-
-/* TITULO */
-.hero-app-texto h1 {
-    margin: 0;
-    font-size: 1.4rem;
-    font-weight: 900;
-    color: #ffffff;
-}
-
-/* SUB */
-.hero-app-texto p {
-    margin: 0;
-    font-size: 0.85rem;
-    color: #cfcfcf;
-}
-
-/* LINEA DORADA SUTIL */
-.hero-app-top::after {
-    content: "";
-    display: block;
-    margin-top: 12px;
-    height: 2px;
-    width: 40px;
-    background: linear-gradient(90deg, #d4af37, transparent);
-    border-radius: 2px;
-}
-
-/* ANIMACION */
-@keyframes heroFadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
+    .alerta-pro {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+
+    .slots-grid-app-pro {
+        grid-template-columns: repeat(2, 1fr);
     }
-}
-/* ===== FIX HEADER + PREMIUM ===== */
-
-.hero-reserva {
-    background: linear-gradient(135deg, #0b0b0b, #111);
-    border-radius: 20px;
-    padding: 18px;
-    margin-bottom: 16px;
-    border: 1px solid rgba(212,175,55,0.2);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-}
-
-/* ⚠️ ESTE ES EL FIX CLAVE DEL LOGO */
-.hero-app-logo img {
-    width: 36px !important;
-    height: 36px !important;
-    object-fit: contain !important;
-    display: block;
-}
-
-/* CONTENEDOR LOGO */
-.hero-app-logo {
-    width: 56px;
-    height: 56px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #d4af37, #f1d77a);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* TEXTOS */
-.hero-app-texto h1 {
-    color: #fff;
-    font-size: 20px;
-    margin: 0;
-}
-
-.hero-app-texto p {
-    color: #aaa;
-    font-size: 13px;
-    margin: 0;
-}
-
-.hero-app-chip {
-    color: #d4af37;
-    font-size: 11px;
 }
