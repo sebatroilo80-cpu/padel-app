@@ -1303,3 +1303,107 @@ body.cliente-body {
     object-fit: contain; /* 🔥 clave */
     display: block;
 }
+.hero-app-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-app-logo img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+/* ===== HEADER PREMIUM NEGRO + DORADO ===== */
+
+.hero-app-top {
+    background: linear-gradient(145deg, #0b0b0b, #111111);
+    border-radius: 22px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+    border: 1px solid rgba(212,175,55,0.25);
+    animation: heroFadeUp 0.5s ease;
+}
+
+/* CONTENIDO */
+.hero-app-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* LOGO */
+.hero-app-logo {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #d4af37, #f1d77a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(212,175,55,0.4);
+}
+
+.hero-app-logo img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+}
+
+/* TEXTO */
+.hero-app-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+/* CHIP */
+.hero-app-chip {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #d4af37;
+    letter-spacing: 0.5px;
+}
+
+/* TITULO */
+.hero-app-texto h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #ffffff;
+}
+
+/* SUB */
+.hero-app-texto p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #cfcfcf;
+}
+
+/* LINEA DORADA SUTIL */
+.hero-app-top::after {
+    content: "";
+    display: block;
+    margin-top: 12px;
+    height: 2px;
+    width: 40px;
+    background: linear-gradient(90deg, #d4af37, transparent);
+    border-radius: 2px;
+}
+
+/* ANIMACION */
+@keyframes heroFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
