@@ -343,41 +343,42 @@ def reservar():
 
     reserva_id = cursor.lastrowid
 
+    # Si el pago entra en el momento, registrar ingreso en caja
     if metodo_pago not in ["Mercado Pago", "Transferencia"] and float(pagado) > 0:
         if opcion_pago == "Reserva":
             descripcion = f"Seña reserva #{reserva_id} - {nombre} - {cancha} - {horario}"
         else:
             descripcion = f"Pago total reserva #{reserva_id} - {nombre} - {cancha} - {horario}"
 
+        fecha_mov = date.today().strftime("%Y-%m-%d")
+
         cursor.execute("""
             INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
             VALUES (?, ?, ?, ?, ?)
         """, (
-            fecha,
+            fecha_mov,
             "ingreso",
             descripcion,
             pagado,
             metodo_pago
         ))
 
-        mensaje = f"""
-        📲 Nueva reserva
+    # Aviso a Telegram SIEMPRE que entra una reserva
+    mensaje = f"""📲 Nueva reserva
 
-        👤 {nombre}
-        📅 {fecha}
-        ⏰ {horario}
-        🏟️ {cancha}
-        💰 ${precio}
-        💳 {metodo_pago}
-        """
+👤 {nombre}
+📞 {telefono}
+📅 {fecha}
+⏰ {horario}
+🏟️ {cancha}
+⏱️ {duracion}
+💰 ${precio}
+💳 {metodo_pago}
+📌 {estado_pago}"""
 
-        enviar_telegram(mensaje)
+    enviar_telegram(mensaje)
 
-        conn.commit()
-        conn.close()
-        
-        return redirect("/?ok=1")
-
+    # Si paga con Mercado Pago, generar link
     if metodo_pago == "Mercado Pago":
         external_id = str(reserva_id)
 
