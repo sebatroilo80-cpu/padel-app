@@ -690,4 +690,243 @@
     border: 1px solid rgba(255,255,255,0.14);
     font-size: 0.85rem;
     font-weight: 800;
-    letter
+    letter   
+    /* ===== ESTILO APP MODERNA (CLARO) ===== */
+
+.portal-pro {
+    max-width: 520px;
+    margin: auto;
+    padding: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* HEADER */
+.hero-reserva-pro {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.hero-badge {
+    font-size: 12px;
+    color: #3b82f6;
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 600;
+}
+
+.hero-texto-pro h1 {
+    margin: 0;
+    font-size: 22px;
+    color: #111;
+}
+
+.hero-texto-pro p {
+    font-size: 13px;
+    color: #666;
+}
+
+/* BOX */
+.portal-box-principal {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+}
+
+/* TITULOS */
+.portal-header-mini h2 {
+    font-size: 15px;
+    margin-bottom: 4px;
+    color: #111;
+}
+
+.portal-header-mini p {
+    font-size: 12px;
+    color: #777;
+}
+
+/* DIAS */
+.dias-app-pro {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin: 10px 0;
+}
+
+.dia-card-pro {
+    background: #f3f4f6;
+    border-radius: 12px;
+    padding: 10px;
+    min-width: 70px;
+    border: none;
+}
+
+.dia-card-pro.activa {
+    background: #3b82f6;
+    color: white;
+}
+
+/* ALERTA */
+.alerta-pro {
+    background: #eff6ff;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #1d4ed8;
+}
+
+/* DURACION */
+.duraciones-app-pro {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.duracion-app-card-pro {
+    flex: 1;
+    background: #f3f4f6;
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+    border: none;
+}
+
+.duracion-app-card-pro.activa {
+    background: #3b82f6;
+    color: white;
+}
+
+/* CANCHAS */
+.cancha-card-app-pro {
+    background: white;
+    border-radius: 18px;
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+.cancha-header-app-pro {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cancha-icono-app {
+    font-size: 22px;
+    margin-right: 10px;
+}
+
+/* HORARIOS */
+.slots-grid-app-pro {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.slot-card {
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 12px;
+}
+
+/* LIBRE */
+.slot-libre-pro {
+    background: white;
+    border: 1px solid #e5e7eb;
+}
+
+.slot-libre-pro:hover {
+    border-color: #3b82f6;
+}
+
+.slot-libre-pro.activa {
+    background: #3b82f6;
+    color: white;
+}
+
+/* OCUPADO */
+.slot-ocupado-pro {
+    background: #f3f4f6;
+    color: #9ca3af;
+}
+
+/* FORM */
+.form-app-box-pro {
+    background: white;
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+}
+
+.form-app-header-pro {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.form-app-icono-pro {
+    font-size: 22px;
+}
+
+/* INPUTS */
+.campo-app-pro {
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+/* OPCIONES */
+.opciones-grid-app-pro {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.opcion-card-app-pro {
+    flex: 1;
+    background: #f3f4f6;
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+}
+
+.opcion-card-app-pro.activa {
+    background: #3b82f6;
+    color: white;
+}
+
+/* PRECIO */
+.precio-app-box-pro {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 12px;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+/* BOTON FINAL */
+.boton-app-final-pro {
+    width: 100%;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: bold;
+    margin-top: 14px;
+}
+
+/* MOBILE */
+@media (max-width: 480px) {
+    .slots-grid-app-pro {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
