@@ -8,22 +8,27 @@
 </head>
 <body class="cliente-body">
 
-<div class="cliente-app nuevo-portal">
+<div class="cliente-app nuevo-portal portal-pro">
 
-    <section class="hero-reserva">
-        <div class="hero-icono">📅</div>
-        <div class="hero-texto">
+    <section class="hero-reserva hero-reserva-pro">
+        <div class="hero-badge">Pádel 37</div>
+        <div class="hero-texto hero-texto-pro">
             <h1>Reservá tu cancha</h1>
-            <p>Elegí día, horario y confirmá en segundos</p>
+            <p>Elegí día, duración y horario en pocos pasos</p>
         </div>
     </section>
 
-    <section class="cliente-box cliente-box-principal">
-        <div class="cliente-dias dias-app" id="diasContainer">
+    <section class="cliente-box cliente-box-principal portal-box-principal">
+        <div class="portal-header-mini">
+            <h2>1. Elegí el día</h2>
+            <p>Podés reservar hasta seis días hacia adelante.</p>
+        </div>
+
+        <div class="cliente-dias dias-app dias-app-pro" id="diasContainer">
             {% for d in dias_cliente %}
             <button
                 type="button"
-                class="dia-card dia-card-app {% if loop.first %}activa{% endif %}"
+                class="dia-card dia-card-app dia-card-pro {% if loop.first %}activa{% endif %}"
                 data-fecha="{{ d.iso }}">
                 <span class="dia-titulo">{{ d.titulo }}</span>
                 <span class="dia-numero">{{ d.numero }}</span>
@@ -32,39 +37,45 @@
             {% endfor %}
         </div>
 
-        <div class="cliente-alerta alerta-horario">
-            ⏰ 08:00 – 23:00
+        <div class="cliente-alerta alerta-horario alerta-pro">
+            <span>⏰ Horario disponible</span>
+            <strong>08:00 – 23:00</strong>
         </div>
 
-        <p class="cliente-ayuda texto-suave">
-            Las reservas se pueden realizar hasta con seis días de antelación.
-        </p>
+        <div class="bloque-duracion-app bloque-duracion-pro">
+            <div class="portal-header-mini">
+                <h2>2. Elegí la duración</h2>
+                <p>Seleccioná cuánto tiempo querés jugar.</p>
+            </div>
 
-        <div class="bloque-duracion-app">
-            <h3 class="cliente-subtitulo-opcion">Duración del turno</h3>
-            <div class="duraciones-app" id="duracionesApp">
-                <button type="button" class="duracion-app-card" data-duracion="60 minutos">
-                    🕐 1 hora
+            <div class="duraciones-app duraciones-app-pro" id="duracionesApp">
+                <button type="button" class="duracion-app-card duracion-app-card-pro" data-duracion="60 minutos">
+                    <span class="duracion-icono">🕐</span>
+                    <span class="duracion-main">1 hora</span>
+                    <small>Turno corto</small>
                 </button>
-                <button type="button" class="duracion-app-card" data-duracion="90 minutos">
-                    🕜 1:30 hs
+
+                <button type="button" class="duracion-app-card duracion-app-card-pro" data-duracion="90 minutos">
+                    <span class="duracion-icono">🕜</span>
+                    <span class="duracion-main">1:30 hs</span>
+                    <small>Turno completo</small>
                 </button>
             </div>
         </div>
     </section>
 
-    <section class="cliente-canchas-app" id="canchasContainer"></section>
+    <section class="cliente-canchas-app cliente-canchas-app-pro" id="canchasContainer"></section>
 
-    <div class="cliente-box cliente-form-box form-app-box" id="formBox" style="display:none;">
-        <div class="form-app-header">
-            <div class="form-app-icono">✅</div>
+    <div class="cliente-box cliente-form-box form-app-box form-app-box-pro" id="formBox" style="display:none;">
+        <div class="form-app-header form-app-header-pro">
+            <div class="form-app-icono form-app-icono-pro">✅</div>
             <div>
-                <h2 class="cliente-seccion-titulo">Completar reserva</h2>
-                <p class="form-app-sub">Confirmá tu turno y elegí cómo querés pagar</p>
+                <h2 class="cliente-seccion-titulo">3. Confirmá tu reserva</h2>
+                <p class="form-app-sub">Completá tus datos y elegí cómo querés pagar</p>
             </div>
         </div>
 
-        <div class="cliente-resumen resumen-app" id="resumenReserva"></div>
+        <div class="cliente-resumen resumen-app resumen-app-pro" id="resumenReserva"></div>
 
         <form action="/reservar" method="POST" id="formReserva">
             <input type="hidden" name="fecha" id="inputFecha">
@@ -75,21 +86,28 @@
             <input type="hidden" name="opcion_pago" id="inputOpcionPago">
             <input type="hidden" name="precio" id="inputPrecio">
 
-            <div class="cliente-datos-grid datos-app-grid">
-                <input type="text" name="nombre" placeholder="👤 Nombre y apellido" class="campo cliente-campo-grande campo-app" required>
-                <input type="text" name="telefono" placeholder="📱 Teléfono" class="campo cliente-campo-grande campo-app" required>
+            <div class="cliente-datos-grid datos-app-grid datos-app-grid-pro">
+                <div class="campo-wrap-pro">
+                    <label>Nombre y apellido</label>
+                    <input type="text" name="nombre" placeholder="👤 Nombre y apellido" class="campo cliente-campo-grande campo-app campo-app-pro" required>
+                </div>
+
+                <div class="campo-wrap-pro">
+                    <label>Teléfono</label>
+                    <input type="text" name="telefono" placeholder="📱 Teléfono" class="campo cliente-campo-grande campo-app campo-app-pro" required>
+                </div>
             </div>
 
-            <div class="cliente-bloque-opciones bloque-app-opciones">
-                <h3 class="cliente-subtitulo-opcion">💸 Cómo querés pagar</h3>
-                <div class="opciones-grid opciones-grid-app">
-                    <button type="button" class="opcion-card opcion-card-app" data-tipo="opcion" data-valor="Reserva">
+            <div class="cliente-bloque-opciones bloque-app-opciones bloque-app-opciones-pro">
+                <h3 class="cliente-subtitulo-opcion">4. Cómo querés pagar</h3>
+                <div class="opciones-grid opciones-grid-app opciones-grid-app-pro">
+                    <button type="button" class="opcion-card opcion-card-app opcion-card-app-pro" data-tipo="opcion" data-valor="Reserva">
                         <span class="opcion-icono-app">📝</span>
                         <span class="opcion-titulo-app">Reservar</span>
                         <span class="opcion-texto-app">Pagás 30% ahora</span>
                     </button>
 
-                    <button type="button" class="opcion-card opcion-card-app" data-tipo="opcion" data-valor="Pagado">
+                    <button type="button" class="opcion-card opcion-card-app opcion-card-app-pro" data-tipo="opcion" data-valor="Pagado">
                         <span class="opcion-icono-app">✅</span>
                         <span class="opcion-titulo-app">Pagar total</span>
                         <span class="opcion-texto-app">Pagás 100% ahora</span>
@@ -97,16 +115,16 @@
                 </div>
             </div>
 
-            <div class="cliente-bloque-opciones bloque-app-opciones">
-                <h3 class="cliente-subtitulo-opcion">💳 Método de pago</h3>
-                <div class="opciones-grid opciones-grid-app">
-                    <button type="button" class="opcion-card opcion-card-app" data-tipo="metodo" data-valor="Transferencia">
+            <div class="cliente-bloque-opciones bloque-app-opciones bloque-app-opciones-pro">
+                <h3 class="cliente-subtitulo-opcion">5. Método de pago</h3>
+                <div class="opciones-grid opciones-grid-app opciones-grid-app-pro">
+                    <button type="button" class="opcion-card opcion-card-app opcion-card-app-pro" data-tipo="metodo" data-valor="Transferencia">
                         <span class="opcion-icono-app">🏦</span>
                         <span class="opcion-titulo-app">Transferencia</span>
                         <span class="opcion-texto-app">Pago bancario</span>
                     </button>
 
-                    <button type="button" class="opcion-card opcion-card-app" data-tipo="metodo" data-valor="Mercado Pago">
+                    <button type="button" class="opcion-card opcion-card-app opcion-card-app-pro" data-tipo="metodo" data-valor="Mercado Pago">
                         <span class="opcion-icono-app">💳</span>
                         <span class="opcion-titulo-app">Mercado Pago</span>
                         <span class="opcion-texto-app">Pago digital</span>
@@ -115,8 +133,8 @@
             </div>
 
             <div id="datos_transferencia" style="display:none; margin-top:12px;">
-                <div class="bloque-transferencia-app">
-                    <strong>📌 Datos para transferir:</strong><br><br>
+                <div class="bloque-transferencia-app bloque-transferencia-app-pro">
+                    <strong>📌 Datos para transferir</strong><br><br>
                     Alias: 37padelclub<br>
                     CVU: 0000003100030540946290<br>
                     Titular: Eduardo Sebastián Troilo<br><br>
@@ -124,12 +142,12 @@
                 </div>
             </div>
 
-            <div class="cliente-precio-info precio-app-box">
+            <div class="cliente-precio-info precio-app-box precio-app-box-pro">
                 <p id="precioTotalTexto"></p>
                 <p id="precioPagoTexto"></p>
             </div>
 
-            <button class="boton cliente-boton-final boton-app-final" type="submit">
+            <button class="boton cliente-boton-final boton-app-final boton-app-final-pro" type="submit">
                 🚀 Confirmar reserva
             </button>
         </form>
@@ -287,7 +305,7 @@ function renderCanchas() {
 
     canchas.forEach(c => {
         const card = document.createElement("div");
-        card.className = "cancha-card-app";
+        card.className = "cancha-card-app cancha-card-app-pro";
 
         const horariosHtml = horariosBase.map(h => {
             const disponible = canchaDisponible(fechaSeleccionada, c.nombre, h, duracionSeleccionada);
@@ -295,14 +313,15 @@ function renderCanchas() {
 
             if (!disponible) {
                 return `
-                    <div class="slot-card slot-ocupado">
+                    <div class="slot-card slot-ocupado slot-ocupado-pro">
                         <span class="slot-hora">${h}</span>
+                        <span class="slot-estado">Ocupado</span>
                     </div>
                 `;
             }
 
             return `
-                <button type="button" class="slot-card slot-libre"
+                <button type="button" class="slot-card slot-libre slot-libre-pro"
                     data-cancha="${c.nombre}"
                     data-horario="${h}"
                     data-duracion="${duracionSeleccionada}"
@@ -314,7 +333,7 @@ function renderCanchas() {
         }).join("");
 
         card.innerHTML = `
-            <div class="cancha-header-app">
+            <div class="cancha-header-app cancha-header-app-pro">
                 <div class="cancha-icono-app">🎾</div>
                 <div class="cancha-info-app">
                     <h3>${c.nombre}</h3>
@@ -322,7 +341,7 @@ function renderCanchas() {
                 </div>
             </div>
 
-            <div class="slots-grid-app">
+            <div class="slots-grid-app slots-grid-app-pro">
                 ${horariosHtml}
             </div>
         `;
