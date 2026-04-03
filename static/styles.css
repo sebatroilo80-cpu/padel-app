@@ -1407,3 +1407,50 @@ body.cliente-body {
         transform: translateY(0);
     }
 }
+/* ===== FIX HEADER + PREMIUM ===== */
+
+.hero-reserva {
+    background: linear-gradient(135deg, #0b0b0b, #111);
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(212,175,55,0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* ⚠️ ESTE ES EL FIX CLAVE DEL LOGO */
+.hero-app-logo img {
+    width: 36px !important;
+    height: 36px !important;
+    object-fit: contain !important;
+    display: block;
+}
+
+/* CONTENEDOR LOGO */
+.hero-app-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #d4af37, #f1d77a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* TEXTOS */
+.hero-app-texto h1 {
+    color: #fff;
+    font-size: 20px;
+    margin: 0;
+}
+
+.hero-app-texto p {
+    color: #aaa;
+    font-size: 13px;
+    margin: 0;
+}
+
+.hero-app-chip {
+    color: #d4af37;
+    font-size: 11px;
+}
