@@ -1184,3 +1184,107 @@ body.cliente-body {
 .hero-icono {
     font-size: 26px;
 }
+/* ===== HEADER APP PRO ===== */
+
+.hero-app-top {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid #e6edf5;
+    border-radius: 22px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+    animation: heroFadeUp 0.45s ease;
+}
+
+.hero-app-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.hero-app-logo {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #009ee3 0%, #2563eb 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.18);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.hero-app-logo img {
+    width: 78%;
+    height: 78%;
+    object-fit: contain;
+    display: block;
+}
+
+.hero-app-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.hero-app-chip {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #eaf4ff;
+    color: #0a66c2;
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+
+.hero-app-texto h1 {
+    margin: 0;
+    font-size: 1.45rem;
+    line-height: 1.05;
+    color: #111827;
+    font-weight: 900;
+}
+
+.hero-app-texto p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+@keyframes heroFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 520px) {
+    .hero-app-top {
+        padding: 16px;
+    }
+
+    .hero-app-brand {
+        gap: 12px;
+    }
+
+    .hero-app-logo {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+    }
+
+    .hero-app-texto h1 {
+        font-size: 1.25rem;
+    }
+
+    .hero-app-texto p {
+        font-size: 0.86rem;
+    }
+}
