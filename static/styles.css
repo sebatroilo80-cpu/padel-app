@@ -930,3 +930,235 @@
         grid-template-columns: repeat(2, 1fr);
     }
 }
+/* ===== ESTILO MERCADO PAGO / APP MODERNA ===== */
+
+body.cliente-body {
+    background: #f5f7fb;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* CONTENEDOR */
+.nuevo-portal {
+    max-width: 520px;
+    margin: auto;
+    padding: 16px;
+}
+
+/* HERO */
+.hero-reserva {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.05);
+    margin-bottom: 16px;
+}
+
+.hero-icono {
+    font-size: 28px;
+}
+
+.hero-texto h1 {
+    font-size: 20px;
+    margin: 0;
+    color: #111;
+}
+
+.hero-texto p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 2px 0 0;
+}
+
+/* BOX */
+.cliente-box {
+    background: white;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+}
+
+/* DIAS */
+.dias-app {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-bottom: 10px;
+}
+
+.dia-card {
+    background: #eef2f7;
+    border-radius: 14px;
+    padding: 10px;
+    min-width: 70px;
+    text-align: center;
+    border: none;
+}
+
+.dia-card.activa {
+    background: #009ee3;
+    color: white;
+}
+
+.dia-titulo {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.dia-numero {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.dia-mes {
+    font-size: 10px;
+}
+
+/* ALERTA */
+.alerta-horario {
+    background: #e7f3ff;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #0077cc;
+}
+
+/* DURACION */
+.duraciones-app {
+    display: flex;
+    gap: 10px;
+}
+
+.duracion-app-card {
+    flex: 1;
+    background: #eef2f7;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+}
+
+.duracion-app-card.activa {
+    background: #009ee3;
+    color: white;
+}
+
+/* CANCHAS */
+.cancha-card-app {
+    background: white;
+    border-radius: 18px;
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+.cancha-header-app {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* HORARIOS */
+.slots-grid-app {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.slot-card {
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+}
+
+/* LIBRE */
+.slot-libre {
+    background: white;
+    border: 1px solid #e5e7eb;
+}
+
+.slot-libre:hover {
+    border-color: #009ee3;
+}
+
+.slot-libre.activa {
+    background: #009ee3;
+    color: white;
+}
+
+/* OCUPADO */
+.slot-ocupado {
+    background: #f3f4f6;
+    color: #9ca3af;
+}
+
+/* FORM */
+.form-app-box {
+    background: white;
+    border-radius: 18px;
+    padding: 16px;
+}
+
+/* INPUTS */
+.campo-app {
+    width: 100%;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+/* OPCIONES */
+.opciones-grid-app {
+    display: flex;
+    gap: 10px;
+}
+
+.opcion-card-app {
+    flex: 1;
+    background: #eef2f7;
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+}
+
+.opcion-card-app.activa {
+    background: #009ee3;
+    color: white;
+}
+
+/* TRANSFERENCIA */
+.bloque-transferencia-app {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+/* PRECIO */
+.precio-app-box {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 12px;
+    margin-top: 10px;
+}
+
+/* BOTON */
+.boton-app-final {
+    width: 100%;
+    background: #009ee3;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: bold;
+    margin-top: 12px;
+}
+
+/* MOBILE */
+@media (max-width: 480px) {
+    .slots-grid-app {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
