@@ -1185,7 +1185,9 @@ def editar(id):
 
     if request.method == "POST":
         cursor.execute("""
-            SELECT nombre, telefono, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado
+            SELECT nombre, telefono, fecha, cancha, duracion, horario,
+                   precio, metodo_pago, estado_pago, pagado,
+                   descuento, motivo_descuento, precio_final
             FROM reservas
             WHERE id = ?
         """, (id,))
@@ -1213,17 +1215,22 @@ def editar(id):
             return "Ese horario ya está ocupado o bloqueado. Volvé atrás y elegí otro."
 
         precio_original = calcular_precio(cursor, duracion, horario)
-        precio = max(0, precio_original - descuento)
 
-        if pagado > precio:
-            pagado = precio
+        if descuento > precio_original:
+            descuento = precio_original
 
-        estado_pago = calcular_estado_desde_pagado(precio, pagado)
+        precio_final = max(0, precio_original - descuento)
+
+        if pagado > precio_final:
+            pagado = precio_final
+
+        estado_pago = calcular_estado_desde_pagado(precio_final, pagado)
 
         cursor.execute("""
             UPDATE reservas
             SET nombre = ?, telefono = ?, fecha = ?, cancha = ?, duracion = ?, horario = ?,
-                metodo_pago = ?, estado_pago = ?, precio = ?, pagado = ?, descuento = ?, motivo_descuento = ?
+                metodo_pago = ?, estado_pago = ?, precio = ?, pagado = ?, descuento = ?,
+                motivo_descuento = ?, precio_final = ?
             WHERE id = ?
         """, (
             nombre,
@@ -1234,10 +1241,11 @@ def editar(id):
             horario,
             metodo_pago,
             estado_pago,
-            precio,
+            precio_original,
             pagado,
             descuento,
             motivo_descuento,
+            precio_final,
             id
         ))
 
@@ -1258,9 +1266,9 @@ def editar(id):
                 columnas = [col[1] for col in cursor.fetchall()]
                 campo_texto = "descripcion" if "descripcion" in columnas else "concepto"
 
-                if float(pagado_anterior) == 0 and float(pagado) == float(precio):
+                if float(pagado_anterior) == 0 and float(pagado) == float(precio_final):
                     texto_mov = f"Pago total reserva #{id} - {nombre} - {cancha} - {horario}"
-                elif float(pagado_anterior) > 0 and float(pagado) == float(precio):
+                elif float(pagado_anterior) > 0 and float(pagado) == float(precio_final):
                     texto_mov = f"Saldo completado reserva #{id} - {nombre} - {cancha} - {horario}"
                 else:
                     texto_mov = f"Pago adicional reserva #{id} - {nombre} - {cancha} - {horario}"

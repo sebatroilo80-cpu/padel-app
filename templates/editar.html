@@ -33,8 +33,9 @@
             </select>
 
             <select name="duracion">
-                <option value="60 minutos" {% if reserva[5]=="60 minutos" %}selected{% endif %}>60 minutos</option>
-                <option value="90 minutos" {% if reserva[5]=="90 minutos" %}selected{% endif %}>90 minutos</option>
+                <option value="60 minutos" {{ 'selected' if reserva[5]=='60 minutos' else '' }}>60 minutos</option>
+                <option value="90 minutos" {{ 'selected' if reserva[5]=='90 minutos' else '' }}>90 minutos</option>
+                <option value="120 minutos" {{ 'selected' if reserva[5]=='120 minutos' else '' }}>120 minutos</option>
             </select>
         </div>
 
@@ -64,19 +65,14 @@
 
         <!-- Resumen -->
 <div class="app-resumen">
-
     <div>Estado: <b>{{ reserva[9] }}</b></div>
-
     <div>Precio original: ${{ reserva[7] }}</div>
-
     <div>Descuento: ${{ reserva[12] if reserva|length > 12 else 0 }}</div>
-
     <div style="font-size: 20px; font-weight: bold;">
-        Total final: $
-        {{ (reserva[7] - (reserva[12] if reserva|length > 12 else 0)) }}
+        Total final: ${{ reserva[14] if reserva|length > 14 else reserva[7] }}
     </div>
-
 </div>
+
 
         <!-- BOTONES -->
         <button class="btn-main">Guardar cambios</button>
