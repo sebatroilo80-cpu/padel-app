@@ -51,14 +51,32 @@
 
         <!-- Monto pagado -->
         <input type="number" name="pagado" value="{{ reserva[10] or 0 }}" placeholder="Monto pagado">
+         
+        <div class="campo-grupo">
+    <label>Descuento</label>
+    <input type="number" name="descuento" value="{{ reserva[12] if reserva|length > 12 else 0 }}" min="0" step="0.01">
+</div>
+
+<div class="campo-grupo">
+    <label>Motivo del descuento</label>
+    <input type="text" name="motivo_descuento" value="{{ reserva[13] if reserva|length > 13 else '' }}" placeholder="Ej: Clase, promo, práctica">
+</div>
 
         <!-- Resumen -->
-        <div class="app-resumen">
-            <div>Estado: <b>{{ reserva[9] }}</b></div>
-            <div>Total: ${{ reserva[7] }}</div>
-            <div>Pagó: ${{ reserva[10] or 0 }}</div>
-            <div>Falta: ${{ (reserva[7] or 0) - (reserva[10] or 0) }}</div>
-        </div>
+<div class="app-resumen">
+
+    <div>Estado: <b>{{ reserva[9] }}</b></div>
+
+    <div>Precio original: ${{ reserva[7] }}</div>
+
+    <div>Descuento: ${{ reserva[12] if reserva|length > 12 else 0 }}</div>
+
+    <div style="font-size: 20px; font-weight: bold;">
+        Total final: $
+        {{ (reserva[7] - (reserva[12] if reserva|length > 12 else 0)) }}
+    </div>
+
+</div>
 
         <!-- BOTONES -->
         <button class="btn-main">Guardar cambios</button>

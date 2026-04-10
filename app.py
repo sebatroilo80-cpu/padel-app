@@ -1204,12 +1204,15 @@ def editar(id):
         horario = request.form["horario"]
         metodo_pago = request.form["metodo_pago"]
         pagado = limpiar_numero(request.form.get("pagado"))
+        descuento = limpiar_numero(request.form.get("descuento"))
+        motivo_descuento = request.form.get("motivo_descuento", "").strip()
 
         if hay_conflicto(cursor, fecha, cancha, horario, duracion, excluir_id=id):
             conn.close()
             return "Ese horario ya está ocupado o bloqueado. Volvé atrás y elegí otro."
 
-        precio = calcular_precio(cursor, duracion, horario)
+        precio_original = calcular_precio(cursor, duracion, horario)
+        precio = max(0, precio_original - descuento)
 
         if pagado > precio:
             pagado = precio
@@ -1218,7 +1221,8 @@ def editar(id):
 
         cursor.execute("""
             UPDATE reservas
-            SET nombre = ?, fecha = ?, cancha = ?, duracion = ?, horario = ?, metodo_pago = ?, estado_pago = ?, precio = ?, pagado = ?
+            SET nombre = ?, telefono = ?, fecha = ?, cancha = ?, duracion = ?, horario = ?,
+                metodo_pago = ?, estado_pago = ?, precio = ?, pagado = ?, descuento = ?, motivo_descuento = ?
             WHERE id = ?
         """, (
             nombre,
@@ -1230,6 +1234,8 @@ def editar(id):
             estado_pago,
             precio,
             pagado,
+            descuento,
+            motivo_descuento,
             id
         ))
 
