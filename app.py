@@ -1213,6 +1213,7 @@ def editar(id):
         duracion = request.form["duracion"]
         horario = request.form["horario"]
         metodo_pago = request.form["metodo_pago"]
+        estado_pago_nuevo = request.form["estado_pago"]
         descuento = limpiar_numero(request.form.get("descuento"))
         motivo_descuento = request.form.get("motivo_descuento", "").strip()
 
@@ -1234,15 +1235,24 @@ def editar(id):
 
         total_final = max(0.0, precio_original - descuento)
 
-        if estado_anterior in ["Reserva", "Pendiente reserva"]:
+        if estado_pago_nuevo == "Reserva":
             pagado = sena_base
             estado_pago = "Reserva"
-        elif estado_anterior == "Pendiente pago total":
+
+        elif estado_pago_nuevo == "Pendiente reserva":
             pagado = 0.0
+            estado_pago = "Pendiente reserva"
+
+        elif estado_pago_nuevo == "Pendiente pago total":
+            pagado = pagado_anterior
             estado_pago = "Pendiente pago total"
-        elif estado_anterior == "Pagado":
+
+        elif estado_pago_nuevo == "Pagado":
+    # si ya había una seña cargada, el descuento baja el saldo restante
+    # total_final = precio original - descuento
             pagado = total_final
             estado_pago = "Pagado"
+
         else:
             pagado = limpiar_numero(request.form.get("pagado"))
             if pagado > total_final:

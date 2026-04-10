@@ -50,6 +50,16 @@
             <option value="QR" {% if reserva[8]=="QR" %}selected{% endif %}>QR</option>
         </select>
 
+        <div class="campo-grupo">
+            <label>Estado del pago</label>
+            <select name="estado_pago">
+            <option value="Reserva" {{ 'selected' if reserva[9]=='Reserva' else '' }}>Reserva</option>
+            <option value="Pagado" {{ 'selected' if reserva[9]=='Pagado' else '' }}>Pagado</option>
+            <option value="Pendiente reserva" {{ 'selected' if reserva[9]=='Pendiente reserva' else '' }}>Pendiente reserva</option>
+            <option value="Pendiente pago total" {{ 'selected' if reserva[9]=='Pendiente pago total' else '' }}>Pendiente pago total</option>
+            </select>
+        </div>
+
         <!-- Monto pagado -->
         <input type="number" name="pagado" value="{{ reserva[10] or 0 }}" placeholder="Monto pagado">
          
@@ -82,11 +92,19 @@
         <div style="font-size: 18px; font-weight: bold;">Abonado: ${{ abonado }}</div>
         <div>Saldo final del turno: ${{ total_final }}</div>
         <div>Falta abonar: ${{ falta }}</div>
+
     {% elif reserva[9] == "Pagado" %}
         <div>Descuento: ${{ descuento }}</div>
         <div>Total final del turno: ${{ total_final }}</div>
         <div style="font-size: 18px; font-weight: bold;">Total abonado: ${{ abonado }}</div>
         <div>Falta abonar: $0</div>
+
+    {% elif reserva[9] == "Pendiente pago total" %}
+        <div>Descuento aplicado al saldo: ${{ descuento }}</div>
+        <div>Total final del turno: ${{ total_final }}</div>
+        <div style="font-size: 18px; font-weight: bold;">Abonado: ${{ abonado }}</div>
+        <div>Falta abonar: ${{ falta }}</div>
+
     {% else %}
         <div>Descuento: ${{ descuento }}</div>
         <div>Total final del turno: ${{ total_final }}</div>
