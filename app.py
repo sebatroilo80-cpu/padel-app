@@ -31,15 +31,26 @@ BASE_URL = (os.getenv("BASE_URL") or "http://127.0.0.1:5000").rstrip("/")
 app = Flask(__name__)
 app.secret_key = "clave_secreta_37"
 
-# ===== FIX BASE DE DATOS (WhatsApp enviado) =====
+# ===== FIX BASE DE DATOS =====
 conn = sqlite3.connect("padel.db")
 cursor = conn.cursor()
 
+# Reservas
 cursor.execute("PRAGMA table_info(reservas)")
-columnas = [col[1] for col in cursor.fetchall()]
+columnas_reservas = [col[1] for col in cursor.fetchall()]
 
-if "whatsapp_enviado" not in columnas:
+if "whatsapp_enviado" not in columnas_reservas:
     cursor.execute("ALTER TABLE reservas ADD COLUMN whatsapp_enviado INTEGER DEFAULT 0")
+
+# Configuración
+cursor.execute("PRAGMA table_info(configuracion)")
+columnas_config = [col[1] for col in cursor.fetchall()]
+
+if "precio_120_dia" not in columnas_config:
+    cursor.execute("ALTER TABLE configuracion ADD COLUMN precio_120_dia REAL DEFAULT 45000")
+
+if "precio_120_noche" not in columnas_config:
+    cursor.execute("ALTER TABLE configuracion ADD COLUMN precio_120_noche REAL DEFAULT 55000")
 
 conn.commit()
 conn.close()
@@ -49,7 +60,10 @@ init_db()
 
 def obtener_config(cursor):
     cursor.execute("""
-        SELECT precio_60_dia, precio_60_noche, precio_90_dia, precio_90_noche
+        SELECT precio_60_dia, precio_60_noche,
+               precio_90_dia, precio_90_noche,
+               COALESCE(precio_120_dia, 45000),
+               COALESCE(precio_120_noche, 55000)
         FROM configuracion
         WHERE id = 1
     """)
@@ -73,13 +87,29 @@ def calcular_precio(cursor, duracion, horario):
     precio_60_noche = config[1]
     precio_90_dia = config[2]
     precio_90_noche = config[3]
+    precio_120_dia = config[4] if len(config) > 4 else 45000
+    precio_120_noche = config[5] if len(config) > 5 else 55000
 
-    hora = int(horario.split(":")[0])
+    hora, minuto = map(int, horario.split(":"))
 
-    if hora < 18:
-        return precio_60_dia if duracion == "60 minutos" else precio_90_dia
+    # calcular hora de fin
+    duracion_min = 60 if duracion == "60 minutos" else 90 if duracion == "90 minutos" else 120
+    fin = hora * 60 + minuto + duracion_min
+
+    # si en algún momento pasa de las 17:00 (1020 minutos)
+    if fin > (17 * 60):
+        es_noche = True
     else:
-        return precio_60_noche if duracion == "60 minutos" else precio_90_noche
+        es_noche = False
+
+    if duracion == "60 minutos":
+        return precio_60_noche if es_noche else precio_60_dia
+    elif duracion == "90 minutos":
+        return precio_90_noche if es_noche else precio_90_dia
+    elif duracion == "120 minutos":
+        return precio_120_noche if es_noche else precio_120_dia
+
+    return 0
 
 def crear_preferencia_mp(data):
     import os
@@ -130,7 +160,8 @@ def slots_reserva(horario, duracion):
             slots = horarios[idx:idx + 2]
         elif duracion == "90 minutos":
             slots = horarios[idx:idx + 3]
-
+        elif duracion == "120 minutos":
+            slots = horarios[idx:idx + 4]
     return slots
 
 
@@ -647,6 +678,8 @@ def admin():
                 return horarios[idx:idx+2]
             elif duracion == "90 minutos":
                 return horarios[idx:idx+3]
+            elif duracion == "120 minutos":
+                return horarios[idx:idx+4]
             else:
                 return [hora_inicio]
 
