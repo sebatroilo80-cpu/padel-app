@@ -1223,34 +1223,44 @@ def editar(id):
         # Datos anteriores
         estado_anterior = reserva_actual[8] or ""
         pagado_anterior = float(reserva_actual[9] or 0)
-        descuento_anterior = float(reserva_actual[10] or 0)
-        precio_final_anterior = float(reserva_actual[12] or reserva_actual[6] or 0)
 
-        # Nuevo cálculo
+        # Precio original del turno
         precio_original = float(calcular_precio(cursor, duracion, horario) or 0)
 
-        if descuento > precio_original:
-            descuento = precio_original
+        # Seña base
+        sena_base = round(precio_original * 0.30, 2)
 
-        precio_final = max(0.0, precio_original - descuento)
-
-        # Recalcular pagado automáticamente según el tipo real de reserva anterior
-        # Si antes era una reserva/seña, mantener 30% del nuevo total
+        # Nueva lógica:
+        # el descuento se aplica sobre lo que se cobra ahora, no sobre el total
         if estado_anterior in ["Reserva", "Pendiente reserva"]:
-            pagado = round(precio_final * 0.30, 2)
-        # Si antes estaba pagado completo, mantener pagado completo del nuevo total
+            if descuento > sena_base:
+                descuento = sena_base
+            pagado = max(0.0, sena_base - descuento)
+            estado_pago = "Reserva"
+
         elif estado_anterior == "Pagado":
-            pagado = precio_final
-        # Si era pendiente pago total, mantener 0
+            if descuento > precio_original:
+                descuento = precio_original
+            pagado = max(0.0, precio_original - descuento)
+            estado_pago = "Pagado"
+
         elif estado_anterior == "Pendiente pago total":
             pagado = 0.0
-        else:
-            # fallback: usar lo que venga del form pero capear al total final
-            pagado = limpiar_numero(request.form.get("pagado"))
-            if pagado > precio_final:
-                pagado = precio_final
+            estado_pago = "Pendiente pago total"
 
-        estado_pago = calcular_estado_desde_pagado(precio_final, pagado)
+        else:
+            # fallback
+            pagado = limpiar_numero(request.form.get("pagado"))
+            if descuento > precio_original:
+                descuento = precio_original
+            if pagado > precio_original:
+                pagado = precio_original
+            estado_pago = calcular_estado_desde_pagado(precio_original, pagado)
+
+        # Precio final guardado como referencia visual/contable
+        # En tu lógica actual, precio_final representa cuánto queda como valor de referencia del turno
+        # pero el descuento se aplicó al cobro actual
+        precio_final = precio_original
 
         cursor.execute("""
             UPDATE reservas
@@ -1275,7 +1285,7 @@ def editar(id):
             id
         ))
 
-        # ===== AJUSTE DE CAJA =====
+        # Ajuste de caja
         diferencia_pagado = round(pagado - pagado_anterior, 2)
 
         if diferencia_pagado != 0:
@@ -1285,10 +1295,12 @@ def editar(id):
                 tipo_mov = "ingreso"
                 monto_mov = diferencia_pagado
                 descripcion_mov = f"Ajuste positivo reserva #{id} - {nombre} - {cancha} - {horario}"
+                metodo_mov = metodo_pago
             else:
                 tipo_mov = "egreso"
                 monto_mov = abs(diferencia_pagado)
                 descripcion_mov = f"Ajuste descuento reserva #{id} - {nombre} - {cancha} - {horario}"
+                metodo_mov = "Ajuste"
 
             if descuento > 0 and motivo_descuento:
                 descripcion_mov += f" | Desc: {motivo_descuento}"
@@ -1301,7 +1313,7 @@ def editar(id):
                 tipo_mov,
                 descripcion_mov,
                 monto_mov,
-                metodo_pago if tipo_mov == "ingreso" else "Ajuste"
+                metodo_mov
             ))
 
         conn.commit()
