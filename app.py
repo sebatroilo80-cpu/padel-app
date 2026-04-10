@@ -1058,26 +1058,26 @@ def configuracion():
     cursor = conn.cursor()
 
     if request.method == "POST":
-    precio_60_dia = request.form["precio_60_dia"]
-    precio_60_noche = request.form["precio_60_noche"]
-    precio_90_dia = request.form["precio_90_dia"]
-    precio_90_noche = request.form["precio_90_noche"]
-    precio_120_dia = request.form["precio_120_dia"]
-    precio_120_noche = request.form["precio_120_noche"]
+        precio_60_dia = request.form["precio_60_dia"]
+        precio_60_noche = request.form["precio_60_noche"]
+        precio_90_dia = request.form["precio_90_dia"]
+        precio_90_noche = request.form["precio_90_noche"]
+        precio_120_dia = request.form["precio_120_dia"]
+        precio_120_noche = request.form["precio_120_noche"]
 
-    cursor.execute("""
-        UPDATE configuracion
-        SET precio_60_dia = ?, precio_60_noche = ?,
-            precio_90_dia = ?, precio_90_noche = ?,
-            precio_120_dia = ?, precio_120_noche = ?
-        WHERE id = 1
-    """, (
-        precio_60_dia, precio_60_noche,
-        precio_90_dia, precio_90_noche,
-        precio_120_dia, precio_120_noche
-    ))
+        cursor.execute("""
+            UPDATE configuracion
+            SET precio_60_dia = ?, precio_60_noche = ?,
+                precio_90_dia = ?, precio_90_noche = ?,
+                precio_120_dia = ?, precio_120_noche = ?
+            WHERE id = 1
+        """, (
+            precio_60_dia, precio_60_noche,
+            precio_90_dia, precio_90_noche,
+            precio_120_dia, precio_120_noche
+        ))
 
-    conn.commit()
+        conn.commit()
 
     config = obtener_config(cursor)
     if not config:
