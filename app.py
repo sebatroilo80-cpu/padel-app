@@ -42,6 +42,12 @@ columnas_reservas = [col[1] for col in cursor.fetchall()]
 if "whatsapp_enviado" not in columnas_reservas:
     cursor.execute("ALTER TABLE reservas ADD COLUMN whatsapp_enviado INTEGER DEFAULT 0")
 
+if "descuento" not in columnas_reservas:
+    cursor.execute("ALTER TABLE reservas ADD COLUMN descuento REAL DEFAULT 0")
+
+if "motivo_descuento" not in columnas_reservas:
+    cursor.execute("ALTER TABLE reservas ADD COLUMN motivo_descuento TEXT DEFAULT ''")
+
 # Configuración
 cursor.execute("PRAGMA table_info(configuracion)")
 columnas_config = [col[1] for col in cursor.fetchall()]
@@ -618,18 +624,20 @@ def admin():
     # =========================
     # CONFIGURACION
     # =========================
-    config = [25000, 30000, 35000, 40000]
+    config = [25000, 30000, 35000, 40000, 45000, 55000]
 
-    if tiene_config:
-        cursor.execute("""
-            SELECT precio_60_dia, precio_60_noche, precio_90_dia, precio_90_noche
-            FROM configuracion
-            ORDER BY id DESC
-            LIMIT 1
-        """)
-        fila_config = cursor.fetchone()
-        if fila_config:
-            config = list(fila_config)
+if tiene_config:
+    cursor.execute("""
+        SELECT precio_60_dia, precio_60_noche,
+               precio_90_dia, precio_90_noche,
+               precio_120_dia, precio_120_noche
+        FROM configuracion
+        ORDER BY id DESC
+        LIMIT 1
+    """)
+    fila_config = cursor.fetchone()
+    if fila_config:
+        config = list(fila_config)
 
     # =========================
     # GRILLA
@@ -1050,22 +1058,30 @@ def configuracion():
     cursor = conn.cursor()
 
     if request.method == "POST":
-        precio_60_dia = request.form["precio_60_dia"]
-        precio_60_noche = request.form["precio_60_noche"]
-        precio_90_dia = request.form["precio_90_dia"]
-        precio_90_noche = request.form["precio_90_noche"]
+    precio_60_dia = request.form["precio_60_dia"]
+    precio_60_noche = request.form["precio_60_noche"]
+    precio_90_dia = request.form["precio_90_dia"]
+    precio_90_noche = request.form["precio_90_noche"]
+    precio_120_dia = request.form["precio_120_dia"]
+    precio_120_noche = request.form["precio_120_noche"]
 
-        cursor.execute("""
-            UPDATE configuracion
-            SET precio_60_dia = ?, precio_60_noche = ?, precio_90_dia = ?, precio_90_noche = ?
-            WHERE id = 1
-        """, (precio_60_dia, precio_60_noche, precio_90_dia, precio_90_noche))
+    cursor.execute("""
+        UPDATE configuracion
+        SET precio_60_dia = ?, precio_60_noche = ?,
+            precio_90_dia = ?, precio_90_noche = ?,
+            precio_120_dia = ?, precio_120_noche = ?
+        WHERE id = 1
+    """, (
+        precio_60_dia, precio_60_noche,
+        precio_90_dia, precio_90_noche,
+        precio_120_dia, precio_120_noche
+    ))
 
-        conn.commit()
+    conn.commit()
 
     config = obtener_config(cursor)
     if not config:
-        config = [0, 0, 0, 0]
+        config = [25000, 30000, 35000, 40000, 45000, 55000]
 
     conn.close()
 
@@ -1084,6 +1100,8 @@ def admin_reservar():
     horario = request.form["horario"]
     metodo_pago = request.form["metodo_pago"]
     opcion_pago = request.form["opcion_pago"]
+    descuento = limpiar_numero(request.form.get("descuento"))
+    motivo_descuento = request.form.get("motivo_descuento", "")
 
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
@@ -1105,14 +1123,15 @@ def admin_reservar():
         conn.close()
         return "Ese horario ya está ocupado o bloqueado. Volvé atrás y elegí otro."
 
-    precio = calcular_precio(cursor, duracion, horario)
+    precio_original = calcular_precio(cursor, duracion, horario)
+    precio = max(0, precio_original - descuento)
     pagado = calcular_pagado_inicial(precio, opcion_pago)
     estado_pago = calcular_estado_desde_pagado(precio, pagado)
 
     cursor.execute("""
         INSERT INTO reservas (
             nombre, telefono, fecha, cancha, duracion, horario,
-            precio, metodo_pago, estado_pago, pagado
+            precio, metodo_pago, estado_pago, pagado, descuento, motivo_descuento
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
@@ -1125,7 +1144,9 @@ def admin_reservar():
         precio,
         metodo_pago,
         estado_pago,
-        pagado
+        pagado,
+        descuento,
+        motivo_descuento
     ))
 
     reserva_id = cursor.lastrowid

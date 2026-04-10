@@ -54,19 +54,24 @@
             </div>
 
             <div class="duraciones-app duraciones-app-pro" id="duracionesApp">
-                <button type="button" class="duracion-app-card duracion-app-card-pro" data-duracion="60 minutos">
-                    <span class="duracion-icono">🕐</span>
-                    <span class="duracion-main">1 hora</span>
-                    <small>Turno corto</small>
-                </button>
+    <button type="button" class="duracion-app-card duracion-app-card-pro" data-duracion="60 minutos">
+        <span class="duracion-icono">🕐</span>
+        <span class="duracion-main">1 hora</span>
+        <small>Turno corto</small>
+    </button>
 
-                <button type="button" class="duracion-app-card duracion-app-card-pro" data-duracion="90 minutos">
-                    <span class="duracion-icono">🕜</span>
-                    <span class="duracion-main">1:30 hs</span>
-                    <small>Turno completo</small>
-                </button>
-            </div>
-        </div>
+    <button type="button" class="duracion-app-card duracion-app-card-pro" data-duracion="90 minutos">
+        <span class="duracion-icono">🕜</span>
+        <span class="duracion-main">1:30 hs</span>
+        <small>Turno completo</small>
+    </button>
+
+    <button type="button" class="duracion-app-card duracion-app-card-pro" data-duracion="120 minutos">
+        <span class="duracion-icono">🕑</span>
+        <span class="duracion-main">2 horas</span>
+        <small>Turno extendido</small>
+    </button>
+</div>
     </section>
 
     <section class="cliente-canchas-app cliente-canchas-app-pro" id="canchasContainer"></section>
@@ -216,13 +221,22 @@ const formReserva = document.getElementById("formReserva");
 const datosTransferencia = document.getElementById("datos_transferencia");
 
 function precioSegunHora(duracion, horario) {
-    const hora = parseInt(horario.split(":")[0], 10);
+    const [hora, minuto] = horario.split(":").map(Number);
+    const inicioMin = hora * 60 + minuto;
 
-    if (hora < 18) {
-        return duracion === "60 minutos" ? config[0] : config[2];
-    } else {
-        return duracion === "60 minutos" ? config[1] : config[3];
+    if (duracion === "60 minutos") {
+        return inicioMin >= (17 * 60) ? config[1] : config[0];
     }
+
+    if (duracion === "90 minutos") {
+        return inicioMin >= (16 * 60 + 30) ? config[3] : config[2];
+    }
+
+    if (duracion === "120 minutos") {
+        return inicioMin >= (16 * 60) ? config[5] : config[4];
+    }
+
+    return 0;
 }
 
 function slotsNecesarios(horario, duracion) {
@@ -232,7 +246,16 @@ function slotsNecesarios(horario, duracion) {
     if (duracion === "60 minutos") {
         return horariosBase.slice(idx, idx + 2);
     }
-    return horariosBase.slice(idx, idx + 3);
+
+    if (duracion === "90 minutos") {
+        return horariosBase.slice(idx, idx + 3);
+    }
+
+    if (duracion === "120 minutos") {
+        return horariosBase.slice(idx, idx + 4);
+    }
+
+    return [];
 }
 
 function estaOcupado(fecha, cancha, horario) {

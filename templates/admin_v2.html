@@ -551,6 +551,7 @@
                         <option value="">Elegí duración</option>
                         <option>60 minutos</option>
                         <option>90 minutos</option>
+                        <option>120 minutos</option>
                     </select>
                 </div>
 
@@ -565,7 +566,17 @@
                     </select>
                 </div>
             </div>
+            <div class="modal-grid-2">
+                <div class="modal-field-app">
+                <label>Descuento</label>
+                <input type="number" name="descuento" class="campo campo-app" min="0" step="0.01" placeholder="0">
+            </div>
 
+            <div class="modal-field-app">
+                <label>Motivo del descuento</label>
+                <input type="text" name="motivo_descuento" class="campo campo-app" placeholder="Ej: Clase, promo, práctica">
+           </div>
+        </div>
             <div class="modal-field-app">
                 <label>Cómo querés cobrar</label>
                 <select name="opcion_pago" class="campo campo-app" required>
