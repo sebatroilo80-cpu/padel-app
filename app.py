@@ -626,18 +626,18 @@ def admin():
     # =========================
     config = [25000, 30000, 35000, 40000, 45000, 55000]
 
-if tiene_config:
-    cursor.execute("""
-        SELECT precio_60_dia, precio_60_noche,
-               precio_90_dia, precio_90_noche,
-               precio_120_dia, precio_120_noche
-        FROM configuracion
-        ORDER BY id DESC
-        LIMIT 1
-    """)
-    fila_config = cursor.fetchone()
-    if fila_config:
-        config = list(fila_config)
+    if tiene_config:
+        cursor.execute("""
+            SELECT precio_60_dia, precio_60_noche,
+                   precio_90_dia, precio_90_noche,
+                   precio_120_dia, precio_120_noche
+            FROM configuracion
+            ORDER BY id DESC
+            LIMIT 1
+        """)
+        fila_config = cursor.fetchone()
+        if fila_config:
+            config = list(fila_config)
 
     # =========================
     # GRILLA
