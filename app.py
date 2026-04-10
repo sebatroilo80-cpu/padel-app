@@ -1185,7 +1185,7 @@ def editar(id):
 
     if request.method == "POST":
         cursor.execute("""
-            SELECT nombre, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado
+            SELECT nombre, telefono, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado
             FROM reservas
             WHERE id = ?
         """, (id,))
@@ -1195,9 +1195,10 @@ def editar(id):
             conn.close()
             return "Reserva no encontrada"
 
-        pagado_anterior = float(reserva_actual[8] or 0)
+        pagado_anterior = float(reserva_actual[9] or 0)
 
         nombre = request.form["nombre"]
+        telefono = request.form["telefono"]
         fecha = request.form["fecha"]
         cancha = request.form["cancha"]
         duracion = request.form["duracion"]
@@ -1226,6 +1227,7 @@ def editar(id):
             WHERE id = ?
         """, (
             nombre,
+            telefono,
             fecha,
             cancha,
             duracion,
@@ -1262,6 +1264,9 @@ def editar(id):
                     texto_mov = f"Saldo completado reserva #{id} - {nombre} - {cancha} - {horario}"
                 else:
                     texto_mov = f"Pago adicional reserva #{id} - {nombre} - {cancha} - {horario}"
+
+                if descuento > 0 and motivo_descuento:
+                    texto_mov += f" | Desc: {motivo_descuento}"
 
                 cursor.execute(f"""
                     INSERT INTO movimientos (fecha, tipo, {campo_texto}, monto, metodo_pago)
