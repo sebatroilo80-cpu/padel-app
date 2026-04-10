@@ -48,6 +48,9 @@ if "descuento" not in columnas_reservas:
 if "motivo_descuento" not in columnas_reservas:
     cursor.execute("ALTER TABLE reservas ADD COLUMN motivo_descuento TEXT DEFAULT ''")
 
+if "precio_final" not in columnas_reservas:
+    cursor.execute("ALTER TABLE reservas ADD COLUMN precio_final REAL DEFAULT 0")
+
 # Configuración
 cursor.execute("PRAGMA table_info(configuracion)")
 columnas_config = [col[1] for col in cursor.fetchall()]
