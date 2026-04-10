@@ -94,11 +94,10 @@
         <div>Falta abonar: ${{ falta }}</div>
     {% endif %}
 </div>
-</div>
 
 
         <!-- BOTONES -->
-        <button class="btn-main">Guardar cambios</button>
+        <button type="submit" class="btn-app btn-guardar">Guardar cambios</button>
 
         {% if reserva[8] == "Transferencia" and reserva[9] == "Pendiente reserva" %}
             <a href="/confirmar_transferencia/{{ reserva[0] }}">
