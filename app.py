@@ -1220,47 +1220,34 @@ def editar(id):
             conn.close()
             return "Ese horario ya está ocupado o bloqueado. Volvé atrás y elegí otro."
 
-        # Datos anteriores
-        estado_anterior = reserva_actual[8] or ""
+        estado_anterior = (reserva_actual[8] or "").strip()
         pagado_anterior = float(reserva_actual[9] or 0)
 
-        # Precio original del turno
         precio_original = float(calcular_precio(cursor, duracion, horario) or 0)
-
-        # Seña base
         sena_base = round(precio_original * 0.30, 2)
 
-        # Nueva lógica:
-        # el descuento se aplica sobre lo que se cobra ahora, no sobre el total
+        # Lógica nueva:
+        # - Reserva: siempre mantiene la seña normal, sin descuento aplicado a la reserva
+        # - El descuento solo baja el saldo / total final
+        if descuento > precio_original:
+            descuento = precio_original
+
+        total_final = max(0.0, precio_original - descuento)
+
         if estado_anterior in ["Reserva", "Pendiente reserva"]:
-            if descuento > sena_base:
-                descuento = sena_base
-            pagado = max(0.0, sena_base - descuento)
+            pagado = sena_base
             estado_pago = "Reserva"
-
-        elif estado_anterior == "Pagado":
-            if descuento > precio_original:
-                descuento = precio_original
-            pagado = max(0.0, precio_original - descuento)
-            estado_pago = "Pagado"
-
         elif estado_anterior == "Pendiente pago total":
             pagado = 0.0
             estado_pago = "Pendiente pago total"
-
+        elif estado_anterior == "Pagado":
+            pagado = total_final
+            estado_pago = "Pagado"
         else:
-            # fallback
             pagado = limpiar_numero(request.form.get("pagado"))
-            if descuento > precio_original:
-                descuento = precio_original
-            if pagado > precio_original:
-                pagado = precio_original
-            estado_pago = calcular_estado_desde_pagado(precio_original, pagado)
-
-        # Precio final guardado como referencia visual/contable
-        # En tu lógica actual, precio_final representa cuánto queda como valor de referencia del turno
-        # pero el descuento se aplicó al cobro actual
-        precio_final = precio_original
+            if pagado > total_final:
+                pagado = total_final
+            estado_pago = calcular_estado_desde_pagado(total_final, pagado)
 
         cursor.execute("""
             UPDATE reservas
@@ -1281,11 +1268,11 @@ def editar(id):
             pagado,
             descuento,
             motivo_descuento,
-            precio_final,
+            total_final,
             id
         ))
 
-        # Ajuste de caja
+        # Ajuste de caja solo si cambia lo realmente cobrado
         diferencia_pagado = round(pagado - pagado_anterior, 2)
 
         if diferencia_pagado != 0:

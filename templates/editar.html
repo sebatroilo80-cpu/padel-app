@@ -66,11 +66,34 @@
         <!-- Resumen -->
 <div class="app-resumen">
     <div>Estado: <b>{{ reserva[9] }}</b></div>
-    <div>Precio original: ${{ reserva[7] }}</div>
-    <div>Descuento: ${{ reserva[12] if reserva|length > 12 else 0 }}</div>
-    <div style="font-size: 20px; font-weight: bold;">
-        Total final: ${{ reserva[14] if reserva|length > 14 else reserva[7] }}
-    </div>
+
+    {% set precio_original = reserva[7] %}
+    {% set abonado = reserva[10] if reserva|length > 10 else 0 %}
+    {% set descuento = reserva[12] if reserva|length > 12 else 0 %}
+    {% set total_final = reserva[14] if reserva|length > 14 else precio_original %}
+    {% set sena_base = precio_original * 0.30 %}
+    {% set falta = total_final - abonado %}
+
+    <div>Precio original: ${{ precio_original }}</div>
+
+    {% if reserva[9] == "Reserva" or reserva[9] == "Pendiente reserva" %}
+        <div>Seña base (30%): ${{ sena_base }}</div>
+        <div>Descuento aplicado al saldo: ${{ descuento }}</div>
+        <div style="font-size: 18px; font-weight: bold;">Abonado: ${{ abonado }}</div>
+        <div>Saldo final del turno: ${{ total_final }}</div>
+        <div>Falta abonar: ${{ falta }}</div>
+    {% elif reserva[9] == "Pagado" %}
+        <div>Descuento: ${{ descuento }}</div>
+        <div>Total final del turno: ${{ total_final }}</div>
+        <div style="font-size: 18px; font-weight: bold;">Total abonado: ${{ abonado }}</div>
+        <div>Falta abonar: $0</div>
+    {% else %}
+        <div>Descuento: ${{ descuento }}</div>
+        <div>Total final del turno: ${{ total_final }}</div>
+        <div style="font-size: 18px; font-weight: bold;">Pagado: ${{ abonado }}</div>
+        <div>Falta abonar: ${{ falta }}</div>
+    {% endif %}
+</div>
 </div>
 
 
