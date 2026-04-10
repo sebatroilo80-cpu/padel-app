@@ -51,6 +51,12 @@ if "motivo_descuento" not in columnas_reservas:
 if "precio_final" not in columnas_reservas:
     cursor.execute("ALTER TABLE reservas ADD COLUMN precio_final REAL DEFAULT 0")
 
+cursor.execute("""
+    UPDATE reservas
+    SET precio_final = precio
+    WHERE precio_final IS NULL OR precio_final = 0
+""")
+
 # Configuración
 cursor.execute("PRAGMA table_info(configuracion)")
 columnas_config = [col[1] for col in cursor.fetchall()]
@@ -1200,8 +1206,6 @@ def editar(id):
             conn.close()
             return "Reserva no encontrada"
 
-        pagado_anterior = float(reserva_actual[9] or 0)
-
         nombre = request.form["nombre"]
         telefono = request.form["telefono"]
         fecha = request.form["fecha"]
@@ -1209,7 +1213,6 @@ def editar(id):
         duracion = request.form["duracion"]
         horario = request.form["horario"]
         metodo_pago = request.form["metodo_pago"]
-        pagado = limpiar_numero(request.form.get("pagado"))
         descuento = limpiar_numero(request.form.get("descuento"))
         motivo_descuento = request.form.get("motivo_descuento", "").strip()
 
@@ -1217,15 +1220,35 @@ def editar(id):
             conn.close()
             return "Ese horario ya está ocupado o bloqueado. Volvé atrás y elegí otro."
 
-        precio_original = calcular_precio(cursor, duracion, horario)
+        # Datos anteriores
+        estado_anterior = reserva_actual[8] or ""
+        pagado_anterior = float(reserva_actual[9] or 0)
+        descuento_anterior = float(reserva_actual[10] or 0)
+        precio_final_anterior = float(reserva_actual[12] or reserva_actual[6] or 0)
+
+        # Nuevo cálculo
+        precio_original = float(calcular_precio(cursor, duracion, horario) or 0)
 
         if descuento > precio_original:
             descuento = precio_original
 
-        precio_final = max(0, precio_original - descuento)
+        precio_final = max(0.0, precio_original - descuento)
 
-        if pagado > precio_final:
+        # Recalcular pagado automáticamente según el tipo real de reserva anterior
+        # Si antes era una reserva/seña, mantener 30% del nuevo total
+        if estado_anterior in ["Reserva", "Pendiente reserva"]:
+            pagado = round(precio_final * 0.30, 2)
+        # Si antes estaba pagado completo, mantener pagado completo del nuevo total
+        elif estado_anterior == "Pagado":
             pagado = precio_final
+        # Si era pendiente pago total, mantener 0
+        elif estado_anterior == "Pendiente pago total":
+            pagado = 0.0
+        else:
+            # fallback: usar lo que venga del form pero capear al total final
+            pagado = limpiar_numero(request.form.get("pagado"))
+            if pagado > precio_final:
+                pagado = precio_final
 
         estado_pago = calcular_estado_desde_pagado(precio_final, pagado)
 
@@ -1252,43 +1275,34 @@ def editar(id):
             id
         ))
 
-        diferencia = float(pagado) - float(pagado_anterior)
+        # ===== AJUSTE DE CAJA =====
+        diferencia_pagado = round(pagado - pagado_anterior, 2)
 
-        if diferencia > 0:
+        if diferencia_pagado != 0:
             fecha_mov = date.today().strftime("%Y-%m-%d")
 
+            if diferencia_pagado > 0:
+                tipo_mov = "ingreso"
+                monto_mov = diferencia_pagado
+                descripcion_mov = f"Ajuste positivo reserva #{id} - {nombre} - {cancha} - {horario}"
+            else:
+                tipo_mov = "egreso"
+                monto_mov = abs(diferencia_pagado)
+                descripcion_mov = f"Ajuste descuento reserva #{id} - {nombre} - {cancha} - {horario}"
+
+            if descuento > 0 and motivo_descuento:
+                descripcion_mov += f" | Desc: {motivo_descuento}"
+
             cursor.execute("""
-                SELECT name
-                FROM sqlite_master
-                WHERE type='table'
-            """)
-            tablas = [t[0] for t in cursor.fetchall()]
-
-            if "movimientos" in tablas:
-                cursor.execute("PRAGMA table_info(movimientos)")
-                columnas = [col[1] for col in cursor.fetchall()]
-                campo_texto = "descripcion" if "descripcion" in columnas else "concepto"
-
-                if float(pagado_anterior) == 0 and float(pagado) == float(precio_final):
-                    texto_mov = f"Pago total reserva #{id} - {nombre} - {cancha} - {horario}"
-                elif float(pagado_anterior) > 0 and float(pagado) == float(precio_final):
-                    texto_mov = f"Saldo completado reserva #{id} - {nombre} - {cancha} - {horario}"
-                else:
-                    texto_mov = f"Pago adicional reserva #{id} - {nombre} - {cancha} - {horario}"
-
-                if descuento > 0 and motivo_descuento:
-                    texto_mov += f" | Desc: {motivo_descuento}"
-
-                cursor.execute(f"""
-                    INSERT INTO movimientos (fecha, tipo, {campo_texto}, monto, metodo_pago)
-                    VALUES (?, ?, ?, ?, ?)
-                """, (
-                    fecha_mov,
-                    "ingreso",
-                    texto_mov,
-                    diferencia,
-                    metodo_pago
-                ))
+                INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                fecha_mov,
+                tipo_mov,
+                descripcion_mov,
+                monto_mov,
+                metodo_pago if tipo_mov == "ingreso" else "Ajuste"
+            ))
 
         conn.commit()
         conn.close()
