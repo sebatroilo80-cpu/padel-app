@@ -740,7 +740,7 @@ def admin():
         reservas = cursor.fetchall()
 
     # =========================
-    # EGRESOS UNIFICADOS
+    # EGRESOS / MOVIMIENTOS UNIFICADOS
     # =========================
     egresos = []
 
@@ -770,12 +770,15 @@ def admin():
     # =========================
     ingresos_hoy = 0.0
     egresos_hoy = 0.0
+    descuentos_hoy = 0.0
+
     efectivo_hoy = 0.0
     transferencia_hoy = 0.0
     mercado_pago_hoy = 0.0
     qr_hoy = 0.0
 
     if tiene_movimientos:
+        # Ingresos del día
         cursor.execute("""
             SELECT COALESCE(SUM(monto), 0)
             FROM movimientos
@@ -783,13 +786,33 @@ def admin():
         """, (fecha_admin,))
         ingresos_hoy = float(cursor.fetchone()[0] or 0)
 
+        # Egresos reales del día (sin descuentos)
         cursor.execute("""
             SELECT COALESCE(SUM(monto), 0)
             FROM movimientos
-            WHERE tipo = 'egreso' AND fecha = ?
+            WHERE tipo = 'egreso'
+              AND fecha = ?
+              AND descripcion NOT LIKE 'Descuento reserva #%'
+              AND descripcion NOT LIKE 'Ajuste descuento reserva #%'
+              AND descripcion NOT LIKE 'Ajuste negativo reserva #%'
         """, (fecha_admin,))
-        egresos_hoy += float(cursor.fetchone()[0] or 0)
+        egresos_hoy = float(cursor.fetchone()[0] or 0)
 
+        # Descuentos del día
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'egreso'
+              AND fecha = ?
+              AND (
+                    descripcion LIKE 'Descuento reserva #%'
+                 OR descripcion LIKE 'Ajuste descuento reserva #%'
+                 OR descripcion LIKE 'Ajuste negativo reserva #%'
+              )
+        """, (fecha_admin,))
+        descuentos_hoy = float(cursor.fetchone()[0] or 0)
+
+        # Medios de pago (solo ingresos)
         cursor.execute("""
             SELECT COALESCE(SUM(monto), 0)
             FROM movimientos
@@ -826,13 +849,14 @@ def admin():
         """, (fecha_admin,))
         egresos_hoy += float(cursor.fetchone()[0] or 0)
 
-    total_hoy = ingresos_hoy - egresos_hoy
+    total_hoy = ingresos_hoy - egresos_hoy - descuentos_hoy
 
     # =========================
     # CAJA MENSUAL
     # =========================
     ingresos_mes = 0.0
     egresos_mes = 0.0
+    descuentos_mes = 0.0
 
     if tiene_movimientos:
         cursor.execute("""
@@ -845,9 +869,26 @@ def admin():
         cursor.execute("""
             SELECT COALESCE(SUM(monto), 0)
             FROM movimientos
-            WHERE tipo = 'egreso' AND substr(fecha, 1, 7) = ?
+            WHERE tipo = 'egreso'
+              AND substr(fecha, 1, 7) = ?
+              AND descripcion NOT LIKE 'Descuento reserva #%'
+              AND descripcion NOT LIKE 'Ajuste descuento reserva #%'
+              AND descripcion NOT LIKE 'Ajuste negativo reserva #%'
         """, (mes_actual,))
-        egresos_mes += float(cursor.fetchone()[0] or 0)
+        egresos_mes = float(cursor.fetchone()[0] or 0)
+
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'egreso'
+              AND substr(fecha, 1, 7) = ?
+              AND (
+                    descripcion LIKE 'Descuento reserva #%'
+                 OR descripcion LIKE 'Ajuste descuento reserva #%'
+                 OR descripcion LIKE 'Ajuste negativo reserva #%'
+              )
+        """, (mes_actual,))
+        descuentos_mes = float(cursor.fetchone()[0] or 0)
 
     if tiene_egresos:
         cursor.execute("""
@@ -857,13 +898,14 @@ def admin():
         """, (mes_actual,))
         egresos_mes += float(cursor.fetchone()[0] or 0)
 
-    total_mes = ingresos_mes - egresos_mes
+    total_mes = ingresos_mes - egresos_mes - descuentos_mes
 
     # =========================
     # CAJA ANUAL
     # =========================
     ingresos_anio = 0.0
     egresos_anio = 0.0
+    descuentos_anio = 0.0
 
     if tiene_movimientos:
         cursor.execute("""
@@ -876,9 +918,26 @@ def admin():
         cursor.execute("""
             SELECT COALESCE(SUM(monto), 0)
             FROM movimientos
-            WHERE tipo = 'egreso' AND substr(fecha, 1, 4) = ?
+            WHERE tipo = 'egreso'
+              AND substr(fecha, 1, 4) = ?
+              AND descripcion NOT LIKE 'Descuento reserva #%'
+              AND descripcion NOT LIKE 'Ajuste descuento reserva #%'
+              AND descripcion NOT LIKE 'Ajuste negativo reserva #%'
         """, (anio_actual,))
-        egresos_anio += float(cursor.fetchone()[0] or 0)
+        egresos_anio = float(cursor.fetchone()[0] or 0)
+
+        cursor.execute("""
+            SELECT COALESCE(SUM(monto), 0)
+            FROM movimientos
+            WHERE tipo = 'egreso'
+              AND substr(fecha, 1, 4) = ?
+              AND (
+                    descripcion LIKE 'Descuento reserva #%'
+                 OR descripcion LIKE 'Ajuste descuento reserva #%'
+                 OR descripcion LIKE 'Ajuste negativo reserva #%'
+              )
+        """, (anio_actual,))
+        descuentos_anio = float(cursor.fetchone()[0] or 0)
 
     if tiene_egresos:
         cursor.execute("""
@@ -888,7 +947,7 @@ def admin():
         """, (anio_actual,))
         egresos_anio += float(cursor.fetchone()[0] or 0)
 
-    total_anio = ingresos_anio - egresos_anio
+    total_anio = ingresos_anio - egresos_anio - descuentos_anio
 
     # =========================
     # REPORTE MENSUAL
@@ -907,6 +966,7 @@ def admin():
 
         ingresos = 0.0
         egresos_mes_item = 0.0
+        descuentos_mes_item = 0.0
 
         if tiene_movimientos:
             cursor.execute("""
@@ -919,9 +979,26 @@ def admin():
             cursor.execute("""
                 SELECT COALESCE(SUM(monto), 0)
                 FROM movimientos
-                WHERE tipo = 'egreso' AND substr(fecha, 1, 7) = ?
+                WHERE tipo = 'egreso'
+                  AND substr(fecha, 1, 7) = ?
+                  AND descripcion NOT LIKE 'Descuento reserva #%'
+                  AND descripcion NOT LIKE 'Ajuste descuento reserva #%'
+                  AND descripcion NOT LIKE 'Ajuste negativo reserva #%'
             """, (clave_mes,))
-            egresos_mes_item += float(cursor.fetchone()[0] or 0)
+            egresos_mes_item = float(cursor.fetchone()[0] or 0)
+
+            cursor.execute("""
+                SELECT COALESCE(SUM(monto), 0)
+                FROM movimientos
+                WHERE tipo = 'egreso'
+                  AND substr(fecha, 1, 7) = ?
+                  AND (
+                        descripcion LIKE 'Descuento reserva #%'
+                     OR descripcion LIKE 'Ajuste descuento reserva #%'
+                     OR descripcion LIKE 'Ajuste negativo reserva #%'
+                  )
+            """, (clave_mes,))
+            descuentos_mes_item = float(cursor.fetchone()[0] or 0)
 
         if tiene_egresos:
             cursor.execute("""
@@ -931,12 +1008,13 @@ def admin():
             """, (clave_mes,))
             egresos_mes_item += float(cursor.fetchone()[0] or 0)
 
-        saldo = ingresos - egresos_mes_item
+        saldo = ingresos - egresos_mes_item - descuentos_mes_item
 
         reporte_mensual.append({
             "mes": nombres_meses[mes_num],
             "ingresos": ingresos,
             "egresos": egresos_mes_item,
+            "descuentos": descuentos_mes_item,
             "saldo": saldo
         })
 
@@ -1040,6 +1118,7 @@ def admin():
         config=config,
         ingresos_hoy=ingresos_hoy,
         egresos_hoy=egresos_hoy,
+        descuentos_hoy=descuentos_hoy,
         efectivo_hoy=efectivo_hoy,
         transferencia_hoy=transferencia_hoy,
         mercado_pago_hoy=mercado_pago_hoy,
@@ -1047,6 +1126,8 @@ def admin():
         total_hoy=total_hoy,
         total_mes=total_mes,
         total_anio=total_anio,
+        descuentos_mes=descuentos_mes,
+        descuentos_anio=descuentos_anio,
         reporte_mensual=reporte_mensual,
         horarios_mas_usados=horarios_mas_usados,
         dias_mas_usados=dias_mas_usados,
