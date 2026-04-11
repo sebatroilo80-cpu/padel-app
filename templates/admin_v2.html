@@ -154,7 +154,7 @@
     </div>
 </section>
 
-        <<!-- RESERVAS -->
+        <!-- RESERVAS -->
 <section id="seccion-reservas" class="adminv2-seccion {% if active_tab == 'reservas' %}activa{% endif %}">
     <div class="adminv2-grilla-box">
         <div class="adminv2-section-head reservas-head-v2">
@@ -281,7 +281,7 @@
         {% endif %}
     </div>
 </section>
-        <!-- CAJA -->
+  
         <!-- CAJA -->
 <section id="seccion-caja" class="adminv2-seccion {% if active_tab == 'caja' %}activa{% endif %}">
     <div class="wallet-wrap">
@@ -299,26 +299,31 @@
         </div>
 
         <div class="wallet-mini-grid">
-            <div class="wallet-mini-card ingreso">
-                <span>Ingresos del día</span>
-                <strong>${{ ingresos_hoy }}</strong>
-            </div>
+    <div class="wallet-mini-card ingreso">
+        <span>Ingresos del día</span>
+        <strong>${{ ingresos_hoy }}</strong>
+    </div>
 
-            <div class="wallet-mini-card egreso">
-                <span>Egresos del día</span>
-                <strong>${{ egresos_hoy }}</strong>
-            </div>
+    <div class="wallet-mini-card egreso">
+        <span>Egresos del día</span>
+        <strong>${{ egresos_hoy }}</strong>
+    </div>
 
-            <div class="wallet-mini-card neutro">
-                <span>Saldo del mes</span>
-                <strong>${{ total_mes }}</strong>
-            </div>
+    <div class="wallet-mini-card descuento">
+        <span>Descuentos del día</span>
+        <strong>${{ descuentos_hoy }}</strong>
+    </div>
 
-            <div class="wallet-mini-card neutro">
-                <span>Saldo del año</span>
-                <strong>${{ total_anio }}</strong>
-            </div>
-        </div>
+    <div class="wallet-mini-card neutro">
+        <span>Saldo del mes</span>
+        <strong>${{ total_mes }}</strong>
+    </div>
+
+    <div class="wallet-mini-card neutro">
+        <span>Saldo del año</span>
+        <strong>${{ total_anio }}</strong>
+    </div>
+</div>
 
         <div class="wallet-section">
             <div class="wallet-section-head">
@@ -350,22 +355,28 @@
 
         <div class="wallet-section">
             <div class="wallet-section-head">
-                <h3>Historial de egresos</h3>
+                <h3>Historial de egresos y descuentos</h3>
             </div>
 
             {% if egresos and egresos|length > 0 %}
                 <div class="wallet-mov-list">
                     {% for e in egresos %}
-                    <div class="wallet-mov-item egreso">
-                        <div class="wallet-mov-icon">↘️</div>
-                        <div class="wallet-mov-info">
-                            <strong>{{ e[3] }}</strong>
-                            <small>{{ e[1] }}</small>
-                        </div>
-                        <div class="wallet-mov-amount negativo">
-                            - ${{ e[4] }}
-                        </div>
-                    </div>
+                    <div class="wallet-mov-item {% if 'Descuento reserva #' in e[3] or 'Ajuste descuento reserva #' in e[3] or 'Ajuste negativo reserva #' in e[3] %}descuento{% else %}egreso{% endif %}">
+    <div class="wallet-mov-icon">
+        {% if 'Descuento reserva #' in e[3] or 'Ajuste descuento reserva #' in e[3] or 'Ajuste negativo reserva #' in e[3] %}
+            🏷️
+        {% else %}
+            ↘️
+        {% endif %}
+    </div>
+    <div class="wallet-mov-info">
+        <strong>{{ e[3] }}</strong>
+        <small>{{ e[1] }}</small>
+    </div>
+    <div class="wallet-mov-amount negativo">
+        - ${{ e[4] }}
+    </div>
+</div>
                     {% endfor %}
                 </div>
             {% else %}
@@ -626,10 +637,14 @@ function calcularPrecioModal() {
     let precio = 0;
 
     if (hora < 18) {
-        precio = duracion === "60 minutos" ? config[0] : config[2];
-    } else {
-        precio = duracion === "60 minutos" ? config[1] : config[3];
-    }
+    if (duracion === "60 minutos") precio = config[0];
+    else if (duracion === "90 minutos") precio = config[2];
+    else if (duracion === "120 minutos") precio = config[4];
+} else {
+    if (duracion === "60 minutos") precio = config[1];
+    else if (duracion === "90 minutos") precio = config[3];
+    else if (duracion === "120 minutos") precio = config[5];
+}
 
     texto.innerText = "Precio: $" + precio;
 }

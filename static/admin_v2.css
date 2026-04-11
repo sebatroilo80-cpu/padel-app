@@ -1880,3 +1880,10 @@ body.adminv2-body {
         grid-template-columns: 1fr;
     }
 }
+.wallet-mini-card.descuento {
+    border-left: 4px solid #d4af37;
+}
+
+.wallet-mov-item.descuento {
+    border-left: 4px solid #d4af37;
+}
