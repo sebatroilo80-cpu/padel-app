@@ -1221,21 +1221,27 @@ def editar(id):
             conn.close()
             return "Ese horario ya está ocupado o bloqueado. Volvé atrás y elegí otro."
 
+        # Datos anteriores
         estado_anterior = (reserva_actual[8] or "").strip()
         pagado_anterior = float(reserva_actual[9] or 0)
 
         precio_original = float(calcular_precio(cursor, duracion, horario) or 0)
         sena_base = round(precio_original * 0.30, 2)
 
-        # Lógica nueva:
-        # - Reserva: siempre mantiene la seña normal, sin descuento aplicado a la reserva
-        # - El descuento solo baja el saldo / total final
         if descuento > precio_original:
             descuento = precio_original
 
         total_final = max(0.0, precio_original - descuento)
 
+        # Valor por defecto
+        pagado = pagado_anterior
+        estado_pago = estado_pago_nuevo
+
+        # =========================
+        # LOGICA NUEVA
+        # =========================
         if estado_pago_nuevo == "Reserva":
+            # La reserva siempre deja la seña normal, sin descuento
             pagado = sena_base
             estado_pago = "Reserva"
 
@@ -1244,20 +1250,19 @@ def editar(id):
             estado_pago = "Pendiente reserva"
 
         elif estado_pago_nuevo == "Pendiente pago total":
+            # Mantiene lo ya pagado
             pagado = pagado_anterior
             estado_pago = "Pendiente pago total"
 
         elif estado_pago_nuevo == "Pagado":
-    # si ya había una seña cargada, el descuento baja el saldo restante
-    # total_final = precio original - descuento
+            # Al completar pago:
+            # total pagado final = precio original - descuento
             pagado = total_final
             estado_pago = "Pagado"
 
         else:
-            pagado = limpiar_numero(request.form.get("pagado"))
-            if pagado > total_final:
-                pagado = total_final
-            estado_pago = calcular_estado_desde_pagado(total_final, pagado)
+            pagado = pagado_anterior
+            estado_pago = estado_pago_nuevo
 
         cursor.execute("""
             UPDATE reservas
@@ -1282,36 +1287,84 @@ def editar(id):
             id
         ))
 
-        # Ajuste de caja solo si cambia lo realmente cobrado
-        diferencia_pagado = round(pagado - pagado_anterior, 2)
+        # =========================
+        # IMPACTO EN CAJA
+        # =========================
+        fecha_mov = date.today().strftime("%Y-%m-%d")
 
-        if diferencia_pagado != 0:
-            fecha_mov = date.today().strftime("%Y-%m-%d")
+        # Caso 1: pasa de Reserva/Pendiente a Pagado
+        # Debe ingresar solo el saldo cobrado realmente
+        if estado_pago_nuevo == "Pagado" and estado_anterior != "Pagado":
+            saldo_a_cobrar = round(total_final - pagado_anterior, 2)
+
+            if saldo_a_cobrar > 0:
+                descripcion_ingreso = f"Pago saldo reserva #{id} - {nombre} - {cancha} - {horario}"
+                if descuento > 0 and motivo_descuento:
+                    descripcion_ingreso += f" | Desc: {motivo_descuento}"
+
+                cursor.execute("""
+                    INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (
+                    fecha_mov,
+                    "ingreso",
+                    descripcion_ingreso,
+                    saldo_a_cobrar,
+                    metodo_pago
+                ))
+
+            # El descuento se registra como egreso solo al completar el pago
+            if descuento > 0:
+                descripcion_egreso = f"Descuento reserva #{id} - {nombre} - {cancha} - {horario}"
+                if motivo_descuento:
+                    descripcion_egreso += f" | {motivo_descuento}"
+
+                cursor.execute("""
+                    INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (
+                    fecha_mov,
+                    "egreso",
+                    descripcion_egreso,
+                    descuento,
+                    "Ajuste"
+                ))
+
+        # Caso 2: ya estaba Pagado y cambia el total
+        elif estado_anterior == "Pagado" and estado_pago_nuevo == "Pagado":
+            diferencia_pagado = round(pagado - pagado_anterior, 2)
 
             if diferencia_pagado > 0:
-                tipo_mov = "ingreso"
-                monto_mov = diferencia_pagado
                 descripcion_mov = f"Ajuste positivo reserva #{id} - {nombre} - {cancha} - {horario}"
-                metodo_mov = metodo_pago
-            else:
-                tipo_mov = "egreso"
-                monto_mov = abs(diferencia_pagado)
+                if descuento > 0 and motivo_descuento:
+                    descripcion_mov += f" | Desc: {motivo_descuento}"
+
+                cursor.execute("""
+                    INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (
+                    fecha_mov,
+                    "ingreso",
+                    descripcion_mov,
+                    diferencia_pagado,
+                    metodo_pago
+                ))
+
+            elif diferencia_pagado < 0:
                 descripcion_mov = f"Ajuste descuento reserva #{id} - {nombre} - {cancha} - {horario}"
-                metodo_mov = "Ajuste"
+                if descuento > 0 and motivo_descuento:
+                    descripcion_mov += f" | Desc: {motivo_descuento}"
 
-            if descuento > 0 and motivo_descuento:
-                descripcion_mov += f" | Desc: {motivo_descuento}"
-
-            cursor.execute("""
-                INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
-                VALUES (?, ?, ?, ?, ?)
-            """, (
-                fecha_mov,
-                tipo_mov,
-                descripcion_mov,
-                monto_mov,
-                metodo_mov
-            ))
+                cursor.execute("""
+                    INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (
+                    fecha_mov,
+                    "egreso",
+                    descripcion_mov,
+                    abs(diferencia_pagado),
+                    "Ajuste"
+                ))
 
         conn.commit()
         conn.close()
