@@ -50,6 +50,11 @@ if "motivo_descuento" not in columnas_reservas:
 
 if "precio_final" not in columnas_reservas:
     cursor.execute("ALTER TABLE reservas ADD COLUMN precio_final REAL DEFAULT 0")
+if "es_fijo" not in columnas_reservas:
+    cursor.execute("ALTER TABLE reservas ADD COLUMN es_fijo INTEGER DEFAULT 0")
+
+if "grupo_fijo" not in columnas_reservas:
+    cursor.execute("ALTER TABLE reservas ADD COLUMN grupo_fijo TEXT DEFAULT ''")
 
 cursor.execute("""
     UPDATE reservas
