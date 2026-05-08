@@ -565,18 +565,7 @@
                         <option>90 minutos</option>
                         <option>120 minutos</option>
                     </select>
-                </div>
 
-                <div class="modal-field-app">
-                    <label>Método de pago</label>
-                    <select name="metodo_pago" class="campo campo-app" required>
-                        <option value="">Elegí método</option>
-                        <option>Transferencia</option>
-                        <option>Mercado Pago</option>
-                        <option>Efectivo</option>
-                        <option>QR</option>
-                    </select>
-                </div>
             </div>
             <div class="modal-grid-2">
                 <div class="modal-field-app">
@@ -589,14 +578,7 @@
                 <input type="text" name="motivo_descuento" class="campo campo-app" placeholder="Ej: Clase, promo, práctica">
            </div>
         </div>
-            <div class="modal-field-app">
-                <label>Cómo querés cobrar</label>
-                <select name="opcion_pago" class="campo campo-app" required>
-                    <option value="">Elegí opción</option>
-                    <option value="Reserva">Reserva (30%)</option>
-                    <option value="Pagado">Pago total</option>
-                </select>
-            </div>
+            
 
             <div id="modal_precio" class="precio-modal precio-modal-app"></div>
 
@@ -614,10 +596,22 @@
         <div class="modal-app-top">
             <div>
                 <h2>Turno fijo</h2>
-                <p>Crear reservas semanales automáticas</p>
-            </div>
 
-            <button type="button" class="modal-close-app" onclick="cerrarModalFijo()">✕</button>
+<div class="modal-grid-2">
+
+    <div class="modal-field-app">
+        <label>Desde</label>
+        <input type="date" name="fecha_desde" required>
+    </div>
+
+    <div class="modal-field-app">
+        <label>Hasta</label>
+        <input type="date" name="fecha_hasta" required>
+    </div>
+
+</div>
+
+<button type="button" class="modal-close-app">
         </div>
 
         <form action="/crear-turno-fijo" method="POST" class="modal-form-app">

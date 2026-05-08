@@ -1273,21 +1273,18 @@ def admin_reservar():
 
 @app.route("/crear-turno-fijo", methods=["POST"])
 def crear_turno_fijo():
-
     if not session.get("admin"):
         return redirect("/login")
 
     nombre = request.form.get("nombre", "").strip()
     telefono = request.form.get("telefono", "").strip()
-
     cancha = request.form.get("cancha", "").strip()
     horario = request.form.get("horario", "").strip()
     duracion = request.form.get("duracion", "").strip()
 
-    fecha_inicio = request.form.get("fecha_inicio")
-    fecha_fin = request.form.get("fecha_fin")
-
-    dia_semana = int(request.form.get("dia_semana"))
+    fecha_inicio = request.form.get("fecha_desde") or request.form.get("fecha_inicio")
+    fecha_fin = request.form.get("fecha_hasta") or request.form.get("fecha_fin")
+    dia_semana = int(request.form.get("dia_semana", 0))
 
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
@@ -1296,54 +1293,28 @@ def crear_turno_fijo():
     fin = datetime.strptime(fecha_fin, "%Y-%m-%d").date()
 
     grupo_fijo = str(uuid.uuid4())
-
     fecha_actual = inicio
 
     while fecha_actual <= fin:
-
         if fecha_actual.weekday() == dia_semana:
-
             fecha_str = fecha_actual.strftime("%Y-%m-%d")
 
             if not hay_conflicto(cursor, fecha_str, cancha, horario, duracion):
-
                 precio = float(calcular_precio(cursor, duracion, horario) or 0)
 
                 cursor.execute("""
                     INSERT INTO reservas (
-                        nombre,
-                        telefono,
-                        fecha,
-                        cancha,
-                        duracion,
-                        horario,
-                        precio,
-                        metodo_pago,
-                        estado_pago,
-                        pagado,
-                        descuento,
-                        motivo_descuento,
-                        precio_final,
-                        es_fijo,
-                        grupo_fijo
+                        nombre, telefono, fecha, cancha, duracion, horario,
+                        precio, metodo_pago, estado_pago, pagado,
+                        descuento, motivo_descuento, precio_final,
+                        es_fijo, grupo_fijo
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
-                    nombre,
-                    telefono,
-                    fecha_str,
-                    cancha,
-                    duracion,
-                    horario,
-                    precio,
-                    "",
-                    "Pendiente pago total",
-                    0,
-                    0,
-                    "",
-                    precio,
-                    1,
-                    grupo_fijo
+                    nombre, telefono, fecha_str, cancha, duracion, horario,
+                    precio, "", "Pendiente pago total", 0,
+                    0, "", precio,
+                    1, grupo_fijo
                 ))
 
         fecha_actual += timedelta(days=1)
