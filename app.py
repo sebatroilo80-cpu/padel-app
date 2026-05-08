@@ -1269,6 +1269,111 @@ def admin_reservar():
 
     return redirect(f"/admin?fecha={fecha}")
 
+@app.route("/crear-turno-fijo", methods=["POST"])
+def crear_turno_fijo():
+    if not session.get("admin"):
+        return redirect("/login")
+
+    nombre = request.form.get("nombre", "").strip()
+    telefono = request.form.get("telefono", "").strip()
+    cancha = request.form.get("cancha", "").strip()
+    horario = request.form.get("horario", "").strip()
+    duracion = request.form.get("duracion", "").strip()
+    metodo_pago = request.form.get("metodo_pago", "").strip()
+    opcion_pago = request.form.get("opcion_pago", "").strip()
+
+    dia_semana = int(request.form.get("dia_semana"))
+    cantidad_semanas = int(request.form.get("cantidad_semanas"))
+
+    grupo_fijo = str(uuid.uuid4())
+
+    conn = sqlite3.connect("padel.db")
+    cursor = conn.cursor()
+
+    hoy = date.today()
+
+    for i in range(cantidad_semanas):
+
+        fecha_turno = hoy + timedelta(days=i * 7)
+
+        while fecha_turno.weekday() != dia_semana:
+            fecha_turno += timedelta(days=1)
+
+        fecha_str = fecha_turno.strftime("%Y-%m-%d")
+
+        if hay_conflicto(cursor, fecha_str, cancha, horario, duracion):
+            continue
+
+        precio = calcular_precio(cursor, duracion, horario)
+
+        if opcion_pago == "Reserva":
+            pagado = round(precio * 0.30, 2)
+            estado_pago = "Reserva"
+
+        else:
+            pagado = precio
+            estado_pago = "Pagado"
+
+        cursor.execute("""
+            INSERT INTO reservas (
+                nombre,
+                telefono,
+                fecha,
+                cancha,
+                duracion,
+                horario,
+                precio,
+                metodo_pago,
+                estado_pago,
+                pagado,
+                descuento,
+                motivo_descuento,
+                precio_final,
+                es_fijo,
+                grupo_fijo
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            nombre,
+            telefono,
+            fecha_str,
+            cancha,
+            duracion,
+            horario,
+            precio,
+            metodo_pago,
+            estado_pago,
+            pagado,
+            0,
+            "",
+            precio,
+            1,
+            grupo_fijo
+        ))
+
+        reserva_id = cursor.lastrowid
+
+        cursor.execute("""
+            INSERT INTO movimientos (
+                fecha,
+                tipo,
+                descripcion,
+                monto,
+                metodo_pago
+            )
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            fecha_str,
+            "ingreso",
+            f"Turno fijo #{reserva_id} - {nombre} - {cancha} - {horario}",
+            pagado,
+            metodo_pago
+        ))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin?tab=reservas")
 
 @app.route("/editar/<int:id>", methods=["GET", "POST"])
 def editar(id):

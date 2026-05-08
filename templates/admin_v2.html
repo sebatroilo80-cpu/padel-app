@@ -25,6 +25,7 @@
 
         <div class="adminv2-nav">
     <button class="btn-nav {% if active_tab == 'grilla' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-grilla', this)">🗓️ Grilla</button>
+    <button class="btn-nav" type="button" onclick="abrirModalFijo()">⭐ Turno fijo</button>
     <button class="btn-nav {% if active_tab == 'reservas' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-reservas', this)">📑 Reservas</button>
     <button class="btn-nav {% if active_tab == 'caja' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-caja', this)">💳 Caja</button>
     <button class="btn-nav {% if active_tab == 'reportes' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-reportes', this)">📈 Reportes</button>
@@ -607,6 +608,113 @@
     </div>
 </div>
 
+<div id="modalFijo" class="modal-fondo">
+    <div class="modal-caja modal-caja-app">
+
+        <div class="modal-app-top">
+            <div>
+                <h2>Turno fijo</h2>
+                <p>Crear reservas semanales automáticas</p>
+            </div>
+
+            <button type="button" class="modal-close-app" onclick="cerrarModalFijo()">✕</button>
+        </div>
+
+        <form action="/crear-turno-fijo" method="POST" class="modal-form-app">
+
+            <div class="modal-grid-2">
+                <div class="modal-field-app">
+                    <label>Nombre</label>
+                    <input type="text" name="nombre" class="campo campo-app" required>
+                </div>
+
+                <div class="modal-field-app">
+                    <label>Teléfono</label>
+                    <input type="text" name="telefono" class="campo campo-app">
+                </div>
+            </div>
+
+            <div class="modal-grid-3">
+                <div class="modal-field-app">
+                    <label>Cancha</label>
+                    <select name="cancha" class="campo campo-app" required>
+                        <option>Cancha 1</option>
+                        <option>Cancha 2</option>
+                        <option>Cancha 3</option>
+                    </select>
+                </div>
+
+                <div class="modal-field-app">
+                    <label>Horario</label>
+                    <input type="time" name="horario" class="campo campo-app" required>
+                </div>
+
+                <div class="modal-field-app">
+                    <label>Duración</label>
+                    <select name="duracion" class="campo campo-app" required>
+                        <option>60 minutos</option>
+                        <option>90 minutos</option>
+                        <option>120 minutos</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-grid-2">
+                <div class="modal-field-app">
+                    <label>Día semanal</label>
+                    <select name="dia_semana" class="campo campo-app" required>
+                        <option value="0">Lunes</option>
+                        <option value="1">Martes</option>
+                        <option value="2">Miércoles</option>
+                        <option value="3">Jueves</option>
+                        <option value="4">Viernes</option>
+                        <option value="5">Sábado</option>
+                        <option value="6">Domingo</option>
+                    </select>
+                </div>
+
+                <div class="modal-field-app">
+                    <label>Cantidad de semanas</label>
+                    <input type="number" name="cantidad_semanas" value="4" min="1" class="campo campo-app" required>
+                </div>
+            </div>
+
+            <div class="modal-grid-2">
+                <div class="modal-field-app">
+                    <label>Método de pago</label>
+                    <select name="metodo_pago" class="campo campo-app" required>
+                        <option>Transferencia</option>
+                        <option>Mercado Pago</option>
+                        <option>Efectivo</option>
+                        <option>QR</option>
+                    </select>
+                </div>
+
+                <div class="modal-field-app">
+                    <label>Cómo cobrar</label>
+                    <select name="opcion_pago" class="campo campo-app" required>
+                        <option value="Reserva">Reserva (30%)</option>
+                        <option value="Pagado">Pago total</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-botones modal-botones-app">
+                <button type="submit" class="btn-guardar btn-app-modal-primary">
+                    Crear turnos fijos
+                </button>
+
+                <button type="button"
+                        onclick="cerrarModalFijo()"
+                        class="btn-cancelar btn-app-modal-secondary">
+                    Cancelar
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
 <script>
 const config = {{ config|tojson }};
 
@@ -621,6 +729,14 @@ function abrirModal(fecha, cancha, horario) {
 
 function cerrarModal() {
     document.getElementById("modalReserva").style.display = "none";
+}
+
+function abrirModalFijo() {
+    document.getElementById("modalFijo").style.display = "flex";
+}
+
+function cerrarModalFijo() {
+    document.getElementById("modalFijo").style.display = "none";
 }
 
 function calcularPrecioModal() {
