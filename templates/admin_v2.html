@@ -25,7 +25,7 @@
 
         <div class="adminv2-nav">
     <button class="btn-nav {% if active_tab == 'grilla' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-grilla', this)">🗓️ Grilla</button>
-    <button class="btn-nav" type="button" onclick="abrirModalFijo()">⭐ Turno fijo</button>
+    <button class="btn-nav" type="button" id="btnTurnoFijo">⭐ Turno fijo</button>
     <button class="btn-nav {% if active_tab == 'reservas' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-reservas', this)">📑 Reservas</button>
     <button class="btn-nav {% if active_tab == 'caja' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-caja', this)">💳 Caja</button>
     <button class="btn-nav {% if active_tab == 'reportes' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-reportes', this)">📈 Reportes</button>
@@ -587,7 +587,16 @@
         </form>
     </div>
 </div>
+document.addEventListener("DOMContentLoaded", function () {
+    const btnTurnoFijo = document.getElementById("btnTurnoFijo");
+    const modalFijo = document.getElementById("modalFijo");
 
+    if (btnTurnoFijo && modalFijo) {
+        btnTurnoFijo.addEventListener("click", function () {
+            modalFijo.style.display = "flex";
+        });
+    }
+});
 <script>
 const config = {{ config|tojson }};
 
