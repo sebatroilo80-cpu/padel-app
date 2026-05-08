@@ -9,6 +9,8 @@ import requests
 from dotenv import load_dotenv
 
 load_dotenv()
+DB_PATH = os.environ.get("DB_PATH", "padel.db")
+init_db()
 
 TELEGRAM_TOKEN = "8789475526:AAGutuZ0izEkKi8kcSTHW8_JFjHBOPs6pms"
 TELEGRAM_CHAT_ID = "7828571382"
@@ -32,7 +34,7 @@ app = Flask(__name__)
 app.secret_key = "clave_secreta_37"
 
 # ===== FIX BASE DE DATOS =====
-conn = sqlite3.connect("/data/padel.db")
+conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
 
 # Reservas
@@ -295,7 +297,7 @@ def generar_dias_cliente(cantidad=7):
 
 @app.route("/")
 def home():
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     config = obtener_config(cursor)
@@ -342,7 +344,7 @@ def reservar():
     metodo_pago = request.form.get("metodo_pago", "").strip()
     opcion_pago = request.form.get("opcion_pago", "").strip()
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -498,7 +500,7 @@ def webhook_mercadopago():
 
         monto_pagado = float(pago.get("transaction_amount") or 0)
 
-        conn = sqlite3.connect("/data/padel.db")
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 
         # Crear tabla movimientos si no existe
@@ -617,7 +619,7 @@ def admin():
     mes_actual = fecha_admin[:7]
     anio_actual = fecha_admin[:4]
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     # =========================
@@ -1149,7 +1151,7 @@ def configuracion():
     if not session.get("admin"):
         return redirect("/login")
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     if request.method == "POST":
@@ -1200,7 +1202,7 @@ def admin_reservar():
     descuento = limpiar_numero(request.form.get("descuento"))
     motivo_descuento = request.form.get("motivo_descuento", "").strip()
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     if hay_conflicto(cursor, fecha, cancha, horario, duracion):
@@ -1286,7 +1288,7 @@ def crear_turno_fijo():
     fecha_fin = request.form.get("fecha_hasta") or request.form.get("fecha_fin")
     dia_semana = int(request.form.get("dia_semana", 0))
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d").date()
@@ -1329,7 +1331,7 @@ def editar(id):
     if not session.get("admin"):
         return redirect("/login")
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     if request.method == "POST":
@@ -1471,7 +1473,7 @@ def whatsapp_enviado(id):
     if not session.get("admin"):
         return redirect("/login")
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -1494,7 +1496,7 @@ def agregar_egreso():
     descripcion = request.form.get("descripcion")
     monto = limpiar_numero(request.form.get("monto"))
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     # Ver tablas existentes
@@ -1552,7 +1554,7 @@ def eliminar_reserva(id):
     if not session.get("admin"):
         return redirect("/login")
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     # Buscar la reserva antes de borrarla
@@ -1601,7 +1603,7 @@ def confirmar_transferencia(id):
     if not session.get("admin"):
         return redirect("/login")
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -1683,7 +1685,7 @@ def eliminar_egreso(id):
     if not session.get("admin"):
         return redirect("/login")
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -1800,7 +1802,7 @@ def finalizar_pago():
         </html>
         """
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -1847,7 +1849,7 @@ def mp_pending():
 
 @app.route("/reset-db")
 def reset_db():
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("DELETE FROM reservas")
@@ -1864,7 +1866,7 @@ def ver_reservas():
     if not session.get("admin"):
         return redirect("/login")
 
-    conn = sqlite3.connect("/data/padel.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""
