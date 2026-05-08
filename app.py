@@ -1188,78 +1188,80 @@ def admin_reservar():
     if not session.get("admin"):
         return redirect("/login")
 
-    nombre = request.form["nombre"]
-    fecha = request.form["fecha"]
-    cancha = request.form["cancha"]
-    duracion = request.form["duracion"]
-    horario = request.form["horario"]
-    metodo_pago = request.form["metodo_pago"]
-    opcion_pago = request.form["opcion_pago"]
+    nombre = request.form.get("nombre", "").strip()
+    telefono = request.form.get("telefono", "").strip()
+    fecha = request.form.get("fecha", "").strip()
+    cancha = request.form.get("cancha", "").strip()
+    duracion = request.form.get("duracion", "").strip()
+    horario = request.form.get("horario", "").strip()
+    metodo_pago = request.form.get("metodo_pago", "").strip()
+    opcion_pago = request.form.get("opcion_pago", "").strip()
+
     descuento = limpiar_numero(request.form.get("descuento"))
-    motivo_descuento = request.form.get("motivo_descuento", "")
+    motivo_descuento = request.form.get("motivo_descuento", "").strip()
 
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
-
-    # Crear tabla movimientos si no existe
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS movimientos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            fecha TEXT,
-            tipo TEXT,
-            descripcion TEXT,
-            monto REAL,
-            metodo_pago TEXT
-        )
-    """)
-    conn.commit()
 
     if hay_conflicto(cursor, fecha, cancha, horario, duracion):
         conn.close()
         return "Ese horario ya está ocupado o bloqueado. Volvé atrás y elegí otro."
 
-    precio_original = calcular_precio(cursor, duracion, horario)
-    precio = max(0, precio_original - descuento)
-    pagado = calcular_pagado_inicial(precio, opcion_pago)
-    estado_pago = calcular_estado_desde_pagado(precio, pagado)
+    precio_original = float(calcular_precio(cursor, duracion, horario) or 0)
+
+    if descuento > precio_original:
+        descuento = precio_original
+
+    # Si es reserva, NO aplicamos descuento sobre la seña
+    if opcion_pago == "Reserva":
+        precio_final = precio_original
+        pagado = round(precio_original * 0.30, 2)
+        estado_pago = "Reserva"
+        descuento_guardado = 0
+        motivo_guardado = ""
+    else:
+        precio_final = max(0.0, precio_original - descuento)
+        pagado = precio_final
+        estado_pago = "Pagado"
+        descuento_guardado = descuento
+        motivo_guardado = motivo_descuento
 
     cursor.execute("""
         INSERT INTO reservas (
             nombre, telefono, fecha, cancha, duracion, horario,
-            precio, metodo_pago, estado_pago, pagado, descuento, motivo_descuento
+            precio, metodo_pago, estado_pago, pagado,
+            descuento, motivo_descuento, precio_final,
+            es_fijo, grupo_fijo
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         nombre,
-        "",
+        telefono,
         fecha,
         cancha,
         duracion,
         horario,
-        precio,
+        precio_original,
         metodo_pago,
         estado_pago,
         pagado,
-        descuento,
-        motivo_descuento
+        descuento_guardado,
+        motivo_guardado,
+        precio_final,
+        0,
+        ""
     ))
 
     reserva_id = cursor.lastrowid
 
-    # Si pagó algo, registrar ingreso en caja
-    if pagado and float(pagado) > 0:
-        if opcion_pago == "Reserva":
-            descripcion = f"Seña reserva #{reserva_id} - {nombre} - {cancha} - {horario}"
-        else:
-            descripcion = f"Pago total reserva #{reserva_id} - {nombre} - {cancha} - {horario}"
-
+    if pagado > 0:
         cursor.execute("""
             INSERT INTO movimientos (fecha, tipo, descripcion, monto, metodo_pago)
             VALUES (?, ?, ?, ?, ?)
         """, (
             fecha,
             "ingreso",
-            descripcion,
+            f"Reserva #{reserva_id} - {nombre} - {cancha} - {horario}",
             pagado,
             metodo_pago
         ))
