@@ -33,46 +33,90 @@ BASE_URL = (os.getenv("BASE_URL") or "http://127.0.0.1:5000").rstrip("/")
 app = Flask(__name__)
 app.secret_key = "clave_secreta_37"
 
-# ===== FIX BASE DE DATOS =====
+# ===== INIT DB =====
+init_db()
+
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
 
-# Reservas
-cursor.execute("PRAGMA table_info(reservas)")
-columnas_reservas = [col[1] for col in cursor.fetchall()]
-
-if "whatsapp_enviado" not in columnas_reservas:
-   
-
-if "descuento" not in columnas_reservas:
-    cursor.execute("ALTER TABLE reservas ADD COLUMN descuento REAL DEFAULT 0")
-
-if "motivo_descuento" not in columnas_reservas:
-    cursor.execute("ALTER TABLE reservas ADD COLUMN motivo_descuento TEXT DEFAULT ''")
-
-if "precio_final" not in columnas_reservas:
-    cursor.execute("ALTER TABLE reservas ADD COLUMN precio_final REAL DEFAULT 0")
-if "es_fijo" not in columnas_reservas:
-    cursor.execute("ALTER TABLE reservas ADD COLUMN es_fijo INTEGER DEFAULT 0")
-
-if "grupo_fijo" not in columnas_reservas:
-    cursor.execute("ALTER TABLE reservas ADD COLUMN grupo_fijo TEXT DEFAULT ''")
-
+# Ver tablas existentes
 cursor.execute("""
-    UPDATE reservas
-    SET precio_final = precio
-    WHERE precio_final IS NULL OR precio_final = 0
+    SELECT name
+    FROM sqlite_master
+    WHERE type='table'
 """)
 
-# Configuración
-cursor.execute("PRAGMA table_info(configuracion)")
-columnas_config = [col[1] for col in cursor.fetchall()]
+tablas = [t[0] for t in cursor.fetchall()]
 
-if "precio_120_dia" not in columnas_config:
-    cursor.execute("ALTER TABLE configuracion ADD COLUMN precio_120_dia REAL DEFAULT 45000")
+# =========================
+# RESERVAS
+# =========================
+if "reservas" in tablas:
 
-if "precio_120_noche" not in columnas_config:
-    cursor.execute("ALTER TABLE configuracion ADD COLUMN precio_120_noche REAL DEFAULT 55000")
+    cursor.execute("PRAGMA table_info(reservas)")
+    columnas_reservas = [col[1] for col in cursor.fetchall()]
+
+    if "whatsapp_enviado" not in columnas_reservas:
+        cursor.execute("""
+            ALTER TABLE reservas
+            ADD COLUMN whatsapp_enviado INTEGER DEFAULT 0
+        """)
+
+    if "descuento" not in columnas_reservas:
+        cursor.execute("""
+            ALTER TABLE reservas
+            ADD COLUMN descuento REAL DEFAULT 0
+        """)
+
+    if "motivo_descuento" not in columnas_reservas:
+        cursor.execute("""
+            ALTER TABLE reservas
+            ADD COLUMN motivo_descuento TEXT DEFAULT ''
+        """)
+
+    if "precio_final" not in columnas_reservas:
+        cursor.execute("""
+            ALTER TABLE reservas
+            ADD COLUMN precio_final REAL DEFAULT 0
+        """)
+
+    if "es_fijo" not in columnas_reservas:
+        cursor.execute("""
+            ALTER TABLE reservas
+            ADD COLUMN es_fijo INTEGER DEFAULT 0
+        """)
+
+    if "grupo_fijo" not in columnas_reservas:
+        cursor.execute("""
+            ALTER TABLE reservas
+            ADD COLUMN grupo_fijo TEXT DEFAULT ''
+        """)
+
+    cursor.execute("""
+        UPDATE reservas
+        SET precio_final = precio
+        WHERE precio_final IS NULL OR precio_final = 0
+    """)
+
+# =========================
+# CONFIGURACION
+# =========================
+if "configuracion" in tablas:
+
+    cursor.execute("PRAGMA table_info(configuracion)")
+    columnas_config = [col[1] for col in cursor.fetchall()]
+
+    if "precio_120_dia" not in columnas_config:
+        cursor.execute("""
+            ALTER TABLE configuracion
+            ADD COLUMN precio_120_dia REAL DEFAULT 45000
+        """)
+
+    if "precio_120_noche" not in columnas_config:
+        cursor.execute("""
+            ALTER TABLE configuracion
+            ADD COLUMN precio_120_noche REAL DEFAULT 55000
+        """)
 
 conn.commit()
 conn.close()
