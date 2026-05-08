@@ -42,7 +42,7 @@ cursor.execute("PRAGMA table_info(reservas)")
 columnas_reservas = [col[1] for col in cursor.fetchall()]
 
 if "whatsapp_enviado" not in columnas_reservas:
-    cursor.execute("ALTER TABLE reservas ADD COLUMN whatsapp_enviado INTEGER DEFAULT 0")
+   
 
 if "descuento" not in columnas_reservas:
     cursor.execute("ALTER TABLE reservas ADD COLUMN descuento REAL DEFAULT 0")
