@@ -673,31 +673,18 @@
                     </select>
                 </div>
 
-                <div class="modal-field-app">
-                    <label>Cantidad de semanas</label>
-                    <input type="number" name="cantidad_semanas" value="4" min="1" class="campo campo-app" required>
-                </div>
+            <div class="modal-field-app">
+    <label>Desde fecha</label>
+    <input type="date" name="fecha_inicio" class="campo campo-app" required>
+</div>
+
+<div class="modal-field-app">
+    <label>Hasta fecha</label>
+    <input type="date" name="fecha_fin" class="campo campo-app" required>
+</div>     
             </div>
 
-            <div class="modal-grid-2">
-                <div class="modal-field-app">
-                    <label>Método de pago</label>
-                    <select name="metodo_pago" class="campo campo-app" required>
-                        <option>Transferencia</option>
-                        <option>Mercado Pago</option>
-                        <option>Efectivo</option>
-                        <option>QR</option>
-                    </select>
-                </div>
-
-                <div class="modal-field-app">
-                    <label>Cómo cobrar</label>
-                    <select name="opcion_pago" class="campo campo-app" required>
-                        <option value="Reserva">Reserva (30%)</option>
-                        <option value="Pagado">Pago total</option>
-                    </select>
-                </div>
-            </div>
+            
 
             <div class="modal-botones modal-botones-app">
                 <button type="submit" class="btn-guardar btn-app-modal-primary">

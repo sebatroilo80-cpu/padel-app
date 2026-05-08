@@ -1277,29 +1277,25 @@ def crear_turno_fijo():
     if not session.get("admin"):
         return redirect("/login")
 
-    nombre = request.form.get("nombre")
-    telefono = request.form.get("telefono")
-    cancha = request.form.get("cancha")
-    horario = request.form.get("horario")
-    duracion = request.form.get("duracion")
-    metodo_pago = request.form.get("metodo_pago")
-    opcion_pago = request.form.get("opcion_pago")
+    nombre = request.form.get("nombre", "").strip()
+    telefono = request.form.get("telefono", "").strip()
+
+    cancha = request.form.get("cancha", "").strip()
+    horario = request.form.get("horario", "").strip()
+    duracion = request.form.get("duracion", "").strip()
 
     fecha_inicio = request.form.get("fecha_inicio")
     fecha_fin = request.form.get("fecha_fin")
 
     dia_semana = int(request.form.get("dia_semana"))
 
-    descuento = limpiar_numero(request.form.get("descuento"))
-    motivo_descuento = request.form.get("motivo_descuento", "").strip()
-
-    grupo_fijo = str(uuid.uuid4())
-
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
 
     inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d").date()
     fin = datetime.strptime(fecha_fin, "%Y-%m-%d").date()
+
+    grupo_fijo = str(uuid.uuid4())
 
     fecha_actual = inicio
 
@@ -1311,26 +1307,7 @@ def crear_turno_fijo():
 
             if not hay_conflicto(cursor, fecha_str, cancha, horario, duracion):
 
-                precio_original = float(calcular_precio(cursor, duracion, horario) or 0)
-
-                if descuento > precio_original:
-                    descuento = precio_original
-
-                if opcion_pago == "Reserva":
-                    precio_final = precio_original
-                    pagado = round(precio_original * 0.30, 2)
-                    estado_pago = "Reserva"
-
-                    descuento_guardado = 0
-                    motivo_guardado = ""
-
-                else:
-                    precio_final = max(0.0, precio_original - descuento)
-                    pagado = precio_final
-                    estado_pago = "Pagado"
-
-                    descuento_guardado = descuento
-                    motivo_guardado = motivo_descuento
+                precio = float(calcular_precio(cursor, duracion, horario) or 0)
 
                 cursor.execute("""
                     INSERT INTO reservas (
@@ -1358,43 +1335,23 @@ def crear_turno_fijo():
                     cancha,
                     duracion,
                     horario,
-                    precio_original,
-                    metodo_pago,
-                    estado_pago,
-                    pagado,
-                    descuento_guardado,
-                    motivo_guardado,
-                    precio_final,
+                    precio,
+                    "",
+                    "Pendiente pago total",
+                    0,
+                    0,
+                    "",
+                    precio,
                     1,
                     grupo_fijo
                 ))
-
-                reserva_id = cursor.lastrowid
-
-                if pagado > 0:
-                    cursor.execute("""
-                        INSERT INTO movimientos (
-                            fecha,
-                            tipo,
-                            descripcion,
-                            monto,
-                            metodo_pago
-                        )
-                        VALUES (?, ?, ?, ?, ?)
-                    """, (
-                        fecha_str,
-                        "ingreso",
-                        f"Turno fijo #{reserva_id} - {nombre}",
-                        pagado,
-                        metodo_pago
-                    ))
 
         fecha_actual += timedelta(days=1)
 
     conn.commit()
     conn.close()
 
-    return redirect(f"/admin?fecha={fecha_inicio}")
+    return redirect("/admin?tab=reservas")
 
 @app.route("/editar/<int:id>", methods=["GET", "POST"])
 def editar(id):
