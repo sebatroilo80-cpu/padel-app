@@ -766,7 +766,16 @@ function mostrarSeccion(id, boton) {
 }
 
 document.getElementById("modal_duracion").addEventListener("change", calcularPrecioModal);
+function abrirModalFijo() {
+    document.getElementById("modalFijo").style.display = "flex";
+}
+
+function cerrarModalFijo() {
+    document.getElementById("modalFijo").style.display = "none";
+}
+
 </script>
+
 
 
 </body>
