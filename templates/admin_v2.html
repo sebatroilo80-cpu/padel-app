@@ -587,6 +587,112 @@
         </form>
     </div>
 </div>
+
+<div id="modalFijo" class="modal-fondo">
+    <div class="modal-caja modal-caja-app">
+        <div class="modal-app-top">
+            <div>
+                <h2>Turno fijo</h2>
+                <p>Crear reservas semanales automáticas</p>
+            </div>
+            <button type="button" class="modal-close-app" onclick="cerrarModalFijo()">✕</button>
+        </div>
+
+        <form action="/crear-turno-fijo" method="POST" class="modal-form-app">
+            <div class="modal-grid-2">
+                <div class="modal-field-app">
+                    <label>Nombre</label>
+                    <input type="text" name="nombre" class="campo campo-app" required>
+                </div>
+
+                <div class="modal-field-app">
+                    <label>Teléfono</label>
+                    <input type="text" name="telefono" class="campo campo-app">
+                </div>
+            </div>
+
+            <div class="modal-grid-3">
+                <div class="modal-field-app">
+                    <label>Cancha</label>
+                    <select name="cancha" class="campo campo-app" required>
+                        <option>Cancha 1</option>
+                        <option>Cancha 2</option>
+                        <option>Cancha 3</option>
+                    </select>
+                </div>
+
+                <div class="modal-field-app">
+                    <label>Horario</label>
+                    <input type="time" name="horario" class="campo campo-app" required>
+                </div>
+
+                <div class="modal-field-app">
+                    <label>Duración</label>
+                    <select name="duracion" class="campo campo-app" required>
+                        <option>60 minutos</option>
+                        <option>90 minutos</option>
+                        <option>120 minutos</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-grid-3">
+                <div class="modal-field-app">
+                    <label>Día semanal</label>
+                    <select name="dia_semana" class="campo campo-app" required>
+                        <option value="0">Lunes</option>
+                        <option value="1">Martes</option>
+                        <option value="2">Miércoles</option>
+                        <option value="3">Jueves</option>
+                        <option value="4">Viernes</option>
+                        <option value="5">Sábado</option>
+                        <option value="6">Domingo</option>
+                    </select>
+                </div>
+
+                <div class="modal-field-app">
+                    <label>Desde fecha</label>
+                    <input type="date" name="fecha_inicio" class="campo campo-app" required>
+                </div>
+
+                <div class="modal-field-app">
+                    <label>Hasta fecha</label>
+                    <input type="date" name="fecha_fin" class="campo campo-app" required>
+                </div>
+            </div>
+
+            <div class="modal-botones modal-botones-app">
+                <button type="submit" class="btn-guardar btn-app-modal-primary">Crear turnos fijos</button>
+                <button type="button" onclick="cerrarModalFijo()" class="btn-cancelar btn-app-modal-secondary">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+const config = {{ config|tojson }};
+
+function abrirModal(fecha, cancha, horario) {
+    document.getElementById("modal_fecha").value = fecha;
+    document.getElementById("modal_cancha").value = cancha;
+    document.getElementById("modal_horario").value = horario;
+    document.getElementById("modal_duracion").value = "";
+    document.getElementById("modal_precio").innerText = "";
+    document.getElementById("modalReserva").style.display = "flex";
+}
+
+function cerrarModal() {
+    document.getElementById("modalReserva").style.display = "none";
+}
+
+function abrirModalFijo() {
+    document.getElementById("modalFijo").style.display = "flex";
+}
+
+function cerrarModalFijo() {
+    document.getElementById("modalFijo").style.display = "none";
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     const btnTurnoFijo = document.getElementById("btnTurnoFijo");
     const modalFijo = document.getElementById("modalFijo");
@@ -597,32 +703,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-<script>
-const config = {{ config|tojson }};
-
-function abrirModal(fecha, cancha, horario) {
-    document.getElementById("modal_fecha").value = fecha;
-    document.getElementById("modal_cancha").value = cancha;
-    document.getElementById("modal_horario").value = horario;
-    document.getElementById("modal_duracion").value = "";
-    document.getElementById("modal_precio").innerText = "";
-    document.getElementById("modalReserva").style.display = "flex";
-}
-
-function cerrarModal() {
-    document.getElementById("modalReserva").style.display = "none";
-}
-
-function abrirModalFijo() {
-    document.getElementById("modalFijo").style.display = "flex";
-}
-
-function cerrarModalFijo() {
-    document.getElementById("modalFijo").style.display = "none";
-}
 
 function calcularPrecioModal() {
-
     const duracion = document.getElementById("modal_duracion").value;
     const horario = document.getElementById("modal_horario").value;
     const texto = document.getElementById("modal_precio");
@@ -633,111 +715,17 @@ function calcularPrecioModal() {
     }
 
     const hora = parseInt(horario.split(":")[0], 10);
-
     let precio = 0;
 
     if (hora < 18) {
-
-        if (duracion === "60 minutos") {
-            precio = config[0];
-        }
-        else if (duracion === "90 minutos") {
-            precio = config[2];
-        }
-        else if (duracion === "120 minutos") {
-            precio = config[4];
-        }
-
+        if (duracion === "60 minutos") precio = config[0];
+        else if (duracion === "90 minutos") precio = config[2];
+        else if (duracion === "120 minutos") precio = config[4];
     } else {
-
-        if (duracion === "60 minutos") {
-            precio = config[1];
-        }
-        else if (duracion === "90 minutos") {
-            precio = config[3];
-        }
-        else if (duracion === "120 minutos") {
-            precio = config[5];
-        }
+        if (duracion === "60 minutos") precio = config[1];
+        else if (duracion === "90 minutos") precio = config[3];
+        else if (duracion === "120 minutos") precio = config[5];
     }
-
-    texto.innerText = "Precio: $" + precio;
-}
-
-function mostrarSeccion(id, boton) {
-
-    document.querySelectorAll(".adminv2-seccion").forEach(sec => {
-        sec.classList.remove("activa");
-    });
-
-    document.querySelectorAll(".btn-nav").forEach(btn => {
-        btn.classList.remove("activo");
-    });
-
-    const seccion = document.getElementById(id);
-
-    if (seccion) {
-        seccion.classList.add("activa");
-    }
-
-    if (boton) {
-        boton.classList.add("activo");
-    }
-}
-
-document.getElementById("modal_duracion")
-    .addEventListener("change", calcularPrecioModal);
-</script>
-
-</body>
-</html>
-
-<script>
-const config = {{ config|tojson }};
-
-function abrirModal(fecha, cancha, horario) {
-    document.getElementById("modal_fecha").value = fecha;
-    document.getElementById("modal_cancha").value = cancha;
-    document.getElementById("modal_horario").value = horario;
-    document.getElementById("modal_duracion").value = "";
-    document.getElementById("modal_precio").innerText = "";
-    document.getElementById("modalReserva").style.display = "flex";
-}
-
-function cerrarModal() {
-    document.getElementById("modalReserva").style.display = "none";
-}
-
-function abrirModalFijo() {
-    document.getElementById("modalFijo").style.display = "flex";
-}
-
-function cerrarModalFijo() {
-    document.getElementById("modalFijo").style.display = "none";
-}
-
-function calcularPrecioModal() {
-    const duracion = document.getElementById("modal_duracion").value;
-    const horario = document.getElementById("modal_horario").value;
-    const texto = document.getElementById("modal_precio");
-
-    if (!duracion || !horario) {
-        texto.innerText = "";
-        return;
-    }
-
-    const hora = parseInt(horario.split(":")[0], 10);
-    let precio = 0;
-
-    if (hora < 18) {
-    if (duracion === "60 minutos") precio = config[0];
-    else if (duracion === "90 minutos") precio = config[2];
-    else if (duracion === "120 minutos") precio = config[4];
-} else {
-    if (duracion === "60 minutos") precio = config[1];
-    else if (duracion === "90 minutos") precio = config[3];
-    else if (duracion === "120 minutos") precio = config[5];
-}
 
     texto.innerText = "Precio: $" + precio;
 }
@@ -762,17 +750,7 @@ function mostrarSeccion(id, boton) {
 }
 
 document.getElementById("modal_duracion").addEventListener("change", calcularPrecioModal);
-function abrirModalFijo() {
-    document.getElementById("modalFijo").style.display = "flex";
-}
-
-function cerrarModalFijo() {
-    document.getElementById("modalFijo").style.display = "none";
-}
-
 </script>
-
-
 
 </body>
 </html>
