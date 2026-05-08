@@ -596,22 +596,14 @@
         <div class="modal-app-top">
             <div>
                 <h2>Turno fijo</h2>
+                <p>Crear reservas semanales automáticas</p>
+            </div>
 
-<div class="modal-grid-2">
-
-    <div class="modal-field-app">
-        <label>Desde</label>
-        <input type="date" name="fecha_desde" required>
-    </div>
-
-    <div class="modal-field-app">
-        <label>Hasta</label>
-        <input type="date" name="fecha_hasta" required>
-    </div>
-
-</div>
-
-<button type="button" class="modal-close-app">
+            <button type="button"
+                    class="modal-close-app"
+                    onclick="cerrarModalFijo()">
+                ✕
+            </button>
         </div>
 
         <form action="/crear-turno-fijo" method="POST" class="modal-form-app">
@@ -619,19 +611,28 @@
             <div class="modal-grid-2">
                 <div class="modal-field-app">
                     <label>Nombre</label>
-                    <input type="text" name="nombre" class="campo campo-app" required>
+                    <input type="text"
+                           name="nombre"
+                           class="campo campo-app"
+                           required>
                 </div>
 
                 <div class="modal-field-app">
                     <label>Teléfono</label>
-                    <input type="text" name="telefono" class="campo campo-app">
+                    <input type="text"
+                           name="telefono"
+                           class="campo campo-app">
                 </div>
             </div>
 
             <div class="modal-grid-3">
+
                 <div class="modal-field-app">
                     <label>Cancha</label>
-                    <select name="cancha" class="campo campo-app" required>
+
+                    <select name="cancha"
+                            class="campo campo-app"
+                            required>
                         <option>Cancha 1</option>
                         <option>Cancha 2</option>
                         <option>Cancha 3</option>
@@ -640,23 +641,35 @@
 
                 <div class="modal-field-app">
                     <label>Horario</label>
-                    <input type="time" name="horario" class="campo campo-app" required>
+
+                    <input type="time"
+                           name="horario"
+                           class="campo campo-app"
+                           required>
                 </div>
 
                 <div class="modal-field-app">
                     <label>Duración</label>
-                    <select name="duracion" class="campo campo-app" required>
+
+                    <select name="duracion"
+                            class="campo campo-app"
+                            required>
                         <option>60 minutos</option>
                         <option>90 minutos</option>
                         <option>120 minutos</option>
                     </select>
                 </div>
+
             </div>
 
-            <div class="modal-grid-2">
+            <div class="modal-grid-3">
+
                 <div class="modal-field-app">
                     <label>Día semanal</label>
-                    <select name="dia_semana" class="campo campo-app" required>
+
+                    <select name="dia_semana"
+                            class="campo campo-app"
+                            required>
                         <option value="0">Lunes</option>
                         <option value="1">Martes</option>
                         <option value="2">Miércoles</option>
@@ -667,21 +680,30 @@
                     </select>
                 </div>
 
-            <div class="modal-field-app">
-    <label>Desde fecha</label>
-    <input type="date" name="fecha_inicio" class="campo campo-app" required>
-</div>
+                <div class="modal-field-app">
+                    <label>Desde fecha</label>
 
-<div class="modal-field-app">
-    <label>Hasta fecha</label>
-    <input type="date" name="fecha_fin" class="campo campo-app" required>
-</div>     
+                    <input type="date"
+                           name="fecha_inicio"
+                           class="campo campo-app"
+                           required>
+                </div>
+
+                <div class="modal-field-app">
+                    <label>Hasta fecha</label>
+
+                    <input type="date"
+                           name="fecha_fin"
+                           class="campo campo-app"
+                           required>
+                </div>
+
             </div>
 
-            
-
             <div class="modal-botones modal-botones-app">
-                <button type="submit" class="btn-guardar btn-app-modal-primary">
+
+                <button type="submit"
+                        class="btn-guardar btn-app-modal-primary">
                     Crear turnos fijos
                 </button>
 
@@ -690,9 +712,11 @@
                         class="btn-cancelar btn-app-modal-secondary">
                     Cancelar
                 </button>
+
             </div>
 
         </form>
+
     </div>
 </div>
 
