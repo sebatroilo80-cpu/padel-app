@@ -1273,109 +1273,128 @@ def admin_reservar():
 
 @app.route("/crear-turno-fijo", methods=["POST"])
 def crear_turno_fijo():
+
     if not session.get("admin"):
         return redirect("/login")
 
-    nombre = request.form.get("nombre", "").strip()
-    telefono = request.form.get("telefono", "").strip()
-    cancha = request.form.get("cancha", "").strip()
-    horario = request.form.get("horario", "").strip()
-    duracion = request.form.get("duracion", "").strip()
-    metodo_pago = request.form.get("metodo_pago", "").strip()
-    opcion_pago = request.form.get("opcion_pago", "").strip()
+    nombre = request.form.get("nombre")
+    telefono = request.form.get("telefono")
+    cancha = request.form.get("cancha")
+    horario = request.form.get("horario")
+    duracion = request.form.get("duracion")
+    metodo_pago = request.form.get("metodo_pago")
+    opcion_pago = request.form.get("opcion_pago")
+
+    fecha_inicio = request.form.get("fecha_inicio")
+    fecha_fin = request.form.get("fecha_fin")
 
     dia_semana = int(request.form.get("dia_semana"))
-    cantidad_semanas = int(request.form.get("cantidad_semanas"))
+
+    descuento = limpiar_numero(request.form.get("descuento"))
+    motivo_descuento = request.form.get("motivo_descuento", "").strip()
 
     grupo_fijo = str(uuid.uuid4())
 
     conn = sqlite3.connect("padel.db")
     cursor = conn.cursor()
 
-    hoy = date.today()
+    inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d").date()
+    fin = datetime.strptime(fecha_fin, "%Y-%m-%d").date()
 
-    for i in range(cantidad_semanas):
+    fecha_actual = inicio
 
-        fecha_turno = hoy + timedelta(days=i * 7)
+    while fecha_actual <= fin:
 
-        while fecha_turno.weekday() != dia_semana:
-            fecha_turno += timedelta(days=1)
+        if fecha_actual.weekday() == dia_semana:
 
-        fecha_str = fecha_turno.strftime("%Y-%m-%d")
+            fecha_str = fecha_actual.strftime("%Y-%m-%d")
 
-        if hay_conflicto(cursor, fecha_str, cancha, horario, duracion):
-            continue
+            if not hay_conflicto(cursor, fecha_str, cancha, horario, duracion):
 
-        precio = calcular_precio(cursor, duracion, horario)
+                precio_original = float(calcular_precio(cursor, duracion, horario) or 0)
 
-        if opcion_pago == "Reserva":
-            pagado = round(precio * 0.30, 2)
-            estado_pago = "Reserva"
+                if descuento > precio_original:
+                    descuento = precio_original
 
-        else:
-            pagado = precio
-            estado_pago = "Pagado"
+                if opcion_pago == "Reserva":
+                    precio_final = precio_original
+                    pagado = round(precio_original * 0.30, 2)
+                    estado_pago = "Reserva"
 
-        cursor.execute("""
-            INSERT INTO reservas (
-                nombre,
-                telefono,
-                fecha,
-                cancha,
-                duracion,
-                horario,
-                precio,
-                metodo_pago,
-                estado_pago,
-                pagado,
-                descuento,
-                motivo_descuento,
-                precio_final,
-                es_fijo,
-                grupo_fijo
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            nombre,
-            telefono,
-            fecha_str,
-            cancha,
-            duracion,
-            horario,
-            precio,
-            metodo_pago,
-            estado_pago,
-            pagado,
-            0,
-            "",
-            precio,
-            1,
-            grupo_fijo
-        ))
+                    descuento_guardado = 0
+                    motivo_guardado = ""
 
-        reserva_id = cursor.lastrowid
+                else:
+                    precio_final = max(0.0, precio_original - descuento)
+                    pagado = precio_final
+                    estado_pago = "Pagado"
 
-        cursor.execute("""
-            INSERT INTO movimientos (
-                fecha,
-                tipo,
-                descripcion,
-                monto,
-                metodo_pago
-            )
-            VALUES (?, ?, ?, ?, ?)
-        """, (
-            fecha_str,
-            "ingreso",
-            f"Turno fijo #{reserva_id} - {nombre} - {cancha} - {horario}",
-            pagado,
-            metodo_pago
-        ))
+                    descuento_guardado = descuento
+                    motivo_guardado = motivo_descuento
+
+                cursor.execute("""
+                    INSERT INTO reservas (
+                        nombre,
+                        telefono,
+                        fecha,
+                        cancha,
+                        duracion,
+                        horario,
+                        precio,
+                        metodo_pago,
+                        estado_pago,
+                        pagado,
+                        descuento,
+                        motivo_descuento,
+                        precio_final,
+                        es_fijo,
+                        grupo_fijo
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    nombre,
+                    telefono,
+                    fecha_str,
+                    cancha,
+                    duracion,
+                    horario,
+                    precio_original,
+                    metodo_pago,
+                    estado_pago,
+                    pagado,
+                    descuento_guardado,
+                    motivo_guardado,
+                    precio_final,
+                    1,
+                    grupo_fijo
+                ))
+
+                reserva_id = cursor.lastrowid
+
+                if pagado > 0:
+                    cursor.execute("""
+                        INSERT INTO movimientos (
+                            fecha,
+                            tipo,
+                            descripcion,
+                            monto,
+                            metodo_pago
+                        )
+                        VALUES (?, ?, ?, ?, ?)
+                    """, (
+                        fecha_str,
+                        "ingreso",
+                        f"Turno fijo #{reserva_id} - {nombre}",
+                        pagado,
+                        metodo_pago
+                    ))
+
+        fecha_actual += timedelta(days=1)
 
     conn.commit()
     conn.close()
 
-    return redirect("/admin?tab=reservas")
+    return redirect(f"/admin?fecha={fecha_inicio}")
 
 @app.route("/editar/<int:id>", methods=["GET", "POST"])
 def editar(id):
