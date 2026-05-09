@@ -16,15 +16,19 @@ TELEGRAM_TOKEN = "8744638600:AAGtICOaJmTfLBEmS5pWl84BTrs8xp9HjJA"
 TTELEGRAM_CHAT_ID = "8785039087"
 
 def enviar_telegram(mensaje):
+
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+
     data = {
         "chat_id": TELEGRAM_CHAT_ID,
         "text": mensaje
     }
+
     try:
-        requests.post(url, data=data, timeout=10)
-    except:
-        pass
+        response = requests.post(url, data=data, timeout=10)
+        print(response.text)
+    except Exception as e:
+        print(e)
 
 MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN") or ""
 print("TOKEN MP:", MP_ACCESS_TOKEN[:12])
