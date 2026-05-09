@@ -12,8 +12,8 @@ load_dotenv()
 DB_PATH = os.environ.get("DB_PATH", "padel.db")
 init_db()
 
-TELEGRAM_TOKEN = "8789475526:AAGutuZ0izEkKi8kcSTHW8_JFjHBOPs6pms"
-TELEGRAM_CHAT_ID = "7828571382"
+TELEGRAM_TOKEN = "8744638600:AAGtICOaJmTfLBEmS5pWl84BTrs8xp9HjJA"
+TELEGRAM_CHAT_ID = "8785039087"
 
 def enviar_telegram(mensaje):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
