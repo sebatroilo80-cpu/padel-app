@@ -1377,6 +1377,39 @@ def crear_turno_fijo():
 
     return redirect("/admin?tab=reservas")
 
+@app.route("/turnos-fijos")
+def turnos_fijos():
+    if not session.get("admin"):
+        return redirect("/login")
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT 
+            grupo_fijo,
+            nombre,
+            telefono,
+            cancha,
+            duracion,
+            horario,
+            MIN(fecha) as desde,
+            MAX(fecha) as hasta,
+            COUNT(*) as cantidad
+        FROM reservas
+        WHERE es_fijo = 1
+          AND grupo_fijo IS NOT NULL
+          AND grupo_fijo != ''
+        GROUP BY grupo_fijo, nombre, telefono, cancha, duracion, horario
+        ORDER BY nombre ASC, desde ASC
+    """)
+
+    turnos = cursor.fetchall()
+
+    conn.close()
+
+    return render_template("turnos_fijos.html", turnos=turnos)
+
 @app.route("/editar/<int:id>", methods=["GET", "POST"])
 def editar(id):
     if not session.get("admin"):
