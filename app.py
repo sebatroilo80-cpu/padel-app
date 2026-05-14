@@ -736,11 +736,25 @@ def admin():
 
     if tiene_reservas:
         cursor.execute("""
-            SELECT id, nombre, telefono, fecha, cancha, duracion, horario, precio, metodo_pago, estado_pago, pagado, whatsapp_enviado
-            FROM reservas
-            WHERE fecha = ?
-            ORDER BY horario ASC
-        """, (fecha_admin,))
+    SELECT 
+        id,
+        nombre,
+        telefono,
+        fecha,
+        cancha,
+        duracion,
+        horario,
+        precio,
+        metodo_pago,
+        estado_pago,
+        pagado,
+        whatsapp_enviado,
+        es_fijo,
+        grupo_fijo
+    FROM reservas
+    WHERE fecha = ?
+    ORDER BY horario ASC
+""", (fecha_admin,))
         reservas_dia = cursor.fetchall()
 
         def bloques_reserva(hora_inicio, duracion):
@@ -1990,6 +2004,38 @@ def ver_reservas():
     return render_template("reservas.html", reservas=reservas)
 
 import os
+
+@app.route("/turnos_fijos")
+def turnos_fijos():
+
+    if not session.get("admin"):
+        return redirect("/login")
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT 
+            id,
+            nombre,
+            telefono,
+            fecha,
+            cancha,
+            horario,
+            duracion
+        FROM reservas
+        WHERE es_fijo = 1
+        ORDER BY nombre, fecha
+    """)
+
+    reservas = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "turnos_fijos.html",
+        reservas=reservas
+    )
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

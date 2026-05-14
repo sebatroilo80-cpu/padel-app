@@ -26,6 +26,7 @@
         <div class="adminv2-nav">
     <button class="btn-nav {% if active_tab == 'grilla' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-grilla', this)">🗓️ Grilla</button>
     <button class="btn-nav" type="button" id="btnTurnoFijo">⭐ Turno fijo</button>
+    <a href="/turnos_fijos" class="btn-nav-link">🔁 Ver turnos fijos</a>
     <button class="btn-nav {% if active_tab == 'reservas' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-reservas', this)">📑 Reservas</button>
     <button class="btn-nav {% if active_tab == 'caja' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-caja', this)">💳 Caja</button>
     <button class="btn-nav {% if active_tab == 'reportes' %}activo{% endif %}" type="button" onclick="mostrarSeccion('seccion-reportes', this)">📈 Reportes</button>
@@ -120,7 +121,7 @@
                                 {% set metodo = reserva[8] %}
 {% set estado_pago = reserva[9] %}
 
-<div class="modulo modulo-turno
+<div class="modulo modulo-turno {% if reserva[12] == 1 %}turno-fijo{% endif %}
     {% if estado_pago in ['Pendiente reserva', 'Pendiente pago total'] %} pago-pendiente
     {% elif metodo == 'Efectivo' %} pago-efectivo
     {% elif metodo == 'Transferencia' %} pago-transferencia
@@ -754,3 +755,4 @@ document.getElementById("modal_duracion").addEventListener("change", calcularPre
 
 </body>
 </html>
+

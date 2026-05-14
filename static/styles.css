@@ -1188,3 +1188,14 @@ body.cliente-body {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+.turno-fijo{
+    background: linear-gradient(135deg, #b8860b, #ffd700);
+    border: 2px solid #fff3a0 !important;
+    color: #111 !important;
+}
+
+.turno-fijo .nombre-turno,
+.turno-fijo .hora-turno{
+    color: #111 !important;
+    font-weight: bold;
+}
