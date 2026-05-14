@@ -1389,7 +1389,8 @@ def editar(id):
         cursor.execute("""
             SELECT nombre, telefono, fecha, cancha, duracion, horario,
                    precio, metodo_pago, estado_pago, pagado,
-                   descuento, motivo_descuento, precio_final
+                   descuento, motivo_descuento, precio_final,
+                   es_fijo, grupo_fijo
             FROM reservas
             WHERE id = ?
         """, (id,))
@@ -1414,77 +1415,102 @@ def editar(id):
             conn.close()
             return "Ese horario ya está ocupado o bloqueado."
 
-        # Datos anteriores
-        estado_anterior = (reserva_actual[8] or "").strip()
         pagado_anterior = float(reserva_actual[9] or 0)
+        es_fijo = int(reserva_actual[13] or 0)
+        grupo_fijo = reserva_actual[14] or ""
 
         precio_original = float(calcular_precio(cursor, duracion, horario) or 0)
 
-        # Limitar descuento
         if descuento > precio_original:
             descuento = precio_original
 
-        # Nuevo total real del turno
         total_final = max(0.0, precio_original - descuento)
-
         sena_base = round(precio_original * 0.30, 2)
 
-        # =========================
-        # LOGICA DE PAGOS
-        # =========================
         if estado_pago_nuevo == "Reserva":
             pagado = sena_base
             estado_pago = "Reserva"
-
         elif estado_pago_nuevo == "Pendiente reserva":
             pagado = 0.0
             estado_pago = "Pendiente reserva"
-
         elif estado_pago_nuevo == "Pendiente pago total":
             pagado = pagado_anterior
             estado_pago = "Pendiente pago total"
-
         elif estado_pago_nuevo == "Pagado":
-            # Total pagado es el valor final del turno
             pagado = total_final
             estado_pago = "Pagado"
-
         else:
             pagado = pagado_anterior
             estado_pago = estado_pago_nuevo
 
-        # =========================
-        # GUARDAR RESERVA
-        # =========================
-        cursor.execute("""
-            UPDATE reservas
-            SET nombre = ?, telefono = ?, fecha = ?, cancha = ?, duracion = ?, horario = ?,
-                metodo_pago = ?, estado_pago = ?, precio = ?, pagado = ?, descuento = ?,
-                motivo_descuento = ?, precio_final = ?
-            WHERE id = ?
-        """, (
-            nombre,
-            telefono,
-            fecha,
-            cancha,
-            duracion,
-            horario,
-            metodo_pago,
-            estado_pago,
-            precio_original,
-            pagado,
-            descuento,
-            motivo_descuento,
-            total_final,
-            id
-        ))
+        # Si es turno fijo, actualiza todos los turnos del mismo grupo.
+        # No toca fecha, estado_pago ni pagado de los demás, para no afectar caja.
+        if es_fijo == 1 and grupo_fijo:
+            cursor.execute("""
+                UPDATE reservas
+                SET nombre = ?,
+                    telefono = ?,
+                    cancha = ?,
+                    duracion = ?,
+                    horario = ?,
+                    metodo_pago = ?,
+                    descuento = ?,
+                    motivo_descuento = ?,
+                    precio = ?,
+                    precio_final = ?
+                WHERE grupo_fijo = ?
+            """, (
+                nombre,
+                telefono,
+                cancha,
+                duracion,
+                horario,
+                metodo_pago,
+                descuento,
+                motivo_descuento,
+                precio_original,
+                total_final,
+                grupo_fijo
+            ))
 
-        # =========================
-        # IMPACTO EN CAJA
-        # =========================
+            # También actualiza el estado/pago solo del turno que estás editando
+            cursor.execute("""
+                UPDATE reservas
+                SET estado_pago = ?,
+                    pagado = ?
+                WHERE id = ?
+            """, (
+                estado_pago,
+                pagado,
+                id
+            ))
+
+        else:
+            cursor.execute("""
+                UPDATE reservas
+                SET nombre = ?, telefono = ?, fecha = ?, cancha = ?, duracion = ?, horario = ?,
+                    metodo_pago = ?, estado_pago = ?, precio = ?, pagado = ?, descuento = ?,
+                    motivo_descuento = ?, precio_final = ?
+                WHERE id = ?
+            """, (
+                nombre,
+                telefono,
+                fecha,
+                cancha,
+                duracion,
+                horario,
+                metodo_pago,
+                estado_pago,
+                precio_original,
+                pagado,
+                descuento,
+                motivo_descuento,
+                total_final,
+                id
+            ))
+
+        # Caja: solo impacta por diferencia de pago del turno editado
         fecha_mov = date.today().strftime("%Y-%m-%d")
-
-        # Diferencia real de dinero cobrado
         diferencia = round(pagado - pagado_anterior, 2)
 
         if diferencia > 0:
