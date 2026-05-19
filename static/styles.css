@@ -1199,3 +1199,14 @@ body.cliente-body {
     color: #111 !important;
     font-weight: bold;
 }
+
+.turno-fijo{
+    background: #d4af37 !important;
+    border: 2px solid #ffd700 !important;
+    color: #111 !important;
+}
+
+.turno-fijo *{
+    color: #111 !important;
+    font-weight: bold;
+}
